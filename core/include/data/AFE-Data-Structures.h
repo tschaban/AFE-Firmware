@@ -15,9 +15,11 @@
 #include <AFE-HOME-ASSISTANT-Structure.h>
 #endif
 
+#include <AFE-Global-Objects-structure.h>
 #include <AFE-NETWORK-Structure.h>
 #include <AFE-PASSWORD-Structure.h>
 #include <AFE-PRO-VERSION-Structure.h>
+
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-MCP23017-Structure.h>
@@ -65,7 +67,7 @@
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 #include <AFE-ADC-INPUT-Structure.h>
-#endif 
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 #include <AFE-AS3935-Sensor-Structure.h>
@@ -113,6 +115,10 @@
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
 #include <AFE-TSL2561-Sensor-Structure.h>
-#endif 
- 
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+#include <AFE-FS3000-Sensor-Structure.h>
+#endif
+
 #endif // _AFE_Data_Structures_h

@@ -27,8 +27,7 @@
 
 class AFEAsyncMQTTClient {
 
-private:
-  AsyncMqttClient *_Broker = new AsyncMqttClient();
+private:  
   char _DeviceName[33 + AFE_CONFIG_DEVICE_ID_SIZE + 1];
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -47,11 +46,14 @@ private:
 #endif
 
 public:
+  AsyncMqttClient *_Broker = new AsyncMqttClient();
   /**
-   * @brief set to true after connecting to MQTT Broker
+   * @brief set to true after connecting/disconnecting to MQTT Broker
    *
    */
   static boolean eventConnected;
+  static boolean eventDisconnected;
+
 
   /**
    * @brief is true when device is connected to MQTT broker
@@ -94,7 +96,15 @@ public:
    *
    * @return boolean
    */
-  boolean connected();
+  boolean connectedEvent();
+
+  /**
+   * @brief returns true if device disconnected to MQTT Broker
+   *
+   * @return boolean
+   */
+  boolean disconnectedEvent();
+
 
   /**
    * @brief publishes a message to MQTT Broker

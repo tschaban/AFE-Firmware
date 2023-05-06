@@ -3,10 +3,8 @@
 #ifndef _AFE_UPGRADER_h
 #define _AFE_UPGRADER_h
 
-
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
 #include <AFE-Defaults.h>
+#include <AFE-Firmware.h>
 
 #ifdef DEBUG
 #include <Streaming.h>
@@ -15,9 +13,7 @@
 class AFEUpgrader {
 
 private:
-  FIRMWARE FirmwareConfiguration;
-  AFEDataAccess *Data;
-  AFEDevice *Device;
+  AFEFirmware *Firmware;
 
   /* Upgrades configuration files structure after firmware type change */
   void upgradeFirmwarType();
@@ -27,6 +23,9 @@ private:
 
   /* Upgrades configuration files structure after firmware API Change */
   void updateFirmwareAPIVersion();
+
+  /* Perform post upgrade changes */
+  void upgrade();
 
 #ifndef AFE_ESP32
 
@@ -49,13 +48,10 @@ private:
 
 public:
   /* Constructor */
-  AFEUpgrader(AFEDataAccess *, AFEDevice *);
+  AFEUpgrader(AFEFirmware *);
 
   /* Checks if firmware has been upgraded */
-  boolean upgraded();
-
-  /* Perform post upgrade changes */
-  void upgrade();
+  void upgraded();
 };
 
 #endif

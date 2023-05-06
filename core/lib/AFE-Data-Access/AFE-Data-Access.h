@@ -7,7 +7,7 @@
 #include <AFE-Data-Structures.h>
 #include <ArduinoJson.h>
 #include <IPAddress.h>
-#include <arduino.h>
+#include <Arduino.h>
 
 #ifdef AFE_ESP32
 #include <LITTLEFS.h>
@@ -41,6 +41,8 @@ public:
   boolean fileExist(const char *path);
 
   void getConfiguration(DEVICE *);
+  void getDeviceID(char *id);
+
 #if defined(T0_CONFIG) &&                                                      \
     !defined(                                                                  \
         ESP32) // Version 2.0.0 - 2 Device configuration. Method used only to
@@ -54,6 +56,7 @@ public:
   void saveConfiguration(FIRMWARE *);
   void createFirmwareConfigurationFile();
   void saveFirmwareVersion(const char *);
+  void saveLatestFirmwareVersion(const char *);
   void saveFirmwareAPIVersion();
 
   void getConfiguration(NETWORK *);
@@ -263,11 +266,14 @@ public:
   void saveConfiguration(uint8_t id, CLED_EFFECT_FADE_INOUT *);
   void createCLEDEffectFadeInOutConfigurationFile();
 
+/* @TODO T5 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void createCLEDBacklightConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
+*/
+
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
@@ -281,5 +287,12 @@ public:
   void saveConfiguration(uint8_t id, MCP23XXX *);
   void createMCP23XXXConfigurationFile();
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  boolean getConfiguration(uint8_t id, FS3000_CONFIG *);
+  void saveConfiguration(uint8_t id, FS3000_CONFIG *);
+  void createFS3000SensorConfigurationFile();
+#endif
+
 };
 #endif // _AFE_Data_Access_h

@@ -6,12 +6,12 @@ AFEAPIHTTP::AFEAPIHTTP() {}
 
 /* Initializing class */
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *HTTPServer,
-                       AFEDataAccess *Data, AFEAPIMQTTDomoticz *MqttAPI,
+void AFEAPIHTTP::begin(AFEFirmware *Firmware, AFEHardware *Hardware,
+                       AFEWebServer *HTTPServer, AFEAPIMQTTDomoticz *MqttAPI,
                        AFEAPIHTTPDomoticz *HttpDomoticzAPI) {
-  _Device = Device;
-  if (_Device->configuration.api.http) {
-    _Data = Data;
+  _Firmware = Firmware;
+  if (_Firmware->Device->configuration.api.http) {
+    _Hardware = Hardware;
     _HTTP = HTTPServer;
     _MqttAPI = MqttAPI;
     _HttpAPIDomoticz = HttpDomoticzAPI;
@@ -19,11 +19,11 @@ void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *HTTPServer,
   }
 }
 #else
-void AFEAPIHTTP::begin(AFEDevice *Device, AFEWebServer *HTTPServer,
-                       AFEDataAccess *Data, AFEAPIMQTTStandard *MqttAPI) {
-  _Device = Device;
-  if (_Device->configuration.api.http) {
-    _Data = Data;
+void AFEAPIHTTP::begin(AFEFirmware *Firmware, AFEHardware *Hardware,
+                       AFEWebServer *HTTPServer, AFEAPIMQTTStandard *MqttAPI) {
+  _Firmware = Firmware;
+  if (_Firmware->Device->configuration.api.http) {
+    _Hardware = Hardware;
     _HTTP = HTTPServer;
     _MqttAPI = MqttAPI;
     enabled = true;
@@ -237,19 +237,27 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
     processCLEDEffect(request, AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING);
   }
 #endif // AFE_CONFIG_HARDWARE_CLED
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  else if (strcmp(request->device, AFE_CONFIG_HTTP_DEVICE_FS3000) == 0) {
+#ifdef DEBUG
+    Serial << endl << F("INFO: Processing FS3000 requests");
+#endif
+    processFS3000(request);
+  }
+#endif // AFE_CONFIG_HARDWARE_TSL2561
 
   /* Checking if reboot command */
   else if (strcmp(request->command, AFE_CONFIG_HTTP_COMMAND_REBOOT) == 0) {
     send(request, true);
-    _Device->reboot(_Device->getMode());
+    _Firmware->Device->reboot(_Firmware->Device->getMode());
     /* Checking if configurationMode commad */
   } else if (strcmp(request->command,
                     AFE_CONFIG_HTTP_COMMAND_CONFIGURATION_MODE) == 0) {
     PASSWORD password;
-    _Data->getConfiguration(&password);
+    _Firmware->API->Flash->getConfiguration(&password);
     if (!password.protect) {
       send(request, true);
-      _Device->reboot(AFE_MODE_CONFIGURATION);
+      _Firmware->Device->reboot(AFE_MODE_CONFIGURATION);
     } else {
       send(request, false, L_PASWORD_PROTECTED);
     }
@@ -263,49 +271,46 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-/* Adding pointer to the Relay class */
-void AFEAPIHTTP::addClass(AFERelay *Relay) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
-    _Relay[i] = Relay + i;
-  }
-}
 
 /* Processing relay requests */
 void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
   boolean _relayStateUpdated = false;
-  for (uint8_t i = 0; i < _Device->configuration.noOfRelays; i++) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfRelays; i++) {
 #ifdef AFE_CONFIG_HARDWARE_GATE
     /* For the Relay assigned to a gate code below is not needed for execution
      */
-    if (_Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (_Hardware->Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
 #endif
-      if (strcmp(request->name, _Relay[i]->configuration->name) == 0) {
+      if (strcmp(request->name, _Hardware->Relay[i]->configuration->name) ==
+          0) {
         deviceNotExist = false;
         /* Checking if command: on */
         if (strcmp(request->command, "on") == 0) {
-          _Relay[i]->on();
-          sendOnOffStatus(request, _Relay[i]->get() == AFE_RELAY_ON,
-                          _Relay[i]->get() == AFE_RELAY_ON ? AFE_ON : AFE_OFF);
+          _Hardware->Relay[i]->on();
+          sendOnOffStatus(request, _Hardware->Relay[i]->get() == AFE_RELAY_ON,
+                          _Hardware->Relay[i]->get() == AFE_RELAY_ON ? AFE_ON
+                                                                     : AFE_OFF);
 
           _relayStateUpdated = true;
           /* Checking if command: off */
         } else if (strcmp(request->command, "off") == 0) {
-          _Relay[i]->off();
-          sendOnOffStatus(request, _Relay[i]->get() == AFE_RELAY_OFF,
-                          _Relay[i]->get());
+          _Hardware->Relay[i]->off();
+          sendOnOffStatus(request, _Hardware->Relay[i]->get() == AFE_RELAY_OFF,
+                          _Hardware->Relay[i]->get());
           _relayStateUpdated = true;
 
           /* Checking if command: toggle */
         } else if (strcmp(request->command, "toggle") == 0) {
-          uint8_t state = _Relay[i]->get();
-          _Relay[i]->toggle();
-          sendOnOffStatus(request, state != _Relay[i]->get(), _Relay[i]->get());
+          uint8_t state = _Hardware->Relay[i]->get();
+          _Hardware->Relay[i]->toggle();
+          sendOnOffStatus(request, state != _Hardware->Relay[i]->get(),
+                          _Hardware->Relay[i]->get());
           _relayStateUpdated = true;
 
           /* Checking if command: get */
         } else if (strcmp(request->command, "get") == 0) {
-          sendOnOffStatus(request, true, _Relay[i]->get());
+          sendOnOffStatus(request, true, _Hardware->Relay[i]->get());
           _relayStateUpdated = false;
 
 /* Command not implemented.Info */
@@ -372,7 +377,8 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
     else {
       Serial << endl
              << F("Excluding relay: ") << i
-             << F(" as it's assigned to a Gate: ") << _Relay[i]->gateId;
+             << F(" as it's assigned to a Gate: ")
+             << _Hardware->Relay[i]->gateId;
     }
 #endif
 #endif
@@ -386,27 +392,18 @@ void AFEAPIHTTP::processRelay(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-/* Adding pointer to ADC class */
-void AFEAPIHTTP::addClass(AFEAnalogInput *Analog) {
-#ifdef AFE_ESP32
-  for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
-    _AnalogInput[i] = Analog + i;
-  }
-#else // ESP8266
-  _AnalogInput = Analog;
-#endif
-}
-
 /* Processing ADC Input request */
 void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
 #ifdef AFE_ESP32
   boolean deviceNotExist = true;
-  for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
-    if (strcmp(request->name, _AnalogInput[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfAnalogInputs;
+       i++) {
+    if (strcmp(request->name, _Hardware->AnalogInput[i]->configuration->name) ==
+        0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
-        _AnalogInput[i]->getJSON(json);
+        _Hardware->AnalogInput[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -419,7 +416,7 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
 #else  // ESP8266
   if (strcmp(request->command, "get") == 0) {
     char json[AFE_CONFIG_API_JSON_ADC_DATA_LENGTH];
-    _AnalogInput->getJSON(json);
+    _Hardware->AnalogInput->getJSON(json);
     send(request, true, json);
   } else {
     send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -432,12 +429,14 @@ void AFEAPIHTTP::processAnalogInput(HTTPCOMMAND *request) {
 void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
 #ifdef AFE_ESP32
   boolean deviceNotExist = true;
-  for (uint8_t i = 0; i < _Device->configuration.noOfAnalogInputs; i++) {
-    if (strcmp(request->name, _AnalogInput[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfAnalogInputs;
+       i++) {
+    if (strcmp(request->name, _Hardware->AnalogInput[i]->configuration->name) ==
+        0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
-        _AnalogInput[i]->getBatteryMeterJSON(json);
+        _Hardware->AnalogInput[i]->getBatteryMeterJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -450,7 +449,7 @@ void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
 #else // ESP8266
   if (strcmp(request->command, "get") == 0) {
     char json[AFE_CONFIG_API_JSON_BATTERYMETER_DATA_LENGTH];
-    _AnalogInput->getBatteryMeterJSON(json);
+    _Hardware->AnalogInput->getBatteryMeterJSON(json);
     send(request, true, json);
   } else {
     send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -460,20 +459,16 @@ void AFEAPIHTTP::processBatteryMeter(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-void AFEAPIHTTP::addClass(AFESensorBMEX80 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
-    _BMx80Sensor[i] = Sensor + i;
-  }
-}
 
 void AFEAPIHTTP::processBMEX80(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
-  for (uint8_t i = 0; i < _Device->configuration.noOfBMEX80s; i++) {
-    if (strcmp(request->name, _BMx80Sensor[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfBMEX80s; i++) {
+    if (strcmp(request->name,
+               _Hardware->BMEX80Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BMEX80_DATA_LENGTH];
-        _BMx80Sensor[i]->getJSON(json);
+        _Hardware->BMEX80Sensor[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -487,20 +482,16 @@ void AFEAPIHTTP::processBMEX80(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEAPIHTTP::addClass(AFESensorBH1750 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
-    _BH1750Sensor[i] = Sensor + i;
-  }
-}
 void AFEAPIHTTP::processBH1750(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfBH1750s; i++) {
-    if (strcmp(request->name, _BH1750Sensor[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfBH1750s; i++) {
+    if (strcmp(request->name,
+               _Hardware->BH1750Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BH1750_DATA_LENGTH];
-        _BH1750Sensor[i]->getJSON(json);
+        _Hardware->BH1750Sensor[i]->getJSON(json);
 
         send(request, true, json);
       } else {
@@ -515,20 +506,16 @@ void AFEAPIHTTP::processBH1750(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-void AFEAPIHTTP::addClass(AFESensorTSL2561 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
-    _TSL2561Sensor[i] = Sensor + i;
-  }
-}
 void AFEAPIHTTP::processTSL2561(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfTSL2561s; i++) {
-    if (strcmp(request->name, _TSL2561Sensor[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfTSL2561s; i++) {
+    if (strcmp(request->name,
+               _Hardware->TSL2561Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_TSL2561_DATA_LENGTH];
-        _TSL2561Sensor[i]->getJSON(json);
+        _Hardware->TSL2561Sensor[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -542,19 +529,16 @@ void AFEAPIHTTP::processTSL2561(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-void AFEAPIHTTP::addClass(AFESensorHPMA115S0 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
-    _HPMA115S0Sensor[i] = Sensor + i;
-  }
-}
 void AFEAPIHTTP::processHPMA115S0(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
-  for (uint8_t i = 0; i < _Device->configuration.noOfHPMA115S0s; i++) {
-    if (strcmp(request->name, _HPMA115S0Sensor[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfHPMA115S0s;
+       i++) {
+    if (strcmp(request->name,
+               _Hardware->HPMA115S0Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_HPMA115S0_DATA_LENGTH];
-        _HPMA115S0Sensor[i]->getJSON(json);
+        _Hardware->HPMA115S0Sensor[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -568,20 +552,17 @@ void AFEAPIHTTP::processHPMA115S0(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-void AFEAPIHTTP::addClass(AFESensorAS3935 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
-    _AS3935Sensor[i] = Sensor + i;
-  }
-}
+
 void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
-  for (uint8_t i = 0; i < _Device->configuration.noOfAS3935s; i++) {
-    if (strcmp(request->name, _AS3935Sensor[i]->configuration.name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfAS3935s; i++) {
+    if (strcmp(request->name,
+               _Hardware->AS3935Sensornsor[i]->configuration.name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_AS3935_DATA_LENGTH]; // @TODO check the
                                                            // size
-        _AS3935Sensor[i]->getJSON(json);
+        _Hardware->AS3935Sensornsor[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -597,16 +578,10 @@ void AFEAPIHTTP::processAS3935(HTTPCOMMAND *request) {
 
 /* Processing Anemometer Input request */
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-
-/* Adding pointer to Anemometer class */
-void AFEAPIHTTP::addClass(AFEAnemometer *AnemometerSensor) {
-  _AnemometerSensor = AnemometerSensor;
-}
-
 void AFEAPIHTTP::processAnemometerSensor(HTTPCOMMAND *request) {
   if (strcmp(request->command, "get") == 0) {
     char json[AFE_CONFIG_API_JSON_ANEMOMETER_DATA_LENGTH];
-    _AnemometerSensor->getJSON(json);
+    _Hardware->AnemometerSensor->getJSON(json);
     send(request, true, json);
   } else {
     send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -616,15 +591,10 @@ void AFEAPIHTTP::processAnemometerSensor(HTTPCOMMAND *request) {
 
 /* Processing Rain Input request */
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-/* Adding pointer to Rainclass */
-void AFEAPIHTTP::addClass(AFERainmeter *RainmeterSensor) {
-  _RainmeterSensor = RainmeterSensor;
-}
-
 void AFEAPIHTTP::processRainSensor(HTTPCOMMAND *request) {
   if (strcmp(request->command, "get") == 0) {
     char json[AFE_CONFIG_API_JSON_RAINMETER_DATA_LENGTH];
-    _RainmeterSensor->getJSON(json);
+    _Hardware->RainmeterSensor->getJSON(json);
     send(request, true, json);
   } else {
     send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -633,27 +603,22 @@ void AFEAPIHTTP::processRainSensor(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-void AFEAPIHTTP::addClass(AFEGate *Item) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    _Gate[i] = Item + i;
-  }
-}
 void AFEAPIHTTP::processGate(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
-  for (uint8_t i = 0; i < _Device->configuration.noOfGates; i++) {
-    if (strcmp(request->name, _Gate[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfGates; i++) {
+    if (strcmp(request->name, _Hardware->Gate[i]->configuration->name) == 0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_GATE_DATA_LENGTH];
       if (strcmp(request->command, "toggle") == 0) {
-        _Gate[i]->toggle();
+        _Hardware->Gate[i]->toggle();
         _MqttAPI->publishGateState(i);
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
         _HttpAPIDomoticz->publishGateState(i);
 #endif
-        _Gate[i]->getJSON(json);
+        _Hardware->Gate[i]->getJSON(json);
         send(request, true, json);
       } else if (strcmp(request->command, "get") == 0) {
-        _Gate[i]->getJSON(json);
+        _Hardware->Gate[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -667,19 +632,17 @@ void AFEAPIHTTP::processGate(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFEAPIHTTP::addClass(AFEContactron *Item) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    _Contactron[i] = Item + i;
-  }
-}
+
 void AFEAPIHTTP::processContactron(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
-  for (uint8_t i = 0; i < _Device->configuration.noOfContactrons; i++) {
-    if (strcmp(request->name, _Contactron[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfContactrons;
+       i++) {
+    if (strcmp(request->name, _Hardware->Contactron[i]->configuration->name) ==
+        0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_CONTACTRON_DATA_LENGTH];
-        _Contactron[i]->getJSON(json);
+        _Hardware->Contactron[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -693,20 +656,16 @@ void AFEAPIHTTP::processContactron(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-void AFEAPIHTTP::addClass(AFESensorDS18B20 *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
-    _DS18B20Sensor[i] = Sensor + i;
-  }
-}
 void AFEAPIHTTP::processDS18B20(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfDS18B20s; i++) {
-    if (strcmp(request->name, _DS18B20Sensor[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfDS18B20s; i++) {
+    if (strcmp(request->name,
+               _Hardware->DS18B20Sensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_DS18B20_DATA_LENGTH];
-        _DS18B20Sensor[i]->getJSON(json);
+        _Hardware->DS18B20Sensor[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -720,27 +679,25 @@ void AFEAPIHTTP::processDS18B20(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-void AFEAPIHTTP::addClass(AFERegulator *Regulator) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    _Regulator[i] = Regulator + i;
-  }
-}
+
 void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfRegulators; i++) {
-    if (strcmp(request->name, _Regulator[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfRegulators;
+       i++) {
+    if (strcmp(request->name, _Hardware->Regulator[i]->configuration->name) ==
+        0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_REGULATOR_DATA_LENGTH];
       boolean sendJSON = true;
       if (strcmp(request->command, "get") == 0) {
         yield(); // JSON is sent (code below)
       } else if (strcmp(request->command, "on") == 0) {
-        _Regulator[i]->on();
+        _Hardware->Regulator[i]->on();
       } else if (strcmp(request->command, "off") == 0) {
-        _Regulator[i]->off();
+        _Hardware->Regulator[i]->off();
       } else if (strcmp(request->command, "toggle") == 0) {
-        _Regulator[i]->toggle();
+        _Hardware->Regulator[i]->toggle();
       } else {
         sendJSON = false;
       }
@@ -753,7 +710,7 @@ void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
           }
 #endif
         }
-        _Regulator[i]->getJSON(json);
+        _Hardware->Regulator[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -767,27 +724,24 @@ void AFEAPIHTTP::processRegulator(HTTPCOMMAND *request) {
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-void AFEAPIHTTP::addClass(AFEThermalProtector *Protector) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    _ThermalProtector[i] = Protector + i;
-  }
-}
 void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfThermalProtectors; i++) {
-    if (strcmp(request->name, _ThermalProtector[i]->configuration->name) == 0) {
+  for (uint8_t i = 0;
+       i < _Firmware->Device->configuration.noOfThermalProtectors; i++) {
+    if (strcmp(request->name,
+               _Hardware->ThermalProtector[i]->configuration->name) == 0) {
       deviceNotExist = false;
       char json[AFE_CONFIG_API_JSON_THERMAL_PROTECTOR_DATA_LENGTH];
       boolean sendJSON = true;
       if (strcmp(request->command, "get") == 0) {
         yield(); // JSON is sent (code below)
       } else if (strcmp(request->command, "on") == 0) {
-        _ThermalProtector[i]->on();
+        _Hardware->ThermalProtector[i]->on();
       } else if (strcmp(request->command, "off") == 0) {
-        _ThermalProtector[i]->off();
+        _Hardware->ThermalProtector[i]->off();
       } else if (strcmp(request->command, "toggle") == 0) {
-        _ThermalProtector[i]->toggle();
+        _Hardware->ThermalProtector[i]->toggle();
       } else {
         sendJSON = false;
       }
@@ -800,7 +754,7 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
           }
 #endif
         }
-        _ThermalProtector[i]->getJSON(json);
+        _Hardware->ThermalProtector[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -814,20 +768,16 @@ void AFEAPIHTTP::processThermalProtector(HTTPCOMMAND *request) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEAPIHTTP::addClass(AFESensorDHT *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    _DHTSensor[i] = Sensor + i;
-  }
-}
 void AFEAPIHTTP::processDHT(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfDHTs; i++) {
-    if (strcmp(request->name, _DHTSensor[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfDHTs; i++) {
+    if (strcmp(request->name, _Hardware->DHTSensor[i]->configuration->name) ==
+        0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_DHT_DATA_LENGTH];
-        _DHTSensor[i]->getJSON(json);
+        _Hardware->DHTSensor[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -841,20 +791,18 @@ void AFEAPIHTTP::processDHT(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEAPIHTTP::addClass(AFESensorBinary *Sensor) {
-  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
-    _BinarySensor[i] = Sensor + i;
-  }
-}
+
 void AFEAPIHTTP::processBinarySensor(HTTPCOMMAND *request) {
   boolean deviceNotExist = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfBinarySensors; i++) {
-    if (strcmp(request->name, _BinarySensor[i]->configuration->name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfBinarySensors;
+       i++) {
+    if (strcmp(request->name,
+               _Hardware->BinarySensor[i]->configuration->name) == 0) {
       deviceNotExist = false;
       if (strcmp(request->command, "get") == 0) {
         char json[AFE_CONFIG_API_JSON_BINARY_SENSOR_DATA_LENGTH];
-        _BinarySensor[i]->getJSON(json);
+        _Hardware->BinarySensor[i]->getJSON(json);
         send(request, true, json);
       } else {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
@@ -869,8 +817,6 @@ void AFEAPIHTTP::processBinarySensor(HTTPCOMMAND *request) {
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-/* Adding pointer to the Relay class */
-void AFEAPIHTTP::addClass(AFECLED *CLED) { _CLED = CLED; }
 
 /* Processing CLED requests */
 void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
@@ -878,19 +824,20 @@ void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
   boolean _stateUpdated = true;
   boolean _sendStatus = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
-    if (strcmp(request->name, _CLED->configuration[i].name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfCLEDs; i++) {
+    if (strcmp(request->name, _Hardware->RGBLEDStrip->configuration[i].name) ==
+        0) {
       deviceNotExist = false;
       _stateUpdated = true;
       /* Checking if command: on */
       if (strcmp(request->command, "on") == 0) {
-        _CLED->on(i, true);
+        _Hardware->RGBLEDStrip->on(i, true);
         /* Checking if command: off */
       } else if (strcmp(request->command, "off") == 0) {
-        _CLED->off(i, true);
+        _Hardware->RGBLEDStrip->off(i, true);
         /* Checking if command: toggle */
       } else if (strcmp(request->command, "toggle") == 0) {
-        _CLED->toggle(i, true);
+        _Hardware->RGBLEDStrip->toggle(i, true);
         /* Checking if command: get */
       } else if (strcmp(request->command, "get") == 0) {
         _stateUpdated = false;
@@ -899,11 +846,12 @@ void AFEAPIHTTP::processCLED(HTTPCOMMAND *request) {
         send(request, false, L_COMMAND_NOT_IMPLEMENTED);
       }
       if (_sendStatus) {
-        sendOnOffStatus(request, true,
-                        _CLED->currentState[i].state ? AFE_ON : AFE_OFF);
+        sendOnOffStatus(
+            request, true,
+            _Hardware->RGBLEDStrip->currentState[i].state ? AFE_ON : AFE_OFF);
         if (_stateUpdated) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-          if (_CLED->isEffectStateUpdated(i)) {
+          if (_Hardware->RGBLEDStrip->isEffectStateUpdated(i)) {
             //_MqttAPI->publishCLEDEffectsState(id);
             //   _HttpAPIDomoticz->publishCLEDEffectState(i);
           }
@@ -925,21 +873,24 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
   boolean _stateUpdated = true;
   boolean _sendStatus = true;
 
-  for (uint8_t i = 0; i < _Device->configuration.noOfCLEDs; i++) {
-    if (strcmp(request->name,
-               effectId == AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING
-                   ? _CLED->configurationEffectBlinking[i].name
-                   : effectId == AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT
-                         ? _CLED->configurationEffectFadeInOut[i].name
-                         : _CLED->configurationEffectWave[i].name) == 0) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfCLEDs; i++) {
+    if (strcmp(
+            request->name,
+            effectId == AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING
+                ? _Hardware->RGBLEDStrip->configurationEffectBlinking[i].name
+                : effectId == AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT
+                      ? _Hardware->RGBLEDStrip->configurationEffectFadeInOut[i]
+                            .name
+                      : _Hardware->RGBLEDStrip->configurationEffectWave[i]
+                            .name) == 0) {
       deviceNotExist = false;
       _stateUpdated = true;
       /* Checking if command: on */
       if (strcmp(request->command, "on") == 0) {
-        _CLED->activateEffect(i, effectId);
+        _Hardware->RGBLEDStrip->activateEffect(i, effectId);
         /* Checking if command: off */
       } else if (strcmp(request->command, "off") == 0) {
-        _CLED->deactivateEffect(i, effectId);
+        _Hardware->RGBLEDStrip->deactivateEffect(i, effectId);
         /* Checking if command: get */
       } else if (strcmp(request->command, "get") == 0) {
         _stateUpdated = false;
@@ -949,12 +900,14 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
       }
       if (_sendStatus) {
         sendOnOffStatus(request, true,
-                        _CLED->currentState[i].effect.id == effectId ? AFE_ON
-                                                                     : AFE_OFF);
+                        _Hardware->RGBLEDStrip->currentState[i].effect.id ==
+                                effectId
+                            ? AFE_ON
+                            : AFE_OFF);
         if (_stateUpdated) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
           // publishCLEDStates(i, strcmp(request->source, "domoticz") == 0);
-          if (_CLED->isStateUpdated(i)) {
+          if (_Hardware->RGBLEDStrip->isStateUpdated(i)) {
             //    _HttpAPIDomoticz->publishCLEDState(i);
           }
 #else
@@ -972,7 +925,7 @@ void AFEAPIHTTP::processCLEDEffect(HTTPCOMMAND *request, uint8_t effectId) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
-  if (_CLED->isStateUpdated(id)) {
+  if (_Hardware->RGBLEDStrip->isStateUpdated(id)) {
     _MqttAPI->publishCLEDState(id);
 
     /* RGB LED are not supported in HTTP Domoticz API
@@ -981,7 +934,7 @@ void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
         }
     */
   }
-  if (_CLED->isEffectStateUpdated(id)) {
+  if (_Hardware->RGBLEDStrip->isEffectStateUpdated(id)) {
     _MqttAPI->publishCLEDEffectsState(id);
     /* RGB LED are not supported in HTTP Domoticz API
     if (!fromDomoticz) {
@@ -992,16 +945,39 @@ void AFEAPIHTTP::publishCLEDStates(uint8_t id, boolean fromDomoticz) {
 }
 #else
 void AFEAPIHTTP::publishCLEDStates(uint8_t id) {
-  if (_CLED->isStateUpdated(id)) {
+  if (_Hardware->RGBLEDStrip->isStateUpdated(id)) {
     _MqttAPI->publishCLEDState(id);
   }
-  if (_CLED->isEffectStateUpdated(id)) {
+  if (_Hardware->RGBLEDStrip->isEffectStateUpdated(id)) {
     _MqttAPI->publishCLEDEffectsState(id);
   }
 }
 #endif
 
 #endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+void AFEAPIHTTP::processFS3000(HTTPCOMMAND *request) {
+  boolean deviceNotExist = true;
+
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfFS3000s; i++) {
+    if (strcmp(request->name,
+               _Hardware->FS3000Sensor[i]->configuration->name) == 0) {
+      deviceNotExist = false;
+      if (strcmp(request->command, "get") == 0) {
+        char json[AFE_CONFIG_API_JSON_FS3000_DATA_LENGTH];
+        _Hardware->FS3000Sensor[i]->getJSON(json);
+        send(request, true, json);
+      } else {
+        send(request, false, L_COMMAND_NOT_IMPLEMENTED);
+      }
+    }
+  }
+  if (deviceNotExist) {
+    send(request, false, L_DEVICE_NOT_EXIST);
+  }
+}
+#endif // AFE_CONFIG_HARDWARE_FS3000
 
 #if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_CLED)
 void AFEAPIHTTP::sendOnOffStatus(HTTPCOMMAND *request, boolean status,

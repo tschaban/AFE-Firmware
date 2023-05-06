@@ -27,7 +27,6 @@ private:
   AFEDevice *Device;
   NETWORK configuration;
   unsigned long delayStartTime = 0;
-  uint8_t WiFiMode;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   unsigned long ledStartTime = 0;
@@ -56,7 +55,7 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
-  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);
+  void begin(AFEDevice *, AFEDataAccess *);
 #endif // AFE_CONFIG_HARDWARE_LED
 
   /**
@@ -119,25 +118,23 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_LED
   /**
    * @brief Sets connection parameters and host name. Must be invoked before
-   * connect
-   * method
+   * connect method
    *
-   * @param  mode             desc
+   * @param
    */
-  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *, AFELED *);
+  void begin(AFEDevice *, AFEDataAccess *, AFELED *);
 #else
   /**
    * @brief Sets connection parameters and host name. Must be invoked before
-   * connect
-   * method
+   * connect method
    *
-   * @param  mode             desc
+   * @param
    */
-  void begin(uint8_t mode, AFEDevice *, AFEDataAccess *);
+  void begin(AFEDevice *, AFEDataAccess *);
 #endif // AFE_CONFIG_HARDWARE_LED
 
   /**
-   * @brief Return TRUE if device is connected to WiFi Acces Point
+   * @brief Return TRUE if device is connected to WiFi Access Point
    *
    * @return boolean
    */
@@ -195,7 +192,6 @@ public:
   static void
   onWiFiAPStationConnected(const WiFiEventSoftAPModeStationConnected &event);
 #endif
-
 
 #endif
 };

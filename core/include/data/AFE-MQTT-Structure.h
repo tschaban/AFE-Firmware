@@ -4,7 +4,7 @@
 #define _AFE_MQTT_Structure_h
 
 #include <AFE-Configuration.h>
-#include <arduino.h>
+#include <Arduino.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
@@ -26,11 +26,12 @@ struct MQTT_MESSAGE {
 };
 */
 
-#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
+
 struct MQTT_TOPIC {
   char topic[AFE_CONFIG_MQTT_TOPIC_LENGTH];
 };
 
+#if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
 struct MQTT_CMD_TOPIC {
   char topic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
 };
@@ -46,8 +47,9 @@ struct MQTT {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG lwt;
 #else
-  MQTT_TOPIC lwt;
+  MQTT_TOPIC lwt;  
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
+  MQTT_TOPIC status;
   uint16_t timeout;
   boolean retainLWT;
   boolean retainAll;

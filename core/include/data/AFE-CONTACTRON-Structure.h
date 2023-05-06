@@ -5,7 +5,7 @@
 
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-#include <arduino.h>
+#include <Arduino.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>
@@ -19,7 +19,7 @@ struct CONTACTRON {
   uint8_t ledID;
 #endif
   uint16_t bouncing = AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_BOUNCING;
-  char name[17];
+  char name[33];
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   DOMOTICZ_BASIC_CONFIG domoticz;
 #else

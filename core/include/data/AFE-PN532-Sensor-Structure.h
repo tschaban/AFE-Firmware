@@ -3,7 +3,7 @@
 #ifndef _AFE_PN532_Structure_h
 #define _AFE_PN532_Structure_h
 
-#include <arduino.h>
+#include <Arduino.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 #include <AFE-DOMOTICZ-Structure.h>

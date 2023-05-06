@@ -3,6 +3,7 @@
 #include "AFE-ASYNC-MQTT.h"
 
 boolean AFEAsyncMQTTClient::eventConnected = false;
+boolean AFEAsyncMQTTClient::eventDisconnected = false;
 boolean AFEAsyncMQTTClient::isConnected = false;
 
 MQTT_MESSAGE
@@ -32,8 +33,9 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Broker->onUnsubscribe(AFEAsyncMQTTClient::onMqttUnsubscribe);
   _Broker->onPublish(AFEAsyncMQTTClient::onMqttPublish);
 #endif
-
-  sprintf(_DeviceName, "%s-%s", Device->configuration.name, Device->deviceId);
+  char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
+  Data->getDeviceID(_deviceId);
+  sprintf(_DeviceName, "%s-%s", Device->configuration.name, _deviceId);
 
   _Broker->setClientId(_DeviceName);
   _Broker->setMaxTopicLength(AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH);
@@ -78,13 +80,14 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
 #ifdef DEBUG
   Serial << endl
          << F("INFO: MQTT Configuration") << endl
-         << F("INFO: Host: ") << configuration->host << endl
-         << F("INFO: IP: ") << configuration->ip << endl
-         << F("INFO: Port: ") << configuration->port << endl
+         << F(" : Device ID: ") << _DeviceName << endl
+         << F(" : Host: ") << configuration->host << endl
+         << F(" : IP: ") << configuration->ip << endl
+         << F(" : Port: ") << configuration->port << endl
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-         << F("INFO: LWT IDX: ") << configuration->lwt.idx;
+         << F(" : LWT IDX: ") << configuration->lwt.idx;
 #else
-         << F("INFO: LWT Topic: ") << configuration->lwt.topic;
+         << F(" : LWT Topic: ") << configuration->lwt.topic;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 #endif
   return _isConfigured;
@@ -130,11 +133,20 @@ boolean AFEAsyncMQTTClient::listener() {
   return _ret;
 }
 
-boolean AFEAsyncMQTTClient::connected() {
+boolean AFEAsyncMQTTClient::connectedEvent() {
   boolean returnValue = AFEAsyncMQTTClient::eventConnected;
   if (returnValue) {
     publishConnected();
     AFEAsyncMQTTClient::eventConnected = false;
+  }
+  return returnValue;
+}
+
+boolean AFEAsyncMQTTClient::disconnectedEvent() {
+  boolean returnValue = AFEAsyncMQTTClient::eventDisconnected;
+  if (returnValue) {
+    AFEAsyncMQTTClient::eventDisconnected = false;
+    _Broker->disconnect(true);
   }
   return returnValue;
 }
@@ -227,8 +239,9 @@ void AFEAsyncMQTTClient::onMqttConnect(bool sessionPresent) {
 #ifdef DEBUG
   Serial << endl << F("INFO: MQTT: Connected to MQTT Broker");
 #endif
-  AFEAsyncMQTTClient::eventConnected = true;
   AFEAsyncMQTTClient::isConnected = true;
+  AFEAsyncMQTTClient::eventConnected = true;
+  AFEAsyncMQTTClient::eventDisconnected = false;
 }
 
 void AFEAsyncMQTTClient::onMqttDisconnect(
@@ -236,7 +249,7 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
 
   if (AFEAsyncMQTTClient::isConnected) {
 #ifdef DEBUG
-    Serial << endl << F("ERROR: MQTT: Problem connecting to MQTT Broker : ");
+    Serial << endl << F("WARN: MQTT: Disconnected from MQTT Broker : ");
 
     switch ((uint8_t)reason) {
     case 0:
@@ -266,6 +279,8 @@ void AFEAsyncMQTTClient::onMqttDisconnect(
     }
 #endif
     AFEAsyncMQTTClient::isConnected = false;
+    AFEAsyncMQTTClient::eventConnected = false;
+    AFEAsyncMQTTClient::eventDisconnected = true;
   }
 }
 
@@ -364,13 +379,9 @@ void AFEAsyncMQTTClient::onMqttMessage(
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Domoticz command: ") << F(" : IDX: ") << endl
-           << AFEAsyncMQTTClient::messagesBuffer
-                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
-                      .command.domoticz.idx
+           << AFEAsyncMQTTClient::messagesBuffer[AFEAsyncMQTTClient::numberOfMessagesInBuffer].command.domoticz.idx
            << F(" : NValue: ") << endl
-           << AFEAsyncMQTTClient::messagesBuffer
-                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
-                      .command.nvalue
+           << AFEAsyncMQTTClient::messagesBuffer[AFEAsyncMQTTClient::numberOfMessagesInBuffer].command.nvalue
            << F(" : SValue: ")
            << AFEAsyncMQTTClient::messagesBuffer
                   [AFEAsyncMQTTClient::numberOfMessagesInBuffer]

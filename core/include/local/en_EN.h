@@ -13,6 +13,8 @@
 #define L_FIRMWARE_NAME "for Shelly-1"
 #elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "for Sonoff Basic"
+#elif defined(AFE_DEVICE_SONOFF_MINI_R4)
+#define L_FIRMWARE_NAME "Sonoff Mini Extreme R4"
 #elif defined(T0_CONFIG)
 #define L_FIRMWARE_NAME "Basic version"
 #elif defined(T1_CONFIG)
@@ -34,8 +36,11 @@
 #define L_COMMAND_NOT_IMPLEMENTED "\"Command is not implemented\""
 #define L_404 "AFE FIRMWARE: Error 404: Page doesn't exist"
 #define L_COMMNAD_NO_COMMAND "\"No command\""
-
 #define L_DONATE "<small>&#128077; Like it? Consider supporting hundreds of hours spent on it by me. thx. adrian</small>"
+
+
+/* JSON RPC API */
+#define L_JSON_RPC_API "Unstable connection to the AFE Firmware server. There is no possibility to check and update the firmware over the Internet and to activate AFE Pro"
 
 /* Menu */
 #define L_USED "used in"
@@ -86,6 +91,7 @@
 #define L_NO "No"
 #define L_SENSOR "Sensor"
 #define L_DISTANCE_UNIT "Distance unit"
+#define L_MILIMETERS "Millimeters"
 #define L_CM "Centimeter"
 #define L_M "Meter"
 #define L_KM "Kilometers"
@@ -138,6 +144,7 @@
 #define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Number of TSL2561's sensors"  
 #define L_DEVICE_NUMBER_OF_ADC "Number of ADC inputs"
 #define L_DEVICE_NUMBER_OF_MCP23XXX "Number of MCP23xxx extensions"
+#define L_DEVICE_NUMBER_OF_FS3000_SENSORS "Number of FS3000"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Additional functionalities"
 #define L_DEVICE_DO_MEASURE_ADC "Measurements from Analog Input"
@@ -147,7 +154,7 @@
 #define L_DEVICE_DOMOTICZ_VERSION_410 "4.10x or older"
 #define L_DEVICE_DOMOTICZ_VERSION_2020 "2020.x or newer"
 #define L_DEVICE_AUTOLOGOUT_TITLE "Automatic logout form the configuration panel"
-#define L_DEVICE_AUTOLOGOUT_DESCRIPTION "Device configuration will be automatically closed after 10min. of idle time in the configuration panel"
+#define L_DEVICE_AUTOLOGOUT_DESCRIPTION "Device configuration will be automatically closed after 10min of idle time in the configuration panel"
 
 
 /* Form: network configuration */
@@ -175,12 +182,15 @@
 #define L_NETWORK_SWITCH_TO_BACKUP "Number of failures before switching to backup configuration"
 #define L_NETWORK_RADIO_MODE "Radio Mode: 802.11"
 #define L_NETWORK_OUTPUT_POWER "Transmit power (dBm)"
+#define L_NETWORK_DEFAULT_DNS1 "Default: 8.8.8.8"
+#define L_NETWORK_DEFAULT_DNS2 "Default: 8.8.4.4"
 
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Topic"
 #define L_MQTT_IDX_LWT "LWT's IDX"
 #define L_MQTT_TOPIC_LWT "LWT's Topic"
+#define L_MQTT_TOPIC_STATUS "Firmware monitoring Topic"
 #define L_MQTT_CONFIGURATION_INFO "Enter MQTT Broker hostname or its IP address"
 #define L_MQTT_TOPIC_EMPTY "If left empty, message won't be sent to MQTT Broker"
 #define L_MQTT_TIMEOUT "Timeout"
@@ -437,6 +447,20 @@
 #define L_TSL2561_GAIN_BROADBAND "IDX Broadband"
 #define L_TSL2561_GAIN_IR "IDX Infrared"
 #define L_ILUMINANCE "Illuminance"
+
+/* FS3000 */
+#define L_FS3000_SENSOR "FS3000 Sensor"
+#define L_FS3000_SENSORS "FS3000 Sensors"
+#define L_FS3000_MQTT_TOPIC "FS3000 Sensor's MQTT Topic"
+#define L_FS3000_RANGE_7 "0-7 m/s"
+#define L_FS3000_RANGE_15 "0-15 m/s"
+#define L_FS3000_IDX_RAW "IDX raw values"
+#define L_FS3000_IDX_MS "IDX m/s"
+#define L_FS3000_IDX_MILH "IDX mil/h"
+#define L_FS3000_IDX_M3H "IDX m3/h"
+#define L_FS3000_R "Radius"
+#define L_FS3000_R_HINT "The radius of the hole to convert the air flow into m3/h. If it's set to 0, the air flow will not be calculated"
+
 
 /* AS3935 */
 #define L_AS3935_SENSOR "AS3935 Sensor"
@@ -704,8 +728,8 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 /* Firmware version and details */
 #define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Your current firmware"
 #define L_FIRMWARE_TYPE "AFE T{{f.t}}"
-#define L_FIRMWARE_VERSION "Version {{f.v}} (Build:{{f.b}})"
-#define L_FIRMWARE_VERSION_DATE "Compilation date: {{f.k}}"
+#define L_FIRMWARE_VERSION "Version {{f.v}} (Build:{{f.b}} {{f.k}})"
+#define L_FIRMWARE_LATEST_VERSION "Latest version {{f.u}}"
 #define L_ESP_CHIP "Chip: ESP{{f.e}}"
 #define L_ESP_FLASH_SIZE "Flash: {{f.s}} formatted to: {{f.f}}"
 #define L_FIRMWARE_API "API: {{f.a}}"
@@ -715,6 +739,7 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_FIRMWARE_PRO_NO "Pro version: No"
 #define L_REBOOTS_NUMBER "Firmware restarted {{x}} times"
 #define L_ADDITIONAL_INFORMATION "Additional information"
+#define L_OPERATING_TIME "Operating time {{x}}"
 #define L_WIFI_RSSI "WiFi Signal Strength Indicator {{x}} dBm ({{t}})"
 #define L_WIFI_SIGNAL "Signal"
 #define L_WIFI_RSSI_30 "Amazing"
@@ -723,4 +748,3 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_WIFI_RSSI_80 "Not Good"
 #define L_WIFI_RSSI_90 "Unusable"
 #endif // _LANG_EN_h
-

@@ -7,7 +7,7 @@
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Impulse-Catcher.h>
 

@@ -2,7 +2,7 @@
 #define _AFE_DEVICE_Structure_h
 
 #include <AFE-Configuration.h>
-#include <arduino.h>
+#include <Arduino.h>
 
 struct AFE_DEVICE_API {
   boolean http;
@@ -15,7 +15,7 @@ struct AFE_DEVICE_API {
 struct DEVICE {
   char name[33];
   AFE_DEVICE_API api;
-  uint8_t timeToAutoLogOff;
+  uint8_t timeToAutoLogOff;  
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   uint8_t noOfSwitches;
 #endif
@@ -92,9 +92,9 @@ struct DEVICE {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   uint8_t noOfMCP23xxx;
 #endif
-
-
-
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  uint8_t noOfFS3000s;
+#endif
 };
 
 #ifdef T0_CONFIG

@@ -1,6 +1,6 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-#include "AFE-Wifi.h"
+#include "AFE-WiFi.h"
 
 boolean AFEWiFi::eventConnectionEstablished = false;
 boolean AFEWiFi::isConnected = false;
@@ -9,16 +9,15 @@ boolean AFEWiFi::eventConnectionLost = true;
 AFEWiFi::AFEWiFi() {}
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data,
+void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data,
                     AFELED *_LED) {
   Led = _LED;
-  begin(mode, _Device, _Data);
+  begin(_Device, _Data);
 }
 #endif
 
-void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
+void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
   Device = _Device;
-  WiFiMode = mode;
 
 #ifdef AFE_ESP32
   WirelessNetwork.onEvent(AFEWiFi::onWiFiEvent);
@@ -33,30 +32,49 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
 #endif
 
-  // if (WiFiMode == AFE_MODE_NORMAL || WiFiMode == AFE_MODE_CONFIGURATION) {
+  // if (Device->getMode() == AFE_MODE_NORMAL || Device->getMode() == AFE_MODE_CONFIGURATION) {
   _Data->getConfiguration(&configuration);
-  //}
+//}
+
+#ifdef DEBUG
+  Serial << endl
+         << F("INFO: WIFI: Primary Network settings: ") << endl
+         << F(" : SSID: ") << configuration.primary.ssid << endl
+         << F(" : IP: ") << configuration.primary.ip << endl
+         << F(" : Gateway: ") << configuration.primary.gateway << endl
+         << F(" : Subnet: ") << configuration.primary.subnet << endl
+         << F(" : DNS1: ") << configuration.primary.dns1 << endl
+         << F(" : DNS2: ") << configuration.primary.dns2;
+
+  Serial << endl
+         << F("INFO: WIFI: Secondary Network Settings: ") << endl
+         << F(" : SSID: ") << configuration.secondary.ssid << endl
+         << F(" : IP: ") << configuration.secondary.ip << endl
+         << F(" : Gateway: ") << configuration.secondary.gateway << endl
+         << F(" : Subnet: ") << configuration.secondary.subnet << endl
+         << F(" : DNS1: ") << configuration.secondary.dns1 << endl
+         << F(" : DNS2: ") << configuration.secondary.dns2;
+
+#endif
 
   /**
    * @brief Checking if backup configuration exists and setting a flag
    *
    */
-  if (strlen(configuration.ssidBackup) > 0 &&
-      strcmp(configuration.ssidBackup, AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID) !=
-          0 &&
-      strlen(configuration.passwordBackup) > 0) {
+  if (strlen(configuration.secondary.ssid) > 0 &&
+      strcmp(configuration.secondary.ssid,
+             AFE_CONFIG_NETWORK_DEFAULT_NONE_SSID) != 0 &&
+      strlen(configuration.secondary.password) > 0) {
     isBackupConfigurationSet = true;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: WIFI: Bakcup configuration exist. SSID: ")
-           << configuration.ssidBackup;
+    Serial << endl << F("INFO: WIFI: Bakcup configuration exist.");
   } else {
     Serial << endl << F("INFO: WIFI: Bakcup configuration does NOT exist");
 #endif
   } /* Endif: Checking if backup configuration exists and setting a flag */
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: WIFI: Device is in mode: ") << WiFiMode;
+  Serial << endl << F("INFO: WIFI: Device is in mode: ") << Device->getMode();
 #endif
 
 /**
@@ -85,7 +103,6 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
       configuration.outputPower <=
           AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX) {
     WirelessNetwork.setOutputPower(configuration.outputPower);
-
 #ifdef DEBUG
     Serial << endl
            << F("INFO: WIFI: Setting TX Output power to : ")
@@ -100,8 +117,8 @@ void AFEWiFi::begin(uint8_t mode, AFEDevice *_Device, AFEDataAccess *_Data) {
          << F("INFO: WIFI: Phisical mode (1:B 2:G 3:N): ")
          << WirelessNetwork.getPhyMode();
 #endif
-  if (WiFiMode == AFE_MODE_ACCESS_POINT ||
-      WiFiMode == AFE_MODE_NETWORK_NOT_SET) {
+  if (Device->getMode() == AFE_MODE_ACCESS_POINT ||
+      Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Serial << endl << F("INFO: HotSpot: Starting... ");
 #endif
@@ -142,106 +159,129 @@ void AFEWiFi::switchConfiguration() {
   WiFi.setSleep(false);
 #endif
 
+  /**
+   * @brief Setting Fixed IP for Primary Configuration if set
+   *
+   */
+  if (isPrimaryConfiguration && !configuration.primary.isDHCP) {
 
-            /**
-             * @brief Setting Fixed IP for Primary Configuration if set
-             *
-             */
-            if (isPrimaryConfiguration && !configuration.isDHCP) {
+    IPAddress dns1;
+    if (!dns1.fromString(configuration.primary.dns1)) {
 #ifdef DEBUG
-              Serial << endl
-                     << F("INFO: WIFI: Setting fixed IP (") << configuration.ip
-                     << F(")  address for primary WiFi "
-                          "configuration");
+      Serial << endl
+             << F("ERROR: WIFI: Problem with DNS1: ")
+             << configuration.primary.dns1;
 #endif
-              IPAddress ip;
-              if (!ip.fromString(configuration.ip)) {
+    }
+    IPAddress dns2;
+    if (!dns2.fromString(configuration.primary.dns2)) {
 #ifdef DEBUG
-                Serial << endl
-                       << F("ERROR: WIFI: Problem with WIFI IP address: ")
-                       << configuration.ip;
+      Serial << endl
+             << F("ERROR: WIFI: Problem with DNS2: ")
+             << configuration.primary.dns2;
 #endif
-              }
-              IPAddress gateway;
-              if (!gateway.fromString(configuration.gateway)) {
-#ifdef DEBUG
-                Serial << endl
-                       << F("ERROR: WIFI: Problem with WIFI gateway address: ")
-                       << configuration.gateway;
-#endif
-              }
-              IPAddress subnet;
-              if (!subnet.fromString(configuration.subnet)) {
-#ifdef DEBUG
-                Serial << endl
-                       << F("ERROR: WIFI: Problem with WIFI subnet address: ")
-                       << configuration.subnet;
-#endif
-              }
+    }
 
-              WirelessNetwork.config(ip, gateway, subnet);
+    IPAddress ip;
+    if (!ip.fromString(configuration.primary.ip)) {
 #ifdef DEBUG
-              Serial << endl << F("INFO: WIFI: Fixed IP set");
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI IP: ")
+             << configuration.primary.ip;
 #endif
-            }
-            /**
-             * @brief set IPs to 0 for configuration over DHCP
-             *
-             */
-
-            else if ((isPrimaryConfiguration && configuration.isDHCP) ||
-                     (!isPrimaryConfiguration && configuration.isDHCPBackup)) {
-              WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000,
-                                     (uint32_t)0x00000000);
-            }
-
-            /**
-             * @brief Setting fixed IP for backup WiFi configurations
-             *
-             */
-            else if (!isPrimaryConfiguration && !configuration.isDHCPBackup) {
+    }
+    IPAddress gateway;
+    if (!gateway.fromString(configuration.primary.gateway)) {
 #ifdef DEBUG
-              Serial << endl
-                     << F("INFO: WIFI: Setting fixed IP (")
-                     << configuration.ipBackup << F(") address for backup WiFi "
-                                                    "configuration");
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI gateway: ")
+             << configuration.primary.gateway;
 #endif
-
-              IPAddress ip;
-              if (!ip.fromString(configuration.ipBackup)) {
+    }
+    IPAddress subnet;
+    if (!subnet.fromString(configuration.primary.subnet)) {
 #ifdef DEBUG
-                Serial << endl
-                       << F("ERROR: WIFI: Problem with WIFI IP address: ")
-                       << configuration.ipBackup;
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI subnet: ")
+             << configuration.primary.subnet;
 #endif
-              }
-              IPAddress gateway;
-              if (!gateway.fromString(configuration.gatewayBackup)) {
+    }
+
+    WirelessNetwork.config(ip, gateway, subnet, dns1, dns2);
 #ifdef DEBUG
-                Serial << endl
-                       << F("ERROR: WIFI: Problem with WIFI gateway address: ")
-                       << configuration.gatewayBackup;
+    Serial << endl << F("INFO: WIFI: Fixed IP set");
 #endif
-              }
-              IPAddress subnet;
-              if (!subnet.fromString(configuration.subnetBackup)) {
+  }
+  /**
+   * @brief set IPs to 0 for configuration over DHCP
+   *
+   */
+
+  else if ((isPrimaryConfiguration && configuration.primary.isDHCP) ||
+           (!isPrimaryConfiguration && configuration.secondary.isDHCP)) {
+    WirelessNetwork.config((uint32_t)0x00000000, (uint32_t)0x00000000,
+                           (uint32_t)0x00000000);
+  }
+
+  /**
+   * @brief Setting fixed IP for backup WiFi configurations
+   *
+   */
+  else if (!isPrimaryConfiguration && !configuration.secondary.isDHCP) {
 #ifdef DEBUG
-                Serial << endl
-                       << F("ERROR: WIFI: Problem with WIFI subnet address: ")
-                       << configuration.subnetBackup;
+    Serial << endl
+           << F("INFO: WIFI: Setting fixed IP (") << configuration.secondary.ip
+           << F(") address for backup WiFi "
+                "configuration");
 #endif
-              }
 
-              IPAddress dns1(8, 8, 8, 8);
-              IPAddress dns2(8, 8, 4, 4);
-
-              WirelessNetwork.config(ip, gateway, subnet, dns1, dns2);
+    IPAddress dns1;
+    if (!dns1.fromString(configuration.secondary.dns1)) {
 #ifdef DEBUG
-              Serial << endl << F("INFO: WIFI: Fixed IP set");
+      Serial << endl
+             << F("ERROR: WIFI: Problem with DNS1: ")
+             << configuration.secondary.dns1;
 #endif
-            } /* Endif: Setting Fixed IP for Primary Configuration if set */
+    }
+    IPAddress dns2;
+    if (!dns2.fromString(configuration.secondary.dns2)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with DNS2: ")
+             << configuration.secondary.dns2;
+#endif
+    }
 
+    IPAddress ip;
+    if (!ip.fromString(configuration.secondary.ip)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI IP: ")
+             << configuration.secondary.ip;
+#endif
+    }
+    IPAddress gateway;
+    if (!gateway.fromString(configuration.secondary.gateway)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI gateway: ")
+             << configuration.secondary.gateway;
+#endif
+    }
+    IPAddress subnet;
+    if (!subnet.fromString(configuration.secondary.subnet)) {
+#ifdef DEBUG
+      Serial << endl
+             << F("ERROR: WIFI: Problem with WIFI subnet: ")
+             << configuration.secondary.subnet;
+#endif
+    }
 
+    WirelessNetwork.config(ip, gateway, subnet, dns1, dns2);
+#ifdef DEBUG
+    Serial << endl << F("INFO: WIFI: Fixed IP set");
+#endif
+  } /* Endif: Setting Fixed IP for Primary Configuration if set */
 
   WirelessNetwork.mode(WIFI_STA);
 
@@ -254,8 +294,8 @@ void AFEWiFi::switchConfiguration() {
 }
 
 void AFEWiFi::listener() {
-  if (!(WiFiMode == AFE_MODE_ACCESS_POINT ||
-        WiFiMode == AFE_MODE_NETWORK_NOT_SET)) {
+  if (!(Device->getMode() == AFE_MODE_ACCESS_POINT ||
+        Device->getMode() == AFE_MODE_NETWORK_NOT_SET)) {
     if (!connected()) {
       if (sleepMode) {
         if (millis() - sleepStartTime >= configuration.waitTimeSeries * 1000) {
@@ -267,8 +307,8 @@ void AFEWiFi::listener() {
           if (connections == 0) {
 
             /* Checking if WiFi is configured */
-            if (strlen(configuration.ssid) == 0 ||
-                strlen(configuration.password) == 0) {
+            if (strlen(configuration.primary.ssid) == 0 ||
+                strlen(configuration.primary.password) == 0) {
 #ifdef DEBUG
               Serial
                   << endl
@@ -279,18 +319,19 @@ void AFEWiFi::listener() {
             }
 
             if (isPrimaryConfiguration) {
-              WirelessNetwork.begin(configuration.ssid, configuration.password);
+              WirelessNetwork.begin(configuration.primary.ssid,
+                                    configuration.primary.password);
             } else {
-              WirelessNetwork.begin(configuration.ssidBackup,
-                                    configuration.passwordBackup);
+              WirelessNetwork.begin(configuration.secondary.ssid,
+                                    configuration.secondary.password);
             }
 
 #ifdef DEBUG
             Serial
                 << endl
                 << F("INFO: WIFI: Starting establishing WiFi connection to: ")
-                << (isPrimaryConfiguration ? configuration.ssid
-                                           : configuration.ssidBackup);
+                << (isPrimaryConfiguration ? configuration.primary.ssid
+                                           : configuration.secondary.ssid);
 
             Serial << endl
                    << F("INFO: WIFI: Parameters: ") << endl
@@ -409,9 +450,32 @@ void AFEWiFi::listener() {
 
 #ifdef DEBUG
         Serial << endl
-               << F("INFO: WIFI: Connection established") << F(", MAC: ")
-               << WirelessNetwork.macAddress() << F(", IP: ")
-               << WirelessNetwork.localIP();
+               << F("INFO: WIFI: Connection established") << endl
+               << F(" : MAC: ") << WirelessNetwork.macAddress() << endl
+               << F(" : IP: ") << WirelessNetwork.localIP() << endl
+#ifdef AFE_ESP32
+               << F(" : IPv6: ") << WirelessNetwork.localIPv6() << endl
+#endif
+               << F(" : Subnet Mask: ") << WirelessNetwork.subnetMask()
+#ifdef AFE_ESP32
+               << F("/") << WirelessNetwork.subnetCIDR()
+#endif
+               << endl
+               << F(" : Gateway: ") << WirelessNetwork.gatewayIP() << endl
+#ifdef AFE_ESP32
+               << F(" : Broadcast: ") << WirelessNetwork.broadcastIP() << endl
+#endif
+               << F(" : DNS1: ") << WirelessNetwork.dnsIP(0) << endl
+               << F(" : DNS2: ") << WirelessNetwork.dnsIP(1) << endl
+#ifdef AFE_ESP32
+               << F(" : Network ID: ") << WirelessNetwork.networkID() << endl
+#endif
+               << F(" : RSSI: ") << WirelessNetwork.RSSI() << endl
+#ifdef AFE_ESP32
+               << F(" : Hostname: ") << WirelessNetwork.getHostname();
+#else
+               << F(" : Hostname: ") << WirelessNetwork.hostname();
+#endif
 #endif
       }
     }

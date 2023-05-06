@@ -4,8 +4,9 @@
 #define _AFE_API_HTTP_h
 
 #include <AFE-Configuration.h>
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
+#include <AFE-Firmware.h>
+#include <AFE-Hardware.h>
+
 #include <AFE-HTTP-COMMAND-Structure.h>
 #include <AFE-Web-Server.h>
 
@@ -22,66 +23,6 @@
 #include <AFE-API-MQTT-Standard.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-#include <AFE-Relay.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-#include <AFE-Analog-Input.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-#include <AFE-Sensor-BMEX80.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-#include <AFE-Sensor-HPMA115S0.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-#include <AFE-Sensor-BH1750.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-#include <AFE-Sensor-AS3935.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-#include <AFE-Sensor-Anemometer.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER
-#include <AFE-Sensor-Rainmeter.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-#include <AFE-Sensor-DS18B20.h>
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#include <AFE-Regulator.h>
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-#include <AFE-Thermal-Protector.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DHT
-#include <AFE-Sensor-DHT.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-#include <AFE-Sensor-Binary.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_TSL2561
-#include <AFE-Sensor-TSL2561.h>
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED
-#include <AFE-CLED.h>
-#endif
-
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -89,9 +30,9 @@
 class AFEAPIHTTP {
 
 private:
-  AFEDevice *_Device;
+  AFEFirmware *_Firmware;
+  AFEHardware *_Hardware;
   AFEWebServer *_HTTP;
-  AFEDataAccess *_Data;
 
   /* Ture if HTTP API is enabled */
   boolean enabled = false;
@@ -102,79 +43,6 @@ private:
 #else
   AFEAPIMQTTStandard *_MqttAPI;
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
-
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  AFERelay *_Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-#ifdef AFE_ESP32
-  AFEAnalogInput *_AnalogInput[AFE_CONFIG_HARDWARE_NUMBER_OF_ADCS];
-#else  // AFE_ESP8266
-  AFEAnalogInput *_AnalogInput;
-#endif // AFE_ESP32
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-  AFESensorBMEX80 *_BMx80Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BMEX80];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  AFESensorHPMA115S0 *_HPMA115S0Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_HPMA115S0];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-  AFESensorBH1750 *_BH1750Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BH1750];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-  AFESensorAS3935 *_AS3935Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_AS3935];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  AFEAnemometer *_AnemometerSensor;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  AFERainmeter *_RainmeterSensor;
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_GATE
-  AFEGate *_Gate[AFE_CONFIG_HARDWARE_NUMBER_OF_GATES];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  AFEContactron *_Contactron[AFE_CONFIG_HARDWARE_NUMBER_OF_CONTACTRONS];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-  AFESensorDS18B20 *_DS18B20Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DS18B20];
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  AFERegulator *_Regulator[AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS];
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  AFEThermalProtector
-      *_ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DHT
-  AFESensorDHT *_DHTSensor[AFE_CONFIG_HARDWARE_NUMBER_OF_DHT];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  AFESensorBinary *_BinarySensor[AFE_CONFIG_HARDWARE_NUMBER_OF_BINARY_SENSORS];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_TSL2561
-  AFESensorTSL2561 *_TSL2561Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_TSL2561];
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  AFECLED *_CLED;
-#endif
 
   /* Classifies and invokes code for HTTP request processing */
   void processRequest(HTTPCOMMAND *);
@@ -258,6 +126,11 @@ private:
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  void processFS3000(HTTPCOMMAND *);
+#endif // AFE_CONFIG_HARDWARE_FS3000
+
 #if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_CLED)
   /**
   * @brief Method creates and sends On/Off response
@@ -285,83 +158,15 @@ public:
 
 /* Depending on the API compilication different classes are referenced */
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  void begin(AFEDevice *, AFEWebServer *, AFEDataAccess *, AFEAPIMQTTDomoticz *,
+  void begin(AFEFirmware *, AFEHardware *, AFEWebServer *, AFEAPIMQTTDomoticz *,
              AFEAPIHTTPDomoticz *);
 #else
-  void begin(AFEDevice *, AFEWebServer *, AFEDataAccess *,
-             AFEAPIMQTTStandard *);
+  void begin(AFEFirmware *, AFEHardware *, AFEWebServer *, AFEAPIMQTTStandard *);
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   /* Listens fr HTTP requests */
   void listener();
 
-#ifdef AFE_CONFIG_HARDWARE_RELAY
-  void addClass(AFERelay *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-  void addClass(AFEAnalogInput *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BMEX80
-  void addClass(AFESensorBMEX80 *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-  void addClass(AFESensorHPMA115S0 *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BH1750
-  void addClass(AFESensorBH1750 *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_AS3935
-  void addClass(AFESensorAS3935 *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-  void addClass(AFEAnemometer *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_RAINMETER
-  void addClass(AFERainmeter *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_GATE
-  void addClass(AFEGate *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-  void addClass(AFEContactron *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DS18B20
-  void addClass(AFESensorDS18B20 *);
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-  void addClass(AFERegulator *);
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-  void addClass(AFEThermalProtector *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_DHT
-  void addClass(AFESensorDHT *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-  void addClass(AFESensorBinary *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_TSL2561
-  void addClass(AFESensorTSL2561 *);
-#endif
-
-#ifdef AFE_CONFIG_HARDWARE_CLED
-  void addClass(AFECLED *);
-#endif
 };
 
 #endif

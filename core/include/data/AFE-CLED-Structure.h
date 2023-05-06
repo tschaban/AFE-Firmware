@@ -13,13 +13,13 @@
 #endif
 #include <AFE-MQTT-Structure.h>
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct CLED_STRIP {
   uint16_t numberOfLEDs;
 };
 
-
+/* @TODO T5 
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
 struct CLED_LIGHT_CONTROLLED_LEVELS_CONFIG {
   uint32_t lightLevel;
@@ -32,6 +32,7 @@ struct CLED_LIGHT_CONTROLLED_CONFIG {
   config[AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS];
 };
 #endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
+*/
 
 struct CLED_EFFECT_BLINKING {
   char name[33];

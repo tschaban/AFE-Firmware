@@ -7,7 +7,10 @@
 
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
 
-#include <AFE-API.h>
+#include <AFE-Firmware.h>
+#include <AFE-Hardware.h>
+#include <AFE-ASYNC-MQTT.h>
+#include <AFE-MQTT-Structure.h>
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <ArduinoJson.h>
@@ -25,10 +28,14 @@ struct CLED_COMMAND {
 #include <Streaming.h>
 #endif
 
-class AFEAPIMQTTStandard : public AFEAPI {
+class AFEAPIMQTTStandard {
 
 private:
-  void processRequest();
+  AFEFirmware *_Firmware;
+  AFEHardware *_Hardware;
+
+  /* Is API enabled, set in begin() */
+  boolean enabled = false;
 
   /**
    * @brief formats MQTT topic and subscribes to MQTT Broker for command
@@ -64,24 +71,23 @@ private:
   boolean publishOnOffState(const char *topic, uint8_t state,
                             boolean sendAsOpenClosed = false);
 
-  
-/**
- * @brief stores prepared mqtt message to compare with incoming one
- * 
- */
+  /**
+   * @brief stores prepared mqtt message to compare with incoming one
+   *
+   */
   char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
 
 public:
+
+  AFEAsyncMQTTClient *Mqtt = new AFEAsyncMQTTClient();
+
   /**
    * @brief Construct a new AFEAPIMQTTStandard object
    *
    */
   AFEAPIMQTTStandard();
-#ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
-#else
-  void begin(AFEDataAccess *, AFEDevice *);
-#endif // AFE_CONFIG_HARDWARE_LED
+
+  void begin(AFEFirmware *, AFEHardware *);
 
   /**
    * @brief Takes care of subscription to all MQTT commands controlling device
@@ -137,10 +143,9 @@ public:
   boolean publishBatteryMeterValues();
 #endif
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
-
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   void processBMEX80(uint8_t *id);
-  boolean publishBMx80SensorData(uint8_t id);
+  boolean publishBoschBMSensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
@@ -216,6 +221,13 @@ public:
   void processTSL2561(uint8_t *id);
   boolean publishTSL2561SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  void processFS3000(uint8_t *id);
+  boolean publishFS3000SensorData(uint8_t id);
+#endif // AFE_CONFIG_HARDWARE_FS3000
+
+
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

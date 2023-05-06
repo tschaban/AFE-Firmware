@@ -13,6 +13,8 @@
 #define L_FIRMWARE_NAME "dla Shelly-1"
 #elif defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define L_FIRMWARE_NAME "dla Sonoff Basic"
+#elif defined(AFE_DEVICE_SONOFF_MINI_R4)
+#define L_FIRMWARE_NAME "Sonoff Mini Extreme R4"
 #elif defined(T0_CONFIG)
 #define L_FIRMWARE_NAME "Wersja podstawowa"
 #elif defined(T1_CONFIG)
@@ -70,6 +72,7 @@
 #define L_PASSWORD "Hasło"
 #define L_SECONDS "sekundy"
 #define L_MILISECONDS "milisekundy"
+#define L_MILIMETERS "milimetrów"
 #define L_IP_ADDRESS "Adres IP"
 #define L_NONE "Brak"
 #define L_NAME "Nazwa"
@@ -108,6 +111,9 @@
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">Więcej</a> informacji o urządzeniu"
 #define L_INDEX_DONATION "Wsparcie"
 
+/* JSON RPC API */
+#define L_JSON_RPC_API "Niestabilne połączenie z serwerem AFE Firmware. Brak możliwości sprawdzania i aktualizacji firmware przez Internet oraz aktywacji AFE Pro"
+
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Nazwa urządzenia"
 #define L_DEVICE_SECTION_INFO "Nazwa jest wykorzystywana jako nazwa urządzenia w Twojej lokalnej sieci WiFi oraz jako nazwa hotspot'a urządzenia"
@@ -133,6 +139,7 @@
 #define L_DEVICE_NUMBER_OF_TSL2561_SENSORS "Ilość czujników TSL2561"
 #define L_DEVICE_NUMBER_OF_ADC "Ilość wejść ADC"
 #define L_DEVICE_NUMBER_OF_MCP23XXX "Ilość rozszerzeń MCP23xxx"
+#define L_DEVICE_NUMBER_OF_FS3000_SENSORS "Ilość czujników FS3000"
 
 #define L_DEVICE_ADDITIONAL_FUNCTIONALITIES "Dodatkowe funkcje"
 #define L_DEVICE_DO_MEASURE_ADC "Pomiary z wejścia analogowego"
@@ -169,11 +176,15 @@
 #define L_NETWORK_SWITCH_TO_BACKUP "Liczba błędów połączeń przed uruchomieniem konfiguracji zapasowej"
 #define L_NETWORK_RADIO_MODE "Tryb Radio 802.11"
 #define L_NETWORK_OUTPUT_POWER "Moc nadawania (dBm)"
+#define L_NETWORK_DEFAULT_DNS1 "Domyślnie: 8.8.8.8"
+#define L_NETWORK_DEFAULT_DNS2 "Domyślnie: 8.8.4.4"
+
 
 
 /* Form: MQTT Broker */
 #define L_MQTT_TOPIC "Temat"
 #define L_MQTT_TOPIC_LWT "Temat wiadomości LWT"
+#define L_MQTT_TOPIC_STATUS "Temat wiadomości monitorujących firmware"
 #define L_MQTT_IDX_LWT "IDX dla wiadomości LWT"
 #define L_MQTT_CONFIGURATION_INFO "Wprowadź adres hosta np. localhost lub adres IP"
 #define L_MQTT_TOPIC_EMPTY "Jeśli nie zostanie wprowadzone, wiadomość nie będzie wysłana do MQTT Brokera"
@@ -433,6 +444,19 @@
 #define L_TSL2561_GAIN_IR "IDX Podczerwień"
 #define L_ILUMINANCE "Natężenie światła"
 
+/* FS3000 */
+#define L_FS3000_SENSOR "Czujnik FS3000"
+#define L_FS3000_SENSORS "Czujniki FS3000"
+#define L_FS3000_MQTT_TOPIC "Temat MQTT czujnika FS3000"
+#define L_FS3000_RANGE_7 "0-7 m/s"
+#define L_FS3000_RANGE_15 "0-15 m/s"
+#define L_FS3000_IDX_RAW "IDX Dane surowe"
+#define L_FS3000_IDX_MS "IDX m/s"
+#define L_FS3000_IDX_MILH "IDX mil/h"
+#define L_FS3000_IDX_M3H "IDX m3/h"
+#define L_FS3000_R "Promień"
+#define L_FS3000_R_HINT "Promień otworu do przeliczania przepływu w m3/h. Jeśli 0 to przepływ powietrza nie będzie przeliczany"
+
 /* AS3935 */
 #define L_AS3935_SENSOR "Czujnik AS3935"
 #define L_AS3935_NOISE_FLOOR "Poziom hałasów"
@@ -674,20 +698,23 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_HA_PUBLISHING "Publikować/aktualizować konfiguracje urządzenia?"
 #define L_HA_UPDATE_REMOVE "Usuwać nieaktualne konfiguracje?"
 #define L_HA_RETAIN_CONFIGURATION "Pamiętać konfigurację przez MQTT Broker"
+#define L_HA_RETAIN_CONFIGURATION "Pamiętać konfigurację przez MQTT Broker"
  
+
 /* Firmware version and details */
 #define L_FIRMWAR_YOUR_CURRENT_FIRMWARE "Twoje aktualne oprogramowanie"
 #define L_FIRMWARE_DEVICE_NAME "Urządzenie: {{f.d}}"
 #define L_FIRMWARE_DEVICE_ID "ID urządzenia: {{f.n}}"
 #define L_FIRMWARE_TYPE "AFE T{{f.t}}"
-#define L_FIRMWARE_VERSION "Wersja {{f.v}} (Build:{{f.b}})"
-#define L_FIRMWARE_VERSION_DATE "Kompilacja z dnia: {{f.k}}"
+#define L_FIRMWARE_VERSION "Zainstalowana wersja {{f.v}} (Build:{{f.b}} {{f.k}})"
+#define L_FIRMWARE_LATEST_VERSION "Najnowsza wersja: {{f.u}}"
 #define L_ESP_CHIP "Chip: ESP{{f.e}}"
 #define L_ESP_FLASH_SIZE "Flash: {{f.s}} sformatowany do: {{f.f}}"
 #define L_FIRMWARE_API "API: {{f.a}}"
 #define L_FIRMWARE_PRO_YES "Wersja Pro: Tak"
 #define L_FIRMWARE_PRO_NO "Wersja Pro: Nie"
 #define L_ADDITIONAL_INFORMATION "Informacje dodatkowe"
+#define L_OPERATING_TIME "Czas pracy {{x}}"
 #define L_REBOOTS_NUMBER "Firmware restartowany {{x}} razy"
 #define L_WIFI_RSSI "Wskaźnik siły odbieranego sygnału WiFi {{x}} dBm ({{t}})"
 #define L_WIFI_SIGNAL "Sygnał"

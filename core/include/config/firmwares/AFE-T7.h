@@ -1,7 +1,9 @@
 #ifndef _AFE_Configuration_T_h
 #define _AFE_Configuration_T_h
 
-#define AFE_FIRMWARE_VERSION "3.5.0.B5"
+
+
+#define AFE_FIRMWARE_VERSION "3.7.0"
 #define AFE_FIRMWARE_TYPE 7
 
 /* GPIOs of SmartnyDom Sterownik 
@@ -11,13 +13,7 @@ RGB LED 2: 14
 Switch 1: 26 (Zle oznakowanie na płytce)
 Switch 2: 25 (zle oznakowanie na płytce)
 
-
-
-
-
 */
-
-
 
 
 /* Hardware */
@@ -27,10 +23,10 @@ Switch 2: 25 (zle oznakowanie na płytce)
 #define AFE_CONFIG_FUNCTIONALITY_ADC
 #define AFE_CONFIG_HARDWARE_CLED
 
-//#define AFE_CONFIG_HARDWARE_I2C
-//#define AFE_CONFIG_HARDWARE_BH1750
-//#define AFE_CONFIG_HARDWARE_TSL2561
-//#define AFE_CONFIG_HARDWARE_BINARY_SENSOR
+#define AFE_CONFIG_HARDWARE_I2C
+#define AFE_CONFIG_HARDWARE_BH1750
+#define AFE_CONFIG_HARDWARE_TSL2561
+#define AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 
 /* Max number of hardware items per AFE version */

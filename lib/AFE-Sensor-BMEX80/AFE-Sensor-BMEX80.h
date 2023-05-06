@@ -15,7 +15,7 @@
 #include <AFE-Sensors-Common.h>
 #include <ArduinoJson.h>
 #include <Wire.h>
-#include <arduino.h>
+#include <Arduino.h>
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>

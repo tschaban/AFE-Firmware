@@ -8,7 +8,6 @@
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 
 #include <AFE-Data-Access.h>
-
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif

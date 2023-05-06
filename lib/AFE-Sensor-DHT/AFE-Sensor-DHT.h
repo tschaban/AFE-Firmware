@@ -5,7 +5,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_DHT
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Sensors-Common.h>
 #include <DHTesp.h>

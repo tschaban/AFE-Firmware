@@ -30,27 +30,9 @@ void initializeHTTPServer(void) {
   HTTPServer->handle("/", handleHTTPRequests);
   HTTPServer->handle("/favicon.ico", handleFavicon);
   HTTPServer->handleFirmwareUpgrade("/upgrade", handleHTTPRequests,
-                                   handleUpload);
+                                    handleUpload);
   HTTPServer->onNotFound(handleOnNotFound);
-#if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led);
-#elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
-#ifdef AFE_ESP32
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led, &WirePort0,
-                   &WirePort1);
-#else
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI, Led, &WirePort0);
-#endif // AFE_ESP32
-#elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
-#ifdef AFE_ESP32
-  HTTPServer->begin(&Data, Device, FirmwarePro, RestAPI, &WirePort0,
-                   &WirePort1);
-#else
-  HTTPServer->begin(&Data, Device, FirmwarePro, RestAPI, &WirePort0);
-#endif // AFE_ESP32
-#else
-  HTTPServer->begin(Data, Device, FirmwarePro, RestAPI);
-#endif
+  HTTPServer->begin(Firmware);
 
 #ifdef DEBUG
   Serial << endl << F("INFO: BOOT: HTTP Server initialized");

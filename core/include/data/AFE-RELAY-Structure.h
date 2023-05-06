@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct RELAY_DEFAULTS {
   uint8_t powerOn;
@@ -17,7 +17,7 @@ struct RELAY {
   uint8_t gpio;
   char name[17];
   float timeToOff;
- #ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef AFE_CONFIG_HARDWARE_LED
   uint8_t ledID;
 #endif
   uint8_t triggerSignal;
@@ -29,7 +29,10 @@ struct RELAY {
   RELAY_DEFAULTS state;
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   MCP23XXX_ITEM_CONFIG mcp23017;
-#endif  
+#endif
+#ifdef AFE_CONFIG_HARDWARE_PWM
+  boolean pwn;
+#endif
 };
 
 #endif // AFE_CONFIG_HARDWARE_RELAY

@@ -58,6 +58,11 @@
 #define AFE_DEVICE_TYPE_NAME "Sonoff Touch 3G"
 #define AFE_DEVICE_TYPE_ID 8
 
+#elif defined(AFE_DEVICE_SONOFF_MINI_R4)
+#define AFE_DEVICE_MANUFACTURER "Itead"
+#define AFE_DEVICE_TYPE_NAME "Sonoff Mini Extreme R4"
+#define AFE_DEVICE_TYPE_ID 18
+
 #elif defined(AFE_DEVICE_SHELLY_1)
 #define AFE_DEVICE_MANUFACTURER "Allterco"
 #define AFE_DEVICE_TYPE_NAME "Shelly 1"
@@ -87,6 +92,11 @@
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
 #define AFE_DEVICE_TYPE_NAME "T6 E1 Custom"
 #define AFE_DEVICE_TYPE_ID 16
+
+#elif defined(AFE_T6_CUSTOM_E2)
+#define AFE_DEVICE_MANUFACTURER "Espressif Systems"
+#define AFE_DEVICE_TYPE_NAME "T6 E2 Custom"
+#define AFE_DEVICE_TYPE_ID 17
 
 #elif defined(AFE_T1_CUSTOM_E1)
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
@@ -127,6 +137,7 @@
 #define AFE_DEVICE_TYPE_NAME "ESP32 38Pins"
 #define AFE_DEVICE_TYPE_ID 31
 
+
 #else
 #define AFE_DEVICE_MANUFACTURER "Espressif Systems"
 #if defined(ESP8285)
@@ -140,8 +151,7 @@
 #endif
 
 /**
- * @brief WARN: 16th is the last one - above
- * Next one should be 17th and added below 16th
+ * @brief WARN: Next one should be 19th
  * 
  */
 

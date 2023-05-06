@@ -3,7 +3,7 @@
 #ifndef _AFE_API_JSONRPC_h
 #define _AFE_API_JSONRPC_h
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <AFE-Configuration.h>
 #include <AFE-Device.h>
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -46,8 +46,8 @@ private:
   String message;
   //AsyncPing Pings;
   PingClass *Ping = new PingClass();
-  boolean _PingResponded;
-
+  boolean _PingResponded = false;
+  
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
 #endif
@@ -59,6 +59,8 @@ private:
 #endif
 
 public:
+
+  boolean isStableConnection = true;
     
   AFEJSONRPC();
 

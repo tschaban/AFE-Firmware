@@ -14,10 +14,8 @@
 #include <AFE-Configuration.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-
+#include <AFE-Firmware.h>
 #include <AFE-API-MQTT-Standard.h>
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
 #include <AFE-MQTT-Structure.h>
 #include <AFE-Site-components.h>
 #include <ArduinoJson.h>
@@ -39,8 +37,7 @@
 class AFEAPIHomeAssistantIntegration {
 
 private:
-  AFEDataAccess *_Data;
-  AFEDevice *_Device;
+  AFEFirmware *_Firmware;
   AFEAPIMQTTStandard *_MqttAPI;
 
   HOME_ASSISTANT_CONFIG *configuration = new HOME_ASSISTANT_CONFIG;
@@ -59,7 +56,7 @@ private:
     uint8_t id;
     /**
      * @brief Hardware item type required to generated item ID in HA
-     * 
+     *
      */
     uint8_t type;
     uint8_t hardwareId;
@@ -72,9 +69,16 @@ private:
     char unit[AFE_CONFIG_ATTRIBUTE_SIZE_UNIT];
     char deviceClass[AFE_CONFIG_HA_DEVICE_TYPE_SIZE];
     uint8_t entityId;
+    char entityCategory[sizeof("diagnostic")];
   };
 
   HA_DEVICE_CONFIG *_deviceConfiguration = new HA_DEVICE_CONFIG;
+
+  /**
+   * @brief Resets deviceConfiguration variable
+   *
+   */
+  void resetDeviceConfiguration(void);
 
   /**
    * @brief generates HA object ID
@@ -234,13 +238,44 @@ private:
   void publishTSL2561(void);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_GATE
+  /**
+   * @brief publishes gate
+   *
+   */
+  void publishGate(void);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+  /**
+   * @brief publishes contracton
+   *
+   */
+  void publishContactron(void);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  /**
+   * @brief publishes FS3000
+   *
+   */
+  void publishFS3000(void);
+#endif
+
+
+  /**
+   * @brief publishes firmware version
+   *
+   */
+  void publishFirmwareVersion(void);
+
 public:
   /**
    * @brief Construct a new AFEAPIHomeAssistantIntegration object
    *
    */
-  AFEAPIHomeAssistantIntegration(AFEDataAccess *Data, AFEDevice *Device,
-                                 AFEAPIMQTTStandard *MqttAPI);
+  AFEAPIHomeAssistantIntegration(AFEFirmware *_Firmware,
+                                 AFEAPIMQTTStandard *_MqttAPI);
 
   /**
    * @brief method to be called to initialize the

@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct SWITCH {
   uint8_t gpio;

@@ -3,10 +3,7 @@
 #ifndef _AFE_Web_Server_h
 #define _AFE_Web_Server_h
 
-#include <AFE-API-JSONRPC.h>
-#include <AFE-Data-Access.h>
-#include <AFE-Device.h>
-#include <AFE-Firmware-Pro.h>
+#include <AFE-Firmware.h>
 #include <AFE-Sites-Generator.h>
 
 #ifdef AFE_ESP32
@@ -20,8 +17,9 @@
 #ifdef AFE_ESP32 /* ESP32 */
 #include <Update.h>
 #else /* ESP8266 */
+#include <ESP8266HTTPClient.h>
 #include <WiFiUdp.h>
-#include <esp8266httpupdate.h>
+
 #endif // ESP32/ESP8266
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
@@ -30,10 +28,6 @@
 #else
 #include <en_EN.h>
 #endif
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <AFE-LED.h>
-#endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <Wire.h>
@@ -58,14 +52,7 @@ struct AFE_SITE_PARAMETERS {
 class AFEWebServer {
 
 private:
-  AFEDevice *Device;
-  AFEFirmwarePro *FirmwarePro;
-  AFEDataAccess *Data;
-  AFEJSONRPC *RestAPI;
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED *SystemLED;
-#endif
+  AFEFirmware *Firmware;
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
   TwoWire *WirePort0;
@@ -96,10 +83,6 @@ private:
   AFESitesGenerator Site;
 
   boolean upgradeSuccess = false;
-
-#if defined(AFE_CONFIG_HARDWARE_LED) || defined(AFE_CONFIG_HARDWARE_I2C)
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
-#endif // AFE_CONFIG_HARDWARE_LED || AFE_CONFIG_HARDWARE_I2C
 
   /**
    * @brief Method gets url Option parameter value
@@ -270,6 +253,10 @@ private:
   void get(MCP23XXX &data);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  void get(FS3000_CONFIG &data);
+#endif
+
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   uint16_t getOTAFirmwareId();
   boolean upgradeOTAWAN(uint16_t firmwareId);
@@ -283,13 +270,11 @@ public:
   ESP8266WebServer server;
 #endif // ESP32/ESP8266
 
-
   /**
    * @brief  It stores last HTTP API request
    *
    */
   HTTPCOMMAND *httpAPICommand = new HTTPCOMMAND;
-
 
   AFEWebServer();
 
@@ -297,29 +282,17 @@ public:
  * @brief Method initialize WebServer and Updater server
  *
  */
-#if defined(AFE_CONFIG_HARDWARE_LED) && !defined(AFE_CONFIG_HARDWARE_I2C)
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
-             AFELED *);
-#elif defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
+#if defined(AFE_CONFIG_HARDWARE_I2C)
+
 #ifdef AFE_ESP32
-  void begin(AFEDataAccess *_Data, AFEDevice *_Device,
-             AFEFirmwarePro *_FirmwarePro, AFEJSONRPC *_RestAPI, AFELED *_Led,
-             TwoWire *_WirePort0, TwoWire *_WirePort1);
+  void begin(AFEFirmware *, TwoWire *, TwoWire *);
 #else
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
-             AFELED *, TwoWire *);
+  void begin(AFEFirmware *, TwoWire *);
 #endif // AFE_ESP32
-#elif !defined(AFE_CONFIG_HARDWARE_LED) && defined(AFE_CONFIG_HARDWARE_I2C)
-#ifdef AFE_ESP32
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
-             TwoWire *, TwoWire *);
-#else
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *,
-             TwoWire *);
-#endif // AFE_ESP32
-#else
-  void begin(AFEDataAccess *, AFEDevice *, AFEFirmwarePro *, AFEJSONRPC *);
+
 #endif
+
+  void begin(AFEFirmware *);
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   /**
