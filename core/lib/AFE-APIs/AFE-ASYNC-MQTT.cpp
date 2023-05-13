@@ -124,10 +124,20 @@ boolean AFEAsyncMQTTClient::listener() {
       _ret = true;
     }
   } else {
+    if (_reconnectionTimeout == 0) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: MQTT: Connecting to MQTT Broker");
+      Serial << endl << F("INFO: MQTT: Connecting to MQTT Broker");
 #endif
-    _Broker->connect();
+      _Broker->connect();
+      _reconnectionTimeout = millis();
+    } else if (millis() - _reconnectionTimeout >
+               AFE_CONFIG_MQTT_DEFAULT_RECONNECT_TIMEOUT) {
+#ifdef DEBUG
+      Serial << endl << F("INFO: MQTT: Connecting to MQTT Broker");
+#endif
+      _Broker->connect();
+      _reconnectionTimeout = millis();
+    }
   }
 
   return _ret;
@@ -138,6 +148,7 @@ boolean AFEAsyncMQTTClient::connectedEvent() {
   if (returnValue) {
     publishConnected();
     AFEAsyncMQTTClient::eventConnected = false;
+    _reconnectionTimeout = 0;
   }
   return returnValue;
 }
@@ -145,9 +156,20 @@ boolean AFEAsyncMQTTClient::connectedEvent() {
 boolean AFEAsyncMQTTClient::disconnectedEvent() {
   boolean returnValue = AFEAsyncMQTTClient::eventDisconnected;
   if (returnValue) {
+#ifdef AFE_CONFIG_HARDWARE_LED
+    _Led->on();
+#endif
+#ifdef DEBUG
+    Serial << endl
+           << F("WARN: Forcing disconnection from MQTT Broker on object level");
+#endif
     AFEAsyncMQTTClient::eventDisconnected = false;
     _Broker->disconnect(true);
   }
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  _Led->off();
+#endif
   return returnValue;
 }
 
@@ -379,9 +401,13 @@ void AFEAsyncMQTTClient::onMqttMessage(
 #ifdef DEBUG
     Serial << endl
            << F("INFO: Domoticz command: ") << F(" : IDX: ") << endl
-           << AFEAsyncMQTTClient::messagesBuffer[AFEAsyncMQTTClient::numberOfMessagesInBuffer].command.domoticz.idx
+           << AFEAsyncMQTTClient::messagesBuffer
+                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+                      .command.domoticz.idx
            << F(" : NValue: ") << endl
-           << AFEAsyncMQTTClient::messagesBuffer[AFEAsyncMQTTClient::numberOfMessagesInBuffer].command.nvalue
+           << AFEAsyncMQTTClient::messagesBuffer
+                  [AFEAsyncMQTTClient::numberOfMessagesInBuffer]
+                      .command.nvalue
            << F(" : SValue: ")
            << AFEAsyncMQTTClient::messagesBuffer
                   [AFEAsyncMQTTClient::numberOfMessagesInBuffer]

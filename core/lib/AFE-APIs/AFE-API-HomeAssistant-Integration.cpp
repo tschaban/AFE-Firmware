@@ -14,7 +14,7 @@ AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(
       (configuration->addingComponents || configuration->removeingComponents)) {
     _initialize = true;
     _MqttAPI = MqttAPI;
-    sprintf(_firmwareName, "AFE _Firmware T%d-%s", AFE_FIRMWARE_TYPE,
+    sprintf(_firmwareName, "AFE Firmware T%d-%s", AFE_FIRMWARE_TYPE,
             _Firmware->Configuration->Version->installed_version);
     _Firmware->API->Flash->getConfiguration(&_mqttConfiguration);
   }

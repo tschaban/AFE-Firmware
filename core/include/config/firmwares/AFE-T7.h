@@ -3,7 +3,7 @@
 
 
 
-#define AFE_FIRMWARE_VERSION "3.7.0"
+#define AFE_FIRMWARE_VERSION "3.7.1"
 #define AFE_FIRMWARE_TYPE 7
 
 /* GPIOs of SmartnyDom Sterownik 
