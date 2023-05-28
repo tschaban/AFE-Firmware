@@ -10,7 +10,10 @@ void AFEFirmware::begin() {
   timer->days = 0;
   timer->months = 0;
 
+  API->Flash->initializeFileSystem();
+
   Device->begin();
+
   firstBooting();
 
   /**
@@ -246,7 +249,7 @@ void AFEFirmware::firstBooting(void) {
 #ifdef DEBUG
     Serial << F("YES");
 #endif
-    if (Device->setDevice()) {
+    if (API->Flash->setDefaultConfiguration()) {
       Device->begin();
     } else {
       Device->reboot();

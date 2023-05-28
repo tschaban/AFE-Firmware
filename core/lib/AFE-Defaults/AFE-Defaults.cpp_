@@ -19,6 +19,12 @@ boolean AFEDefaults::set(void) {
 
   if (Data->formatFileSystem()) {
 
+    /* Initializatin of the FS */
+    AFEFirmware *_Firmware = new AFEFirmware();
+    _Firmware->initializeFS();
+    delete _Firmware;
+    _Firmware = NULL;
+
     Data->saveWelecomeMessage("");
 #ifdef AFE_CONFIG_HARDWARE_GATE
     Data->createGateConfigurationFile();

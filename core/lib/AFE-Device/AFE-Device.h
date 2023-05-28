@@ -3,7 +3,7 @@
 #ifndef _AFE_Device_h
 #define _AFE_Device_h
 
-#include <AFE-Defaults.h>
+//#include <AFE-Defaults.h>
 #include <AFE-Data-Access.h>
 
 #ifdef DEBUG
@@ -37,8 +37,6 @@ public:
   /* Method saves current device mode to EEPROM */
   void saveMode(uint8_t mode);
 
-  /* Method sets the device to it's default state */
-  boolean setDevice(void);
 
 };
 

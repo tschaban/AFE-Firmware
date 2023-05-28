@@ -29,7 +29,3 @@ uint8_t AFEDevice::getMode() { return deviceMode; }
 
 void AFEDevice::saveMode(uint8_t mode) { Data.saveDeviceMode(mode); }
 
-boolean AFEDevice::setDevice(void) {
-  AFEDefaults Defaults;
-  return Defaults.set();
-}

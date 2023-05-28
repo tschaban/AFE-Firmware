@@ -36,8 +36,9 @@ public:
   AFEDataAccess();
 
   /* It formats SPIFFS */
+  boolean setDefaultConfiguration();
+  boolean initializeFileSystem();
   boolean formatFileSystem();
-
   boolean fileExist(const char *path);
 
   void getConfiguration(DEVICE *);

@@ -494,9 +494,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #ifdef AFE_CONFIG_HARDWARE_FS3000
       exists = root["noOfFS3000s"];
       configuration->noOfFS3000s =
-          exists.success()
-              ? root["noOfFS3000s"]
-              : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_FS3000;
+          exists.success() ? root["noOfFS3000s"]
+                           : AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_FS3000;
 #endif
 
 #ifdef DEBUG
@@ -1429,12 +1428,12 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   configuration.port = AFE_CONFIG_MQTT_DEFAULT_PORT;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   configuration.lwt.idx = AFE_DOMOTICZ_DEFAULT_IDX;
-#else
-  configuration.lwt.topic[0] = AFE_EMPTY_STRING;
+#else  
   char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
   getDeviceID(_deviceId);
   sprintf(configuration.status.topic, AFE_CONFIG_MQTT_DEFAULT_STATE_TOPIC,
           _deviceId);
+  sprintf(configuration.lwt.topic,"%s/lwt",configuration.status.topic);  
 #endif
 
   configuration.retainAll = AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
@@ -7358,3 +7357,176 @@ void AFEDataAccess::printBufforSizeInfo(uint16_t bufferSize,
   }
 }
 #endif
+
+boolean AFEDataAccess::initializeFileSystem() {
+  boolean _ret;
+#ifdef DEBUG
+  Serial << endl << F("INFO: FILES SYSTEM: Mounting file system...");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  _ret = LITTLEFS.begin();
+#else
+  _ret = SPIFFS.begin();
+  if (_ret) {
+    yield();
+    SPIFFS.gc();
+  }
+#endif
+
+#ifdef DEBUG
+  if (_ret) {
+    Serial << F(" Success");
+  } else {
+    Serial << F(" FAILURE") << endl;
+  }
+#endif
+
+  return _ret;
+}
+
+boolean AFEDataAccess::setDefaultConfiguration() {
+  boolean _ret = false;
+/* Turning devicve LED on */
+#ifdef AFE_CONFIG_HARDWARE_LED
+#ifdef DEBUG
+  Serial << endl
+         << F("Turning on system LED on GPIO ")
+         << AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
+#endif
+  pinMode(AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO, OUTPUT);
+  digitalWrite(AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO, LOW);
+#endif
+
+  if (formatFileSystem()) {
+
+    /* Initializatin of the FS */
+    initializeFileSystem();
+
+    saveWelecomeMessage("");
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    createGateConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+    createLEDConfigurationFile();
+    createSystemLedIDConfigurationFile();
+#endif
+
+    createDeviceConfigurationFile();
+    createFirmwareConfigurationFile();
+    createNetworkConfigurationFile();
+    createMQTTConfigurationFile();
+    createProVersionConfigurationFile();
+    createPasswordConfigurationFile();
+    /* Setting device mode to Access Point */
+    saveDeviceMode(AFE_MODE_NETWORK_NOT_SET);
+
+#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+    createDomoticzConfigurationFile();
+#elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
+    createHomeAssistantConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RELAY
+    createRelayConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_SWITCH
+    createSwitchConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+    createADCInputConfigurationFile();
+#endif
+
+#if defined(T3_CONFIG)
+    PIR PIRConfiguration;
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CONTACTRON
+    createContractonConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_HPMA115S0
+    createHPMA115S0SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_UART
+    createSerialConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_I2C
+    createI2CConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BMEX80
+    createBMEX80SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BH1750
+    createBH1750SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_AS3935
+    createAS3935SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+    createAnemometerSensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+    createRainmeterSensorConfigurationFile();
+    createRainmeterSensorDataConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DS18B20
+    createDS18B20SensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    createRegulatorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+    createThermalProtectorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_DHT
+    createDHTSensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
+    createBinarySensorConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
+    createPN532ConfigurationFile();
+    createMiFareCardConfigurationFile();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_CLED
+    createCLEDConfigurationFile();
+    createCLEDEffectBlinkingConfigurationFile();
+    createCLEDEffectFadeInOutConfigurationFile();
+    createCLEDEffectWaveConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_CLED
+
+#ifdef AFE_CONFIG_HARDWARE_TSL2561
+    createTSL2561SensorConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_TSL2561
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+    createMCP23XXXConfigurationFile();
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
+
+    _ret = true;
+  }
+#ifdef DEBUG
+  else {
+    Serial << endl << F("ERROR: Formating failed");
+  }
+#endif
+  return _ret;
+}

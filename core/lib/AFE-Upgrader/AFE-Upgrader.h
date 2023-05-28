@@ -3,7 +3,6 @@
 #ifndef _AFE_UPGRADER_h
 #define _AFE_UPGRADER_h
 
-#include <AFE-Defaults.h>
 #include <AFE-Firmware.h>
 
 #ifdef DEBUG

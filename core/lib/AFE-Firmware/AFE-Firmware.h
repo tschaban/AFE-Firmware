@@ -33,6 +33,7 @@ private:
    *
    */
   void firstBooting(void);
+  
 
 public:
   struct GLOBAL_API_OBJECTS {
@@ -84,6 +85,13 @@ public:
   AFEFirmware();
 
   void begin();
+    /**
+   * @brief Initialization of the LITLLEFS or SPIFFS file system
+   * 
+   * @return true success, false failure
+   */
+  boolean initializeFS(void);
+
 
   void initializeNetwork(void);
   void checkFirmwareVersion(void);

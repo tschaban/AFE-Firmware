@@ -36,12 +36,12 @@ void AFEHardware::initHardwareItems(void) {
     initADC();
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_GATE
-    initGate();
-#endif
-
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
     initContactron();
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_GATE
+    initGate();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
@@ -165,7 +165,6 @@ void AFEHardware::initGate(void) {
     Gate[i] = new AFEGate();
     Gate[i]->begin(i, _Firmware->Device, _Firmware->API->Flash);
     GatesCurrentStates->state[i] = AFE_GATE_UNKNOWN;
-
     /* Assigning Gate ID to a contactron */
     for (uint8_t j = 0; j < Gate[i]->getNoOfContactrons(); j++) {
       Contactron[Gate[i]->getContactronId(j)]->gateId = i;

@@ -15,18 +15,20 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
   Data = _Data;
 
   gateId = id;
-  Data->getConfiguration(gateId,configuration);
+  Data->getConfiguration(gateId, configuration);
 #ifdef DEBUG
   Serial << endl
-         << F("INFO: Initializing the gate's relay: ") << configuration->relayId;
+         << F("INFO: Initializing the gate's relay: ")
+         << configuration->relayId;
 #endif
   if (configuration->relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    GateRelay->begin(Data,configuration->relayId);
+    GateRelay->begin(Data, configuration->relayId);
     GateRelay->setTimerUnitToSeconds(false);
     GateRelay->gateId = id;
   }
 #ifdef DEBUG
-  Serial << endl << F("INFO: Initializing the gate's ") << id << F(", contactrons");
+  Serial << endl
+         << F("INFO: Initializing the gate's ") << id << F(", contactrons");
 #endif
 
   /* How many contactrons monitors the gate. Default 0 set in class init
@@ -45,9 +47,9 @@ void AFEGate::begin(uint8_t id, AFEDevice *_Device, AFEDataAccess *_Data) {
 #endif
 
   for (uint8_t i = 0; i < numberOfContractons; i++) {
-    Contactron[i].begin(configuration->contactron.id[i], _Device, _Data);
+    Contactron[i] = new AFEContactron();
+    Contactron[i]->begin(configuration->contactron.id[i], Device, Data);
   }
-
 
 #ifdef DEBUG
   Serial << endl << F("INFO: Gate Initialization completed");
@@ -72,7 +74,7 @@ uint8_t AFEGate::getGateStateBasedOnContractons() {
   if (numberOfContractons > 0) {
     uint8_t _state[numberOfContractons];
     for (uint8_t i = 0; i < numberOfContractons; i++) {
-      _state[i] = Contactron[i].get();
+      _state[i] = Contactron[i]->get();
     }
     if (_state[0] == AFE_CONTACTRON_OPEN) {
       if (numberOfContractons == 2) {
