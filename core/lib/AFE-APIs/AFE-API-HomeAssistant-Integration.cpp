@@ -541,7 +541,7 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void) {
       sprintf(_deviceConfiguration->label, "%s: %s", _configuration.name,
               L_PERCEPTION);
       sprintf(_deviceConfiguration->deviceClass,
-              AFE_CONFIG_HA_DEVICE_CLASS_NONE);
+              AFE_CONFIG_HA_DEVICE_CLASS_ENUM);
       publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
 
       _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL;
@@ -724,10 +724,13 @@ void AFEAPIHomeAssistantIntegration::publishBMX80(void) {
 
         /* Air perception */
         _deviceConfiguration->unit[0] = AFE_EMPTY_STRING;
+        sprintf(_deviceConfiguration->deviceClass,
+                AFE_CONFIG_HA_DEVICE_CLASS_ENUM);
         _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION;
         sprintf(_deviceConfiguration->label, "%s: %s", _configuration.name,
                 L_PERCEPTION);
         publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
+
         /* Comfort */
         _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL;
         sprintf(_deviceConfiguration->label, "%s: %s", _configuration.name,
@@ -745,8 +748,12 @@ void AFEAPIHomeAssistantIntegration::publishBMX80(void) {
         _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_SENSOR_GAS_RESISTANCE;
         sprintf(_deviceConfiguration->label, "%s: %s", _configuration.name,
                 L_BMEX80_GAS);
+        /* Gas HA sensor doesn't support custom unit anymore
         sprintf(_deviceConfiguration->deviceClass,
-                AFE_CONFIG_HA_DEVICE_CLASS_GAS);
+        AFE_CONFIG_HA_DEVICE_CLASS_GAS);
+        */
+        sprintf(_deviceConfiguration->deviceClass,
+                AFE_CONFIG_HA_DEVICE_CLASS_NONE);
         sprintf(_deviceConfiguration->unit, AFE_UNIT_KOM);
         publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);
 
@@ -1418,6 +1425,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
             deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_ADC_VOLTAGE
                 ? F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_VOLTAGE)
                 : F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_VOLTAGE_CALCULATED));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       } else if (deviceConfiguration->type ==
@@ -1430,6 +1439,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
         /* Sensor ADC: RAW Percentage */
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PERCENT));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1439,6 +1450,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
         /* Sensor ADC: Battert meter: % */
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BATTERY_PERCENT));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       } else if (deviceConfiguration->type ==
@@ -1446,6 +1459,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
         /* Sensor ADC: Battert meter: V */
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_BATTERY_VOLT));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1458,6 +1473,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_TEMPERATURE) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_TEMPERATURE));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1468,6 +1485,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_HUMIDITY) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_HUMIDITY));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1478,6 +1497,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_HUMIDITY) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ABSOLUTE_HUMIDITY));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1488,6 +1509,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_DEW_POINT) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_DEW_POINT));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1498,6 +1521,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_HEAT_INDEX) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_HEAT_INDEX));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1508,8 +1533,6 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_PERCEPTION) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PERCEPTION));
-        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
-                      deviceConfiguration->unit);
       }
 #endif // Perception
 
@@ -1518,8 +1541,6 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_COMFORT_LEVEL) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_COMFORT));
-        _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
-                      deviceConfiguration->unit);
       }
 #endif // Comfort level
 
@@ -1528,6 +1549,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_RELATIVE_PRESSURE) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RELATIVE_PRESSURE));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1538,6 +1561,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_ABSOLUTE_PRESSURE) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ABSOLUTE_PRESSURE));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1563,6 +1588,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_CO2_EQUIVALENT) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_CO2_EQUIVALENT));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1581,6 +1608,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_GAS_RESISTANCE) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_GAS_RESISTANCE));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1591,6 +1620,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_ILLUMINANCE) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ILLUMINANCE));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1600,6 +1631,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_PM10) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1609,6 +1642,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_SENSOR_PM25) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1619,6 +1654,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_PM10_WHO) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM10_WHO));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1629,6 +1666,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_PM25_WHO) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_PM25_WHO));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1639,6 +1678,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_KMH) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_KMH));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1649,6 +1690,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_ANEMOMETER_MS) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ANEMOMETER_MS));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1658,6 +1701,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_FS3000_RAW) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_RAW));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1665,6 +1710,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_FS3000_MS) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_MS));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));                      
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1672,6 +1719,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_FS3000_MILH) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_MILH));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));                      
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1679,6 +1728,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
       else if (deviceConfiguration->type == AFE_CONFIG_HA_ITEM_FS3000_M3H) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_FS3000_M3H));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));                      
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1689,6 +1740,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMM) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMM));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1699,6 +1752,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MMH) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MMH));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1709,6 +1764,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM12H) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM12H));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1719,6 +1776,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_RAINMETER_MM24H) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_RAINMETER_MM24H));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1730,6 +1789,8 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
                AFE_CONFIG_HA_ITEM_SENSOR_ILLUMINANCE) {
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_VALUE_TEMPLATE),
                       F(HA_MQTT_DISCOVERY_VALUE_TEMPLATE_ILLUMINANCE));
+        _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE),
+                      FPSTR(HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE));
         _json.replace(F(HA_MQTT_DISCOVERY_TAG_UNIT_OF_MEASURE),
                       deviceConfiguration->unit);
       }
@@ -1829,6 +1890,7 @@ void AFEAPIHomeAssistantIntegration::publishItemToHomeAssistantMQTTDiscovery(
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_LIGHT_RGB), "");
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_OPTIMISTIC), "");
     _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_ENTITY_CATEGORY), "");
+    _json.replace(F(HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE), "");
 
     _json.toCharArray(_message, sizeof(_message) + 1);
 

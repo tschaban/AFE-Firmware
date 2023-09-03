@@ -199,6 +199,7 @@
 #define AFE_CONFIG_HA_DEVICE_CLASS_AQI "aqi"
 #define AFE_CONFIG_HA_DEVICE_CLASS_CO2 "carbon_dioxide"
 #define AFE_CONFIG_HA_DEVICE_CLASS_GAS "gas"
+#define AFE_CONFIG_HA_DEVICE_CLASS_ENUM "enum"
 #define AFE_CONFIG_HA_DEVICE_CLASS_ILLUMINANCE "illuminance"
 #define AFE_CONFIG_HA_DEVICE_CLASS_PM10 "pm10"
 #define AFE_CONFIG_HA_DEVICE_CLASS_PM25 "pm25"
@@ -271,8 +272,11 @@ const char HA_MQTT_DISCOVERY_JSON_STATES_GATE[] PROGMEM =
 
 
 const char HA_MQTT_DISCOVERY_JSON_SENSOR_COMMON[] PROGMEM =
-    ",\"val_tpl\":\"{{s.vt}}\",\"stat_t\":\"{{i.t}}\","
-    "\"unit_of_meas\":\"{{s.u}}\"";
+    ",\"val_tpl\":\"{{s.vt}}\",\"stat_t\":\"{{i.t}}\"{{uom}}";
+
+const char HA_MQTT_DISCOVERY_JSON_SENSOR_UNIT_OF_MEASURE[] PROGMEM =
+    ",\"unit_of_meas\":\"{{s.u}}\"";
+
 
 
 const char HA_MQTT_DISCOVERY_JSON_DEVICE_CLASS[] PROGMEM =
@@ -327,6 +331,7 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
 #define HA_MQTT_DISCOVERY_TAG_SET_BODY_DEVICE_CLASS "{{bdc}}"
 #define HA_MQTT_DISCOVERY_TAG_SET_BODY_OPTIONS "{{bdo}}"
 #define HA_MQTT_DISCOVERY_TAG_SET_SENSOR "{{sen}}"
+#define HA_MQTT_DISCOVERY_TAG_SET_SENSOR_UNIT_OF_MEASURE "{{uom}}"
 #define HA_MQTT_DISCOVERY_TAG_SET_LIGHT_RGB "{{rgb}}"
 #define HA_MQTT_DISCOVERY_TAG_SET_ENTITY_CATEGORY "{{bec}}"
 
