@@ -7,6 +7,9 @@
 AFEI2CScanner::AFEI2CScanner() {};
 
  void AFEI2CScanner::begin(TwoWire *_WirePort) {
+
+// @TODO Serial << endl << F("INFO: I2C[0]: Scannings for devices");
+
   AFEDataAccess Data;
   WirePort = _WirePort; 
  }

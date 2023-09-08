@@ -40,6 +40,19 @@ void AFEEvent::listener(void) {
 #endif
     _Firmware->timer->minutes = 0;
     _Firmware->timer->hours++;
+
+    if (_Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+#ifdef DEBUG
+      Serial << endl << F("INFO: WAN: Checking access to WAN");
+#endif
+      if (!_Firmware->API->REST->accessToWAN()) {
+        _Firmware->API->REST->checkAccessToWAN();
+#ifdef DEBUG
+      } else {
+        Serial << F(" ... already connected");
+#endif
+      }
+    }
   }
 
   /* Events triggered every 24hrs  */
@@ -77,10 +90,9 @@ void AFEEvent::listener(void) {
 
   if (_Firmware->API->Network->eventConnected()) {
     conenctedToNetwork();
-    /* Checking if AFE Key is valid */
-    _Firmware->validateProVersion();
   }
 
+  /* Checking if got disconnected from Network */
   if (_Firmware->API->Network->eventDisconnected()) {
     disconnectedFromNetwork();
   }
@@ -88,8 +100,8 @@ void AFEEvent::listener(void) {
   if (_Firmware->API->Network->connected()) {
     connectedToMQTTBroker();
   }
-  disconnectedFromMQTTBroker();
 
+  disconnectedFromMQTTBroker();
 }
 
 /**
@@ -160,7 +172,7 @@ void AFEEvent::conenctedToNetwork(void) {
       }
 #endif
 
-/* Not implemented for Dmoticz HTTP 
+/* Not implemented for Dmoticz HTTP
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #ifdef DEBUG
       Serial << endl
@@ -249,6 +261,14 @@ void AFEEvent::disconnectedFromNetwork(void) {
   _Firmware->Hardware->SystemLed->on();
 #endif
   _Firmware->API->REST->setNoWANAccess();
+
+  /* Forcing disconnection from MQTT Brokere */
+  if (_Firmware->Device->getMode() == AFE_MODE_NORMAL &&
+      _Firmware->Device->configuration.api.mqtt) {
+
+    AFEAsyncMQTTClient::eventDisconnected = true;
+  }
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   _Firmware->Hardware->SystemLed->off();
 #endif
@@ -286,21 +306,14 @@ void AFEEvent::connectedToMQTTBroker(void) {
 }
 
 void AFEEvent::disconnectedFromMQTTBroker(void) {
-  if (_MqttAPI->Mqtt->disconnectedEvent()) {
+  if (_Firmware->Device->getMode() == AFE_MODE_NORMAL &&
+      _Firmware->Device->configuration.api.mqtt) {
+
+    if (_MqttAPI->Mqtt->disconnectedEvent()) {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: EVENT: MQTT Disconnected: triggered") << endl
-           << F("Forcing disconnection with MQTT Broker in the object only");
+      Serial << endl << F("INFO: EVENT: MQTT Disconnected: triggered");
 #endif
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-    _Firmware->Hardware->SystemLed->on();
-#endif
-    _MqttAPI->Mqtt->_Broker->disconnect(true);
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-    _Firmware->Hardware->SystemLed->off();
-#endif
+    }
   }
 }
 

@@ -7,59 +7,28 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
-
-  Serial << endl
-         << endl
-         << F("################################ BOOTING "
-              "################################")
-         << endl
-         << F("INFO: All classes and global variables initialized") << endl
-         << F("INFO: Initializing device") << endl;
-
+  Serial << F(AFE_D_WELCOME_MESSAGE);
   getESPInformation();
 #endif
 
 #ifdef AFE_ESP32
 #else // ESP8266
-  // Erase all config
+// Erase all config
+#ifdef DEBUG
+  Serial << F("INFO: ESP: Internally stored configuration: erased: ");
+#endif
   _success = ESP.eraseConfig();
 #ifdef DEBUG
-
   if (_success) {
-    Serial << F("INFO: ESP: Internally stored configuration: erased") << endl;
+    Serial << F("success") << endl;
   } else {
-    Serial << F("ERROR: ESP: Internally stored configuration NOT erased")
-           << endl;
+    Serial << F("FAILURE") << endl;
   }
 #endif
 #endif // ESP32/ESP8266
 
-/**
- * @brief Initializing file system
- *
- */
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  _success = LITTLEFS.begin();
-#else
-  _success = SPIFFS.begin();
-#endif
 #ifdef DEBUG
-  if (_success) {
-    Serial << endl
-           << F("INFO: FILES SYSTEM: Mounted. Performs a quick garbage "
-                "collection operation on SPIFFS");
-  } else {
-    Serial << endl << F("WARN: FILES SYSTEM: Not mounted") << endl;
-  }
-#endif
-
-#if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
-  yield();
-  SPIFFS.gc();
-#endif
-
-#ifdef DEBUG
-  Serial << endl << F("INFO: Setting AFE Global Objects");
+  Serial << endl << F("INFO: Configuring global Objects");
 #endif
 
   Firmware->begin();
@@ -298,7 +267,6 @@ void loop() {
 #ifdef AFE_CONFIG_HARDWARE_FS3000
         FS3000SensorEventsListener();
 #endif
-
 
 /**
  * @brief Listenings and processing PN532 events

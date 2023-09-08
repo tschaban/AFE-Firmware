@@ -54,7 +54,7 @@ private:
 
   unsigned long startTime = 0;
 #ifdef AFE_CONFIG_HARDWARE_LED
-  AFELED *ContactronLed;
+  AFELED *ContactronLed = new AFELED();
 #endif
 };
 

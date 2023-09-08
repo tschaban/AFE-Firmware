@@ -4317,10 +4317,15 @@ void AFESitesGenerator::setAttributes(String *page) {
   page->replace(F("{{s.lang}}"), F(L_LANGUAGE_SHORT));
 
   char _ramText[7];
+  #ifndef AFE_ESP32
   sprintf(_ramText, "%-.1f",
           100 -
               (float)((float)system_get_free_heap_size() / (float)AFE_MAX_RAM) *
                   100);
+  #else
+  sprintf(_ramText, "?");
+  #endif
+  
   page->replace(F("{{f.r}}"), _ramText);
 }
 

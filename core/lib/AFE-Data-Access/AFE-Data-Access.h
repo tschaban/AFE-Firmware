@@ -10,7 +10,7 @@
 #include <Arduino.h>
 
 #ifdef AFE_ESP32
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 #include <WiFi.h>
 #else /* ESP8266 */
 #include <ESP8266WiFi.h>
@@ -36,8 +36,9 @@ public:
   AFEDataAccess();
 
   /* It formats SPIFFS */
+  boolean setDefaultConfiguration();
+  boolean initializeFileSystem();
   boolean formatFileSystem();
-
   boolean fileExist(const char *path);
 
   void getConfiguration(DEVICE *);

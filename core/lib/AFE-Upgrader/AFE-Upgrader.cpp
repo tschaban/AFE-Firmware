@@ -119,10 +119,7 @@ void AFEUpgrader::upgradeFirmwarType() {
 #endif
 
   /* Setting the device from scratch */
-  AFEDefaults *Defaults = new AFEDefaults();
-  Defaults->set();
-  delete Defaults;
-  Defaults = NULL;
+  Firmware->API->Flash->setDefaultConfiguration();
 
 #ifdef DEBUG
   Serial << endl << F("INFO: UPGRADE: Restoring core configuration");

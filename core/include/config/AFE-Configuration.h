@@ -468,8 +468,6 @@
  * @brief include Firmware check/update config
  * 
  */
-#ifdef AFE_CONFIG_FUNCTIONALITY_CHECK_FIRMWARE_VERSION
 #include <functionalities/AFE-Firmware-Update.h>
-#endif
 
 #endif // _AFE_Configuration_h

@@ -35,6 +35,8 @@ private:
   unsigned long _ledStartTime = 0;
 #endif
 
+  unsigned long _reconnectionTimeout = 0;
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   /**
    * @brief Returns RSSI level in DOmoticz Range

@@ -3,10 +3,11 @@
 
 
 
-#define AFE_FIRMWARE_VERSION "3.7.0"
+#define AFE_FIRMWARE_VERSION "3.8.0.B0"
 #define AFE_FIRMWARE_TYPE 7
 
 /* GPIOs of SmartnyDom Sterownik 
+
 System LED: 22
 RGB LED 1: 13
 RGB LED 2: 14

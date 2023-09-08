@@ -147,7 +147,7 @@ void switchEventsListener(void) {
             ? Firmware->Device->reboot(AFE_MODE_CONFIGURATION)
             : Firmware->Device->reboot(AFE_MODE_NORMAL);
       } else if (Hardware->Switch[i]->is30s()) {
-        Firmware->Device->setDevice();
+        Firmware->API->Flash->setDefaultConfiguration();
         Firmware->Device->reboot(AFE_MODE_ACCESS_POINT);
       }
     }
