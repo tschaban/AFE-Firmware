@@ -15,11 +15,14 @@
 **************************************************************************/
 
 /**
- * Work LOG T4
+ * Work LOG T4 @TODO
  * - lokalizacje
- * - to set fr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200, actual
+ * - to set fOr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200, actual
  * JSON size: 40
  * - ESP32
+ * 
+
+
  */
 
 #include <AFE-Configuration.h>

@@ -20,9 +20,11 @@
 
 #ifdef DEBUG
 #include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFEFirmware {
+class AFEFirmware
+{
 
 private:
   unsigned long miliseconds = 0;
@@ -33,10 +35,10 @@ private:
    *
    */
   void firstBooting(void);
-  
 
 public:
-  struct GLOBAL_API_OBJECTS {
+  struct GLOBAL_API_OBJECTS
+  {
     AFEWiFi *Network = new AFEWiFi();
     AFEJSONRPC *REST = new AFEJSONRPC();
     AFEDataAccess *Flash = new AFEDataAccess();
@@ -45,7 +47,8 @@ public:
 #endif
   };
 
-  struct GLOBAL_HARDWARE_OBJECTS {
+  struct GLOBAL_HARDWARE_OBJECTS
+  {
 #ifdef AFE_CONFIG_HARDWARE_LED
     AFELED *SystemLed = new AFELED();
 #endif
@@ -59,12 +62,14 @@ public:
 #endif
   };
 
-  struct GLOBAL_CONFIGURATION_OBJECTS {
+  struct GLOBAL_CONFIGURATION_OBJECTS
+  {
     PRO_VERSION *Pro = new PRO_VERSION;
     FIRMWARE *Version = new FIRMWARE;
   };
 
-  struct TIMER_OBJECT {
+  struct TIMER_OBJECT
+  {
     unsigned long miliseconds;
     uint8_t minutes;
     uint8_t hours;
@@ -81,17 +86,20 @@ public:
 
   AFEDevice *Device = new AFEDevice();
 
+#ifdef DEBUG
+  AFEDebugger *Debugger = new AFEDebugger();
+#endif
+
   /* Constructor */
   AFEFirmware();
 
   void begin();
-    /**
+  /**
    * @brief Initialization of the LITLLEFS or SPIFFS file system
-   * 
+   *
    * @return true success, false failure
    */
   boolean initializeFS(void);
-
 
   void initializeNetwork(void);
   void checkFirmwareVersion(void);

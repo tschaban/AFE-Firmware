@@ -31,14 +31,14 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 24 iECS Gate Driver v3
 10 T1 Mega pack
 11 T1 E1 Custom
-30 ESP32 30Pins
+30 ESP32 30Pins  // From version 3.7.2 30Pins is obsolete. Replaced by version 38 pins
 31 ESP32 38Pins
 
 ### HARDWARE ID ###
 
 0  : ESP8266
 1  : ESP8285
-2  : ESP32-30p
+2  : ESP32-30p  // From version 3.7.2 30Pins is obsolete. Replaced by version 38 pins
 3  : ESP32-38p
 4  : Shelly-1
 5  : Sonoff Basic
@@ -61,7 +61,7 @@ $targetHardware[1][2] = "generic";
 
 $targetHardware[2][0] = "esp32";
 $targetHardware[2][1] = 30; 
-$targetHardware[2][2] = "30pins";
+$targetHardware[2][2] = "38pins";
 
 $targetHardware[3][0] = "esp32";
 $targetHardware[3][1] = 31; 
@@ -215,14 +215,14 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Standard API ESP32
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -231,14 +231,14 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-generic-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-generic-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -364,14 +364,14 @@ $sourceFolder[$index]["api"] = $targetAPI[0];
 // Domoticz API ESP32
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-domoticz/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -380,14 +380,14 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-domoticz-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -513,14 +513,14 @@ $sourceFolder[$index]["api"] = $targetAPI[2];
 // ha API ESP32
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-ha/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -529,14 +529,14 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_30P-ha-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;

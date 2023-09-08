@@ -10,7 +10,7 @@
 #include <Arduino.h>
 
 #ifdef AFE_ESP32
-#include <LITTLEFS.h>
+#include <LittleFS.h>
 #include <WiFi.h>
 #else /* ESP8266 */
 #include <ESP8266WiFi.h>

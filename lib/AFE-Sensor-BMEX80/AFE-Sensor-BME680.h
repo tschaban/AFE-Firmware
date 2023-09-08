@@ -11,7 +11,7 @@
 #include <EEPROM.h>
 #include <Wire.h>
 #include <Arduino.h>
-#include <bsec.h>
+#include <bsec2.h>
 
 
 //#include <bsec_serialized_configurations_iaq.h>
@@ -27,7 +27,8 @@
 class AFESensorBME680 {
 
 private:
-  Bsec *Bme = new Bsec();
+  Bsec2 *Bme = new Bsec2();
+  const bsecOutputs *sensorOutputs;
 
   const uint8_t bsec_config_iaq[454] = {
       0,   8,   4,   1,   61,  0,   0,   0,   0,   0,   0,   0,   174, 1,   0,

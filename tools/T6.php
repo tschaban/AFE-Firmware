@@ -27,7 +27,7 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 0  : ESP8266
 1  : Wheater Station iECS 2.0
 2 :  Wheater Station iECS 2.1
-3  : ESP32-30p
+3  : ESP32-30p  // From version 3.7.2 30Pins is obsolete. Replaced by version 38 pins
 4  : ESP32-38p
 5  : E1
 6  : E2
@@ -156,7 +156,7 @@ $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-standard/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -172,7 +172,7 @@ $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-standard-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -260,7 +260,7 @@ $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -276,7 +276,7 @@ $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -363,7 +363,7 @@ $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -379,7 +379,7 @@ $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
-$index++;
+$index++; // It will not create a new binary; as 30p and 38p version have been merged
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;

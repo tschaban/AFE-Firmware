@@ -15,14 +15,14 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 ### AFE_DEVICE_ID ###
 
 0 ESP Generic
-30 ESP32 30Pins
+30 ESP32 30Pins  // From version 3.7.2 30Pins is obsolete. Replaced by version 38 pins
 31 ESP32 38Pins
 
 ### HARDWARE ID ###
 
 0  : ESP8266
 1  : ESP8285
-3  : ESP32-30p
+3  : ESP32-30p  // From version 3.7.2 30Pins is obsolete. Replaced by version 38 pins
 4  : ESP32-38p
 
 
@@ -41,7 +41,7 @@ $targetHardware[$index][2] = "";
 $index++; // 2
 $targetHardware[$index][0] = "esp32";
 $targetHardware[$index][1] = 30;
-$targetHardware[$index][2] = "30pins";
+$targetHardware[$index][2] = "38pins";
 
 $index++; // 3
 $targetHardware[$index][0] = "esp32";
@@ -94,7 +94,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP32 4MB 30p */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_30P-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -102,8 +102,8 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP32 4MB 30p Debug */
-$index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_30P-generic-development/firmware.bin";
+$index++; 
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-generic-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -111,7 +111,7 @@ $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP32 4MB 38p */
-$index++;
+$index++; // The bin file is not created (30p merged with 38p) stays for bin cont.
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -120,7 +120,7 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP32 4MB 38p  Debug*/
-$index++;
+$index++; // The bin file is not created (30p merged with 38p) stays for bin cont.
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-generic-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -171,7 +171,7 @@ $sourceFolder[$index]["api"] = $targetAPI[0];
 
 /* ESP32 4MB 30p */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_30P-domoticz/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -180,7 +180,7 @@ $sourceFolder[$index]["api"] = $targetAPI[0];
 
 /* ESP32 4MB 30p Debug */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_30P-domoticz-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -188,7 +188,7 @@ $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
 /* ESP32 4MB 38p */
-$index++;
+$index++; // The bin file is not created (30p merged with 38p) stays for bin cont.
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -197,7 +197,7 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
 /* ESP32 4MB 38p  Debug*/
-$index++;
+$index++; // The bin file is not created (30p merged with 38p) stays for bin cont.
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -248,7 +248,7 @@ $sourceFolder[$index]["api"] = $targetAPI[2];
 
 /* ESP32 4MB 30p */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_30P-ha/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -257,7 +257,7 @@ $sourceFolder[$index]["api"] = $targetAPI[2];
 
 /* ESP32 4MB 30p Debug */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_30P-ha-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -265,7 +265,7 @@ $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
 /* ESP32 4MB 38p */
-$index++;
+$index++; // The bin file is not created (30p merged with 38p) stays for bin cont.
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -274,7 +274,7 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
 /* ESP32 4MB 38p  Debug*/
-$index++;
+$index++; // The bin file is not created (30p merged with 38p) stays for bin cont.
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T4_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;

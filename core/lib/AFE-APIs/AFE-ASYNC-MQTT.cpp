@@ -187,9 +187,12 @@ boolean AFEAsyncMQTTClient::publish(const char *topic, const char *message) {
     Serial << endl
            << F("Retain: ") << (configuration->retainAll ? F("YES") : F("NO"));
     Serial << endl << "Message size: " << strlen(message);
+#ifndef AFE_ESP32
     Serial << endl
            << F("Free memory: ") << system_get_free_heap_size() / 1024
            << F("kB");
+#endif
+
 #endif
     if (strlen(topic) > 0) {
       _publishedId = _Broker->publish(topic, configuration->qos,

@@ -2,7 +2,8 @@
 
 AFEFirmware::AFEFirmware(){};
 
-void AFEFirmware::begin() {
+void AFEFirmware::begin()
+{
 
   timer->miliseconds = millis();
   timer->minutes = 0;
@@ -23,7 +24,10 @@ void AFEFirmware::begin() {
    */
   unsigned long _counter = API->Flash->getRebootCounter();
 #ifdef DEBUG
-  Serial << endl << F("INFO: Firmware rebooted: ") << _counter << F(" times");
+
+  Debugger->printInformation(F("Firmware rebooted"), F("BOOT"), 0, 0);
+  Debugger->printValue(_counter, F("times"));
+
 #endif
 
 /**
@@ -43,9 +47,10 @@ void AFEFirmware::begin() {
 #endif
 }
 
-void AFEFirmware::initializeNetwork(void) {
+void AFEFirmware::initializeNetwork(void)
+{
 #ifdef DEBUG
-  Serial << endl << F("INFO: BOOT: Starting network");
+  Debugger->printInformation(F("Starting network"), F("BOOT"));
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
   API->Network->begin(Device, API->Flash, Hardware->SystemLed);
@@ -57,17 +62,21 @@ void AFEFirmware::initializeNetwork(void) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEFirmware::initializeSystemLED(void) {
+void AFEFirmware::initializeSystemLED(void)
+{
   uint8_t id = API->Flash->getSystemLedID();
 #ifdef DEBUG
   boolean initialized = false;
 #endif
-  if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    if (Device->configuration.noOfLEDs - 1 >= id) {
+  if (id != AFE_HARDWARE_ITEM_NOT_EXIST)
+  {
+    if (Device->configuration.noOfLEDs - 1 >= id)
+    {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
       Led->addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
-      if (Hardware->SystemLed->begin(API->Flash, id)) {
+      if (Hardware->SystemLed->begin(API->Flash, id))
+      {
         Hardware->SystemLed->on();
 #ifdef DEBUG
         initialized = true;
@@ -75,10 +84,13 @@ void AFEFirmware::initializeSystemLED(void) {
       }
     }
 #ifdef DEBUG
-    if (initialized) {
-      Serial << endl << F("INFO: BOOT: System LED initialized");
-    } else {
-      Serial << endl << F("WARN: BOOT: System LED NOT initialized");
+    if (initialized)
+    {
+      Debugger->printInformation(F("System LED initialized"), F("BOOT"));
+    }
+    else
+    {
+      Debugger->printWarning(F("System LED NOT initialized"), F("BOOT"));
     }
 #endif // DEBUG
   }
@@ -86,13 +98,15 @@ void AFEFirmware::initializeSystemLED(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-void AFEFirmware::initializeIIC(void) {
+void AFEFirmware::initializeIIC(void)
+{
   I2CPORT I2CBUSConfiguration;
   AFEI2CScanner *I2CBus = new AFEI2CScanner();
   boolean success = false;
 
 #ifdef AFE_ESP32
-  if (Device->configuration.noOfI2Cs > 0) {
+  if (Device->configuration.noOfI2Cs > 0)
+  {
     API->Flash->getConfiguration(0, &I2CBUSConfiguration);
 
 #ifdef DEBUG
@@ -109,9 +123,13 @@ void AFEFirmware::initializeIIC(void) {
   API->Flash->getConfiguration(&I2CBUSConfiguration);
 
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: I2C: SDA: ") << I2CBUSConfiguration.SDA << F(", SCL: ")
-         << I2CBUSConfiguration.SCL;
+
+  Debugger->printInformation(F("Initialization"), F("I2C"));
+  Debugger->printBulletPoint("SDA:");
+  Debugger->printValue(I2CBUSConfiguration.SDA, 1);
+  Debugger->printBulletPoint("SCL:");
+  Debugger->printValue(I2CBUSConfiguration.SCL);
+
 #endif
 
   Hardware->WirePort0->begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL);
@@ -120,10 +138,12 @@ void AFEFirmware::initializeIIC(void) {
 
 #ifdef DEBUG
     // @TODO there was delay(100) here, testing without it
-    if (!success) {
-      Serial << endl << F("ERROR: I2C[0]: Bus doesn't work");
-    } else {
-      Serial << endl << F("INFO: I2C[0]: Scannings for devices");
+    if (!success)
+    {
+      Debugger->printError(F("Doesn't work"), F("I2C[0]"));
+    }
+    else
+    {
       I2CBus->begin(Hardware->WirePort0);
       I2CBus->scanAll();
     }
@@ -132,7 +152,8 @@ void AFEFirmware::initializeIIC(void) {
 #ifdef AFE_ESP32
   }
 
-  if (Device->configuration.noOfI2Cs > 1) {
+  if (Device->configuration.noOfI2Cs > 1)
+  {
     API->Flash->getConfiguration(1, &I2CBUSConfiguration);
 
 #ifdef DEBUG
@@ -148,10 +169,15 @@ void AFEFirmware::initializeIIC(void) {
 
 #ifdef DEBUG
 
-    if (!success) {
-      Serial << endl << F("ERROR: I2C[1]: Bus doesn't work");
-    } else {
-      Serial << endl << F("INFO: I2C[1]: Scannings for devices");
+    if (!success)
+    {
+      Serial << endl
+             << F("ERROR: I2C[1]: Bus doesn't work");
+    }
+    else
+    {
+      Serial << endl
+             << F("INFO: I2C[1]: Scannings for devices");
       I2CBus->begin(Hardware->WirePort1);
       I2CBus->scanAll();
     }
@@ -164,52 +190,59 @@ void AFEFirmware::initializeIIC(void) {
 }
 #endif
 
-void AFEFirmware::validateProVersion(void) {
+void AFEFirmware::validateProVersion(void)
+{
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: AFE PRO: Checking AFE Pro Key");
+  Debugger->printInformation(F("Checking AFE Pro Key"), F("AFE Pro"));
 #endif
 
-  if (strlen(Configuration->Pro->serial) == 0 && Configuration->Pro->valid) {
+  if (strlen(Configuration->Pro->serial) == 0 && Configuration->Pro->valid)
+  {
     Configuration->Pro->valid = false;
 #ifdef DEBUG
-    Serial << endl << F("INFO: AFE PRO: Valid with no key");
+    Debugger->printInformation(F("Valid with no key"), F("AFE Pro"));
 #endif
     API->Flash->saveConfiguration(Configuration->Pro);
-  } else if (strlen(Configuration->Pro->serial) > 0) {
+  }
+  else if (strlen(Configuration->Pro->serial) > 0)
+  {
     String _HtmlResponse;
     boolean isValid;
     _HtmlResponse.reserve(6);
-    if (API->REST->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO)) {
+    if (API->REST->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO))
+    {
       isValid = _HtmlResponse.length() > 0 && _HtmlResponse.equals("true")
                     ? true
                     : false;
 
-      if (Configuration->Pro->valid != isValid) {
+      if (Configuration->Pro->valid != isValid)
+      {
         Configuration->Pro->valid = isValid;
         API->Flash->saveConfiguration(Configuration->Pro);
 #ifdef DEBUG
-        Serial << endl << F("INFO: AFE PRO: Key state has been changed");
+        Debugger->printInformation(F("Key state has been changed"), F("AFE Pro"));
 #endif
       }
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: AFE PRO: Key checked: ")
-             << (isValid ? F("valid") : F("invalid"));
+      Debugger->printInformation(F("Key checked: "), F("AFE Pro"));
+      Debugger->printLine(isValid ? F("valid") : F("invalid"), 0);
 #endif
     }
 #ifdef DEBUG
-    else {
-      Serial << endl << F("ERROR: AFE PRO: while checing the key");
+    else
+    {
+      Debugger->printError(F("while checing the key"), F("AFE Pro"));
     }
 #endif
   }
 }
 
-void AFEFirmware::checkFirmwareVersion(void) {
+void AFEFirmware::checkFirmwareVersion(void)
+{
 #ifdef DEBUG
-  Serial << endl << F("INFO: FIRMWARE: Checking firmware version");
+  Debugger->printInformation(F("Checking firmware version"), F("FIRMWARE"));
 #endif
 
   String _HtmlResponse;
@@ -217,46 +250,56 @@ void AFEFirmware::checkFirmwareVersion(void) {
 
   if (API->REST->sent(
           _HtmlResponse,
-          AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_VERSION)) {
+          AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_VERSION))
+  {
     if (_HtmlResponse.length() > 0 &&
         _HtmlResponse.length() <=
-            sizeof(Configuration->Version->installed_version)) {
+            sizeof(Configuration->Version->installed_version))
+    {
       char _tempVersion[sizeof(Configuration->Version->installed_version)];
       _HtmlResponse.toCharArray(
           _tempVersion, sizeof(Configuration->Version->installed_version));
       if (strcmp(_tempVersion, Configuration->Version->installed_version) !=
-          0) {
+          0)
+      {
         API->Flash->saveLatestFirmwareVersion(_tempVersion);
 #ifdef DEBUG
-        Serial << endl
-               << "INFO: FIRMWARE: New firmware version available: "
-               << _HtmlResponse;
-      } else {
-        Serial << endl << "INFO: FIRMWARE: Up2date: " << _HtmlResponse;
+        Debugger->printInformation(F("New firmware version available"), F("FIRMWARE"));
+      }
+      else
+      {
+        Debugger->printInformation(F("Up2date"), F("FIRMWARE"));
 #endif
       }
     }
   }
 }
 
-void AFEFirmware::firstBooting(void) {
+void AFEFirmware::firstBooting(void)
+{
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: FIRMWARE: Checking if first time launch ... ");
+  Debugger->printInformation(F("Checking if first time launch"), F("FIRMWARE"));
 #endif
 
-  if (Device->getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
+  if (Device->getMode() == AFE_MODE_FIRST_TIME_LAUNCH)
+  {
 #ifdef DEBUG
-    Serial << F("YES");
+    Debugger->printBulletPoint(F("Yes"));
 #endif
-    if (API->Flash->setDefaultConfiguration()) {
+    if (API->Flash->setDefaultConfiguration())
+    {
       Device->begin();
-    } else {
+    }
+    else
+    {
       Device->reboot();
     }
 #ifdef DEBUG
-  } else {
-    Serial << F("NO");
+  }
+  else
+  {
+    Debugger->printBulletPoint(F("No"));
 #endif
   }
 }

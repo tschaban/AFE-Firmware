@@ -7,15 +7,7 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
-
-  Serial << endl
-         << endl
-         << F("################################ BOOTING "
-              "################################")
-         << endl
-         << F("INFO: All classes and global variables initialized") << endl
-         << F("INFO: Initializing device") << endl;
-
+  Serial << F(AFE_D_WELCOME_MESSAGE);
   getESPInformation();
 #endif
 
@@ -36,7 +28,7 @@ void setup() {
 #endif // ESP32/ESP8266
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Configuring global Oojects");
+  Serial << endl << F("INFO: Configuring global Objects");
 #endif
 
   Firmware->begin();

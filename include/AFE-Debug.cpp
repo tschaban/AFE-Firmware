@@ -3,7 +3,13 @@
 #ifdef DEBUG
 
 #define DEBUG_INTERVAL 60
+
+/* DEBUG Messages */
+#define AFE_D_WELCOME_MESSAGE "\n\n################################ BOOTING ################################\nINFO: All classes and global variables initialized\nINFO: Initializing device\n"
+
+
 unsigned long debugStartTime = 0;
+
 
 void debugListener();
 void getAvailableMem();
@@ -29,8 +35,12 @@ void debugListener() {
 }
 
 void getAvailableMem() {
-  Serial << endl
-         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024 << F("kB");
+  
+  #ifndef AFE_ESP32
+  Serial << endl << F("INFO: RAM: ") << system_get_free_heap_size() / 1024 << F("kB");
+  #else
+  Serial << endl << F("WARN: RAM: Free? Not implemented yet for ESP32");
+  #endif
 }
 
 #if AFE_FILE_SYSTEM == AFE_FS_SPIFFS

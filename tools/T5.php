@@ -31,7 +31,7 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 10 T1 Mega pack
 11 T1 E1 Custom
 12 T5 E1 Custom
-30 ESP32 30Pins
+30 ESP32 30Pins  // From version 3.7.2 30Pins is obsolete. Replaced by version 38 pins
 31 ESP32 38Pins
 
 ### HARDWARE ID ###
@@ -40,7 +40,7 @@ $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
 1  : ESP8285
 2  : iECS v2
 3  : iECS v3
-4  : ESP32-30p (not used since 3.7.2)
+4  : ESP32-30p  // From version 3.7.2 30Pins is obsolete. Replaced by version 38 pins
 5  : ESP32-38p
 6  : E1 ESP32-30p  (not used since 3.7.2)
 7  : E1 ESP32-38p
@@ -72,14 +72,14 @@ $targetHardware[$index][0] = "iecs";
 $targetHardware[$index][1] = 24;
 $targetHardware[$index][2] = "iecs-gate-driver-v3";
 
-/*
+
 $index++; // 4
 $targetHardware[$index][0] = "esp32";
 $targetHardware[$index][1] = 30;
-$targetHardware[$index][2] = "30pins";
+$targetHardware[$index][2] = "38pins";
 */
 
-$index = 5;
+$index++; // 5
 $targetHardware[$index][0] = "esp32";
 $targetHardware[$index][1] = 31;
 $targetHardware[$index][2] = "38pins";
@@ -168,9 +168,9 @@ $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
-/*
+
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_30P-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 4;
@@ -178,15 +178,14 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_30P-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-generic-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 4;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[1];
-*/
 
-$index++;
+$index++; // It's here for bin cont. 30p to 38p merge
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -327,9 +326,9 @@ $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
-/*
+
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_30P-domoticz/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 4;
@@ -337,14 +336,14 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_30P-domoticz-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 4;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[0];
-*/
-$index++;
+
+$index++; // It's here for bin cont. 30p to 38p merge
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -352,7 +351,7 @@ $sourceFolder[$index]["hardware"] = 5;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
-$index++;
+$index++; // It's here for bin cont. 30p to 38p merge
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-domoticz-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -483,9 +482,9 @@ $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
-/*
+
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_30P-ha/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 4;
@@ -493,14 +492,14 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_30P-ha-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 4;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[2];
-*/
-$index++;
+
+$index++; // It's here for bin cont. 30p to 38p merge
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
@@ -508,7 +507,7 @@ $sourceFolder[$index]["hardware"] = 5;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
-$index++;
+$index++; // It's here for bin cont. 30p to 38p merge
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T5_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
