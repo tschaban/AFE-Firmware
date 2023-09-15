@@ -51,6 +51,7 @@ void AFEFirmware::initializeNetwork(void)
 {
 #ifdef DEBUG
   Debugger->printInformation(F("Starting network"), F("BOOT"));
+  API->Network->addReference(Debugger);
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
   API->Network->begin(Device, API->Flash, Hardware->SystemLed);
@@ -126,7 +127,7 @@ void AFEFirmware::initializeIIC(void)
 
   Debugger->printInformation(F("Initialization"), F("I2C"));
   Debugger->printBulletPoint("SDA:");
-  Debugger->printValue(I2CBUSConfiguration.SDA, 1);
+  Debugger->printValue(I2CBUSConfiguration.SDA);
   Debugger->printBulletPoint("SCL:");
   Debugger->printValue(I2CBUSConfiguration.SCL);
 
@@ -227,7 +228,7 @@ void AFEFirmware::validateProVersion(void)
 
 #ifdef DEBUG
       Debugger->printInformation(F("Key checked: "), F("AFE Pro"));
-      Debugger->printLine(isValid ? F("valid") : F("invalid"), 0);
+      Debugger->printValue(isValid ? F("valid") : F("invalid"), 0);
 #endif
     }
 #ifdef DEBUG

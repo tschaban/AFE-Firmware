@@ -7,7 +7,7 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
-  Serial << F(AFE_D_WELCOME_MESSAGE);
+  Firmware->Debugger->printValue(F(AFE_D_WELCOME_MESSAGE));
   getESPInformation();
 #endif
 
@@ -15,20 +15,20 @@ void setup() {
 #else // ESP8266
 // Erase all config
 #ifdef DEBUG
-  Serial << F("INFO: ESP: Internally stored configuration: erased: ");
+  Firmware->Debugger->printInformation(F("Internally stored configuration: erased: "),F("ESP"));
 #endif
   _success = ESP.eraseConfig();
 #ifdef DEBUG
   if (_success) {
-    Serial << F("success") << endl;
+    Firmware->Debugger->printValue(F("success"),0,1);
   } else {
-    Serial << F("FAILURE") << endl;
+    Firmware->Debugger->printValue(F("FAILURE"),0,1);
   }
 #endif
 #endif // ESP32/ESP8266
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Configuring global Objects");
+  Firmware->Debugger->printInformation(F("Configuring global Objects"),F("BOOT"));
 #endif
 
   Firmware->begin();
@@ -50,11 +50,11 @@ void setup() {
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: WIFI: Checking, if WiFi was configured: ");
+  Firmware->Debugger->printInformation(F("Checking, if WiFi was configured"),F("WIFI"));
 #endif
   if (Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
-    Serial << F("NO");
+    Firmware->Debugger->printValue(F("No"),0);
 #endif
   } else {
 /**
@@ -62,8 +62,8 @@ void setup() {
  *
  */
 #ifdef DEBUG
-    Serial << F("YES") << endl
-           << F("INFO: FIRMWARE: Checking if firmware should be upgraded?");
+    Firmware->Debugger->printValue(F("Yes"),0);
+    Firmware->Debugger->printInformation(F("Checking if firmware should be upgraded?"),F("FIRMWARE"));
 #endif
     AFEUpgrader *Upgrader = new AFEUpgrader(Firmware);
     Upgrader->upgraded();
@@ -191,7 +191,7 @@ void setup() {
               "####"
               "########");
   getAvailableMem();
-  Serial << F(": Booting completed");
+  Firmware->Debugger->printValue(F(": Booting completed"),0);
 
 #endif
 }

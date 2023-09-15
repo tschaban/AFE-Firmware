@@ -15,10 +15,11 @@
 
 #else // ESP8266
 #include <ESP8266WiFi.h>
+#include <ESP8266mDNS.h>
 #endif // ESP32/ESP8266
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
 class AFEWiFi {
@@ -93,6 +94,10 @@ private:
    *
    */
   void switchConfiguration();
+
+#ifdef DEBUG
+  AFEDebugger *Debugger;
+#endif
 
 public:
 #ifndef AFE_ESP32
@@ -191,6 +196,7 @@ public:
 #ifdef DEBUG
   static void
   onWiFiAPStationConnected(const WiFiEventSoftAPModeStationConnected &event);
+  void addReference(AFEDebugger *_Debugger);
 #endif
 
 #endif

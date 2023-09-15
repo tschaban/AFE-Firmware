@@ -77,7 +77,7 @@ $index++; // 4
 $targetHardware[$index][0] = "esp32";
 $targetHardware[$index][1] = 30;
 $targetHardware[$index][2] = "38pins";
-*/
+
 
 $index++; // 5
 $targetHardware[$index][0] = "esp32";

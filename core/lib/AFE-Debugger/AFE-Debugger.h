@@ -30,6 +30,14 @@ public:
     AFEDebugger();
 
     void printInformation(const char *text, const __FlashStringHelper *messageCategory, uint8_t newLineBefore = 1, uint8_t newLineAfter = 0);
+    /**
+     * @brief Generate debugge message of a type: INFO
+     * 
+     * @param  text             Message
+     * @param  messageCategory  Category, Location, Group
+     * @param  newLineBefore    Default: 1
+     * @param  newLineAfter     Defualt: 0
+     */
     void printInformation(const __FlashStringHelper *text, const __FlashStringHelper *messageCategory, uint8_t newLineBefore = 1, uint8_t newLineAfter = 0);
 
     void printWarning(const char *text, const __FlashStringHelper *messageCategory, uint8_t newLineBefore = 1, uint8_t newLineAfter = 0);
@@ -41,13 +49,16 @@ public:
     void printBulletPoint(const char *text,  uint8_t newLineAfter = 0);
     void printBulletPoint(const __FlashStringHelper *text, uint8_t newLineAfter = 0);
 
-    void printLine(const char *text, uint8_t newLineBefore = 1, uint8_t newLineAfter = 0);
-    void printLine(const __FlashStringHelper *text, uint8_t newLineBefore = 1, uint8_t newLineAfter = 0);
-
+    void printValue(const char *text, uint8_t newLineBefore = 0, uint8_t newLineAfter = 0);
+    void printValue(const __FlashStringHelper *text, uint8_t newLineBefore = 0, uint8_t newLineAfter = 0);
     void printValue(uint8_t number, uint8_t newLineAfter = 0);
     void printValue(uint8_t number, const __FlashStringHelper *text, uint8_t newLineAfter = 0);
     void printValue(unsigned long number, uint8_t newLineAfter = 0);
     void printValue(unsigned long number, const __FlashStringHelper *text, uint8_t newLineAfter = 0);
+    void printValue(float number, uint8_t newLineAfter = 0);
+    void printValue(float number, const __FlashStringHelper *text, uint8_t newLineAfter = 0);
+
+
 };
 #endif
 #endif
