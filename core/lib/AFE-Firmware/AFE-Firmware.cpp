@@ -11,6 +11,7 @@ void AFEFirmware::begin()
   timer->days = 0;
   timer->months = 0;
 
+  API->Flash->addReference(Debugger);
   API->Flash->initializeFileSystem();
 
   Device->begin();

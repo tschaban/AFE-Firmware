@@ -21,15 +21,24 @@
 #endif // ESP32/ESP8266
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
 class AFEDataAccess {
 private:
+  AFEDebugger *Debugger;
   IPAddress IPfromString(const char *address);
 
 #ifdef DEBUG
   void printBufforSizeInfo(uint16_t bufferSize, uint16_t jsonSize);
+  void printFileOpeningInformation(const __FlashStringHelper *fileName, uint8_t id = AFE_NONE);
+  void printFileCreatingInformation(const __FlashStringHelper *fileName, uint8_t id = AFE_NONE);
+  void printFileOpeningError(const __FlashStringHelper *fileName, uint8_t id = AFE_NONE);
+  void printFileWritingInformation();
+  void printFileContentInformation();
+  void printJSONNotPharsed();
+
+  
 #endif
 
 public:
@@ -41,8 +50,12 @@ public:
   boolean formatFileSystem();
   boolean fileExist(const char *path);
 
+#ifdef DEBUG
+  void addReference(AFEDebugger *_Debugger);
+#endif
+
   void getConfiguration(DEVICE *);
-  void getDeviceID(char *id);
+  void getDeviceID(char *id, boolean extended = false);
 
 #if defined(T0_CONFIG) &&                                                      \
     !defined(                                                                  \

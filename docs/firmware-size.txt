@@ -25,3 +25,15 @@ T0 Prod
 RAM:   [====      ]  41.8% (used 34236 bytes from 81920 bytes)    
 Flash: [====      ]  39.4% (used 411480 bytes from 1044464 bytes) 
 
+TEMP
+RAM:   [=====     ]  52.8% (used 43268 bytes from 81920 bytes)
+Flash: [======    ]  55.6% (used 580661 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  52.8% (used 43268 bytes from 81920 bytes)
+Flash: [======    ]  55.6% (used 580897 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  52.8% (used 43280 bytes from 81920 bytes)
+Flash: [======    ]  55.6% (used 580981 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  52.8% (used 43268 bytes from 81920 bytes)
+Flash: [======    ]  55.6% (used 580985 bytes from 1044464 bytes)
