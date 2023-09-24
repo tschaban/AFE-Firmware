@@ -1,30 +1,34 @@
 /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
-
 #include "AFE-I2C-Scanner.h"
 #ifdef AFE_CONFIG_HARDWARE_I2C
 
-AFEI2CScanner::AFEI2CScanner() {};
-
- void AFEI2CScanner::begin(TwoWire *_WirePort) {
-
-// @TODO Serial << endl << F("INFO: I2C[0]: Scannings for devices");
-
-  AFEDataAccess Data;
-  WirePort = _WirePort; 
- }
+AFEI2CScanner::AFEI2CScanner(){};
 
 #ifdef DEBUG
-void AFEI2CScanner::scanAll() {
+void AFEI2CScanner::begin(TwoWire *_WirePort, AFEDebugger *_Debugger)
+{
+  Debugger = _Debugger;
+  begin(_WirePort);
+}
+#endif
+
+void AFEI2CScanner::begin(TwoWire *_WirePort)
+{
+  AFEDataAccess Data;
+  WirePort = _WirePort;
+}
+
+#ifdef DEBUG
+void AFEI2CScanner::scanAll()
+{
 
   uint8_t numberOfDeficesFound = 0;
   boolean searchStatus;
+  Debugger->printHeader(2, 0, 49, AFE_DEBUG_HEADER_TYPE_DASH);
 
-  Serial << endl
-         << endl
-         << F("------------------ I2C Scanner ------------------");
-
-  for (uint8_t address = 1; address < 127; address++) {
+  for (uint8_t address = 1; address < 127; address++)
+  {
 
     searchStatus = scan(address);
 
@@ -32,36 +36,47 @@ void AFEI2CScanner::scanAll() {
       numberOfDeficesFound++;
   }
 
-  if (numberOfDeficesFound == 0) {
-    Serial << endl << F("No I2C devices found");
-  } else {
-    Serial << endl << F("Scanning completed");
+  if (numberOfDeficesFound == 0)
+  {
+    Serial << endl
+           << F("No I2C devices found");
+  }
+  else
+  {
+    Serial << endl
+           << F("Scanning completed");
   }
 
-  Serial << endl
-         << F("---------------------------------------------------") << endl;
+  Debugger->printHeader(1, 1, 49, AFE_DEBUG_HEADER_TYPE_DASH);
 }
 #endif
 
-boolean AFEI2CScanner::scan(byte address) {
+boolean AFEI2CScanner::scan(byte address)
+{
   byte status;
   WirePort->beginTransmission(address);
   status = WirePort->endTransmission();
-  if (status == 0) {
+  if (status == 0)
+  {
 #ifdef DEBUG
-    Serial << endl << F(" - Sensor Found [0x");
-    if (address < 16) {
+    Serial << endl
+           << F(" - Sensor Found [0x");
+    if (address < 16)
+    {
       Serial << F("0");
     }
     Serial << _HEX(address) << F("] : ") << getName(address);
 #endif
     return true;
-  } else {
+  }
+  else
+  {
     return false;
   }
 }
 
-const __FlashStringHelper *AFEI2CScanner::getName(byte deviceAddress) {
+const __FlashStringHelper *AFEI2CScanner::getName(byte deviceAddress)
+{
   /* WARN: Description can't be longer than 70chars, used by addDeviceI2CAddressSelectionItem in AFE-Site-Gnerator.h */
   if (deviceAddress == 0x00)
     return F("AS3935");
@@ -96,28 +111,28 @@ const __FlashStringHelper *AFEI2CScanner::getName(byte deviceAddress) {
   else if (deviceAddress == 0x1E)
     return F("LSM303D,HMC5883L,FXOS8700,LIS3DSH");
   else if (deviceAddress == 0x20)
-    //return F("MCP23017,MCP23008,PCF8574,FXAS21002,SoilMoisture");
+    // return F("MCP23017,MCP23008,PCF8574,FXAS21002,SoilMoisture");
     return F("MCP23017");
   else if (deviceAddress == 0x21)
-    //return F("MCP23017,MCP23008,PCF8574");
+    // return F("MCP23017,MCP23008,PCF8574");
     return F("MCP23017");
   else if (deviceAddress == 0x22)
-    //return F("MCP23017,MCP23008,PCF8574");
+    // return F("MCP23017,MCP23008,PCF8574");
     return F("MCP23017");
   else if (deviceAddress == 0x23)
     return F("BH1750, MCP23017");
-    //return F("BH1750,MCP23017,MCP23008,PCF8574");
+  // return F("BH1750,MCP23017,MCP23008,PCF8574");
   else if (deviceAddress == 0x24)
-    //return F("MCP23017,MCP23008,PCF8574");
+    // return F("MCP23017,MCP23008,PCF8574");
     return F("MCP23017,PN532");
   else if (deviceAddress == 0x25)
-    //return F("MCP23017,MCP23008,PCF8574");
+    // return F("MCP23017,MCP23008,PCF8574");
     return F("MCP23017");
   else if (deviceAddress == 0x26)
-    //return F("MCP23017,MCP23008,PCF8574");
+    // return F("MCP23017,MCP23008,PCF8574");
     return F("MCP23017");
   else if (deviceAddress == 0x27)
-    //return F("MCP23017,MCP23008,PCF8574,LCD16x2,DigoleDisplay");
+    // return F("MCP23017,MCP23008,PCF8574,LCD16x2,DigoleDisplay");
     return F("MCP23017");
   else if (deviceAddress == 0x28)
     return F("FS3000");
@@ -203,7 +218,7 @@ const __FlashStringHelper *AFEI2CScanner::getName(byte deviceAddress) {
     return F("AtlasEzoRTD");
   else if (deviceAddress == 0x68)
     return F("DS1307,DS3231,MPU6050,MPU9050,MPU9250,ITG3200,ITG3701,"
-           "LSM9DS0,L3G4200D");
+             "LSM9DS0,L3G4200D");
   else if (deviceAddress == 0x69)
     return F("MPU6050,MPU9050,MPU9250,ITG3701,L3G4200D");
   else if (deviceAddress == 0x6A)
@@ -220,9 +235,9 @@ const __FlashStringHelper *AFEI2CScanner::getName(byte deviceAddress) {
     return F("AdafruitLED");
   else if (deviceAddress == 0x76)
     return F("BMx280");
-    //return F("BMx280,MS5607,MS5611,MS5637");
+  // return F("BMx280,MS5607,MS5611,MS5637");
   else if (deviceAddress == 0x77)
-    //return F("BMx085,BMx180,BMx280,BMx680,MS5611");
+    // return F("BMx085,BMx180,BMx280,BMx680,MS5611");
     return F("BMx085,BMx180,BMx280,BMx680");
   else
     return F("UNKNOWN");

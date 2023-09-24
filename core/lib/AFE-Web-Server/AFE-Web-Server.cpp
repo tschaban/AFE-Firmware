@@ -7,20 +7,23 @@ AFEWebServer::AFEWebServer() {}
 #if defined(AFE_CONFIG_HARDWARE_I2C)
 #ifdef AFE_ESP32
 void AFEWebServer::begin(AFEFirmware *_Firmware, TwoWire *_WirePort0,
-                         TwoWire *_WirePort1) {
+                         TwoWire *_WirePort1)
+{
   WirePort0 = _WirePort0;
   WirePort1 = _WirePort1;
   begin(_Firmware);
 }
 #else
-void AFEWebServer::begin(AFEFirmware *_Firmware, TwoWire *_WirePort0) {
+void AFEWebServer::begin(AFEFirmware *_Firmware, TwoWire *_WirePort0)
+{
   WirePort0 = _WirePort0;
   begin(_Firmware);
 }
 #endif // AFE_ESP32
 #endif //  AFE_CONFIG_HARDWARE_I2C
 
-void AFEWebServer::begin(AFEFirmware *_Firmware) {
+void AFEWebServer::begin(AFEFirmware *_Firmware)
+{
   Firmware = _Firmware;
   server.begin(80);
 #ifdef AFE_CONFIG_HARDWARE_I2C
@@ -35,7 +38,8 @@ void AFEWebServer::begin(AFEFirmware *_Firmware) {
 }
 
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
-                                  String &page) {
+                                  String &page)
+{
 
   /*
     if (siteConfig->twoColumns) {
@@ -44,19 +48,22 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
       Site.generateEmptyMenu(page, siteConfig->rebootTime);
     }
   */
-  if (siteConfig->form) {
+  if (siteConfig->form)
+  {
     page.concat(F("<form  method=\"post\" action=\"/?c="));
     page.concat(AFE_SERVER_CMD_SAVE);
     page.concat(F("&o="));
     page.concat(siteConfig->ID);
-    if (siteConfig->deviceID >= 0) {
+    if (siteConfig->deviceID >= 0)
+    {
       page.concat(F("&i="));
       page.concat(siteConfig->deviceID);
     }
     page.concat(F("\">"));
   }
 
-  switch (siteConfig->ID) {
+  switch (siteConfig->ID)
+  {
   case AFE_CONFIG_SITE_INDEX:
     Site.siteIndex(page, siteConfig->deviceID == -1 ? true : false);
     break;
@@ -266,8 +273,10 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
   }
 
-  if (siteConfig->form) {
-    if (siteConfig->formButton) {
+  if (siteConfig->form)
+  {
+    if (siteConfig->formButton)
+    {
       page.concat(F("<input type=\"submit\" class=\"b bs\" value=\""));
       page.concat(F(L_SAVE));
       page.concat(F("\">"));
@@ -278,18 +287,23 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   return page;
 }
 
-boolean AFEWebServer::generate(boolean upload) {
+boolean AFEWebServer::generate(boolean upload)
+{
   boolean _ret = true;
 
-  if (getOptionName()) {
+  if (getOptionName())
+  {
 #ifdef DEBUG
-    Serial << endl << F("INFO: HTTP Server: API Request");
+    Firmware->Debugger->printInformation(F("API Request"), F("HTTP Server"));
 #endif
     _ret = false;
-  } else {
+  }
+  else
+  {
 
     /* Reading lastest Device configuration */
-    if (_refreshConfiguration) {
+    if (_refreshConfiguration)
+    {
       _refreshConfiguration = false;
       Firmware->Device->begin();
     }
@@ -301,25 +315,28 @@ boolean AFEWebServer::generate(boolean upload) {
     siteConfig.deviceID = getID();
     siteConfig.option = getOption();
 
-    if (!upload) {
+    if (!upload)
+    {
       /* Setting page refresh time if automatic logout is set */
       if ((Firmware->Device->getMode() == AFE_MODE_CONFIGURATION ||
            Firmware->Device->getMode() == AFE_MODE_ACCESS_POINT) &&
-          Firmware->Device->configuration.timeToAutoLogOff > 0) {
+          Firmware->Device->configuration.timeToAutoLogOff > 0)
+      {
 
         /* Setting the time to auto-close the configuration panel */
         siteConfig.rebootTime =
             Firmware->Device->configuration.timeToAutoLogOff * 60 +
             10; // adds additional 10sec for a reboot to be finished
 #ifdef DEBUG
-        Serial << endl
-               << F("INFO: SITE: Setting auto-logout to ")
-               << siteConfig.rebootTime << F("seconds");
+        Firmware->Debugger->printInformation(F("Setting auto-logout to "), F("HTTP Server"));
+        Serial << siteConfig.rebootTime << F("seconds");
 #endif
       }
 
-      if (command == AFE_SERVER_CMD_SAVE) {
-        if (siteConfig.ID == AFE_CONFIG_SITE_FIRST_TIME) {
+      if (command == AFE_SERVER_CMD_SAVE)
+      {
+        if (siteConfig.ID == AFE_CONFIG_SITE_FIRST_TIME)
+        {
           NETWORK configuration;
           get(configuration);
           siteConfig.twoColumns = false;
@@ -329,29 +346,39 @@ boolean AFEWebServer::generate(boolean upload) {
           siteConfig.ID = AFE_CONFIG_SITE_FIRST_TIME_CONNECTING;
           Firmware->API->Flash->saveConfiguration(&configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_DEVICE) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_DEVICE)
+        {
           DEVICE configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_NETWORK) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_NETWORK)
+        {
           NETWORK configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_PASSWORD) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_PASSWORD)
+        {
           PASSWORD configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_RESET) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_RESET)
+        {
           siteConfig.ID = AFE_CONFIG_SITE_POST_RESET;
           siteConfig.reboot = true;
           siteConfig.rebootMode = AFE_MODE_FIRST_TIME_LAUNCH;
           siteConfig.rebootTime = AFE_SITE_REBOOT_POST_UPGRADE;
           siteConfig.form = false;
           siteConfig.twoColumns = false;
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_PRO_VERSION) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_PRO_VERSION)
+        {
           PRO_VERSION configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
@@ -360,14 +387,17 @@ boolean AFEWebServer::generate(boolean upload) {
                   configuration.serial);
           // Firmware->validate(); @ TODO 3.6.0
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_MQTT) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_MQTT)
+        {
           MQTT configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
           configuration = {0};
         }
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-        else if (siteConfig.ID == AFE_CONFIG_SITE_DOMOTICZ) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_DOMOTICZ)
+        {
           DOMOTICZ configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
@@ -375,7 +405,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-        else if (siteConfig.ID == AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION)
+        {
           HOME_ASSISTANT_CONFIG configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
@@ -384,7 +415,8 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-        else if (siteConfig.ID == AFE_CONFIG_SITE_ANALOG_INPUT) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_ANALOG_INPUT)
+        {
           ADCINPUT configuration;
           get(configuration);
 #ifdef AFE_ESP32
@@ -397,18 +429,22 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
-        else if (siteConfig.ID == AFE_CONFIG_SITE_LED) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_LED)
+        {
           LED configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
                                                   &configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_SYSTEM_LED) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_SYSTEM_LED)
+        {
           Firmware->API->Flash->saveSystemLedID(getSystemLEDData());
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-        else if (siteConfig.ID == AFE_CONFIG_SITE_RELAY) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_RELAY)
+        {
           RELAY configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -417,7 +453,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-        else if (siteConfig.ID == AFE_CONFIG_SITE_SWITCH) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_SWITCH)
+        {
           SWITCH configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -426,7 +463,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-        else if (siteConfig.ID == AFE_CONFIG_SITE_CONTACTRON) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_CONTACTRON)
+        {
           CONTACTRON configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -435,7 +473,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
-        else if (siteConfig.ID == AFE_CONFIG_SITE_GATE) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_GATE)
+        {
           GATE configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -444,7 +483,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-        else if (siteConfig.ID == AFE_CONFIG_SITE_HPMA115S0) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_HPMA115S0)
+        {
           HPMA115S0 configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -453,7 +493,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-        else if (siteConfig.ID == AFE_CONFIG_SITE_BMEX80) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_BMEX80)
+        {
           BMEX80 configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -462,7 +503,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-        else if (siteConfig.ID == AFE_CONFIG_SITE_BH1750) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_BH1750)
+        {
           BH1750_CONFIG configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -471,7 +513,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-        else if (siteConfig.ID == AFE_CONFIG_SITE_AS3935) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_AS3935)
+        {
           AS3935 configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -480,7 +523,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-        else if (siteConfig.ID == AFE_CONFIG_SITE_ANEMOMETER_SENSOR) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_ANEMOMETER_SENSOR)
+        {
           ANEMOMETER configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
@@ -488,7 +532,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-        else if (siteConfig.ID == AFE_CONFIG_SITE_RAINMETER_SENSOR) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_RAINMETER_SENSOR)
+        {
           RAINMETER configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
@@ -496,7 +541,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-        else if (siteConfig.ID == AFE_CONFIG_SITE_DS18B20) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_DS18B20)
+        {
           DS18B20 ds18B20Configuration;
           get(ds18B20Configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -505,7 +551,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif
 #ifdef AFE_CONFIG_HARDWARE_DHT
-        else if (siteConfig.ID == AFE_CONFIG_SITE_DHT) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_DHT)
+        {
           DHT dhtConfiguration;
           get(dhtConfiguration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -514,7 +561,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif // AFE_CONFIG_HARDWARE_DHT
 #ifdef AFE_CONFIG_HARDWARE_UART
-        else if (siteConfig.ID == AFE_CONFIG_SITE_UART) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_UART)
+        {
           SERIALPORT configuration;
           getSerialPortData(&configuration);
           Firmware->API->Flash->saveConfiguration(&configuration);
@@ -522,7 +570,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif // AFE_CONFIG_HARDWARE_UART
 #ifdef AFE_CONFIG_HARDWARE_I2C
-        else if (siteConfig.ID == AFE_CONFIG_SITE_I2C) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_I2C)
+        {
           I2CPORT configuration;
           get(configuration);
 #ifdef AFE_ESP32
@@ -535,7 +584,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif // AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-        else if (siteConfig.ID == AFE_CONFIG_SITE_REGULATOR) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_REGULATOR)
+        {
           REGULATOR configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -544,7 +594,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-        else if (siteConfig.ID == AFE_CONFIG_SITE_THERMAL_PROTECTOR) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_THERMAL_PROTECTOR)
+        {
           THERMAL_PROTECTOR configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -553,7 +604,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-        else if (siteConfig.ID == AFE_CONFIG_SITE_BINARY_SENSOR) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_BINARY_SENSOR)
+        {
           BINARY_SENSOR configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -562,41 +614,53 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-        else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR)
+        {
           PN532_SENSOR configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(0, &configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_MIFARE_CARDS) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_MIFARE_CARDS)
+        {
           MIFARE_CARD configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
                                                   &configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR_ADMIN) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_PN532_SENSOR_ADMIN)
+        {
           processMiFareCard();
         }
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_CLED
-        else if (siteConfig.ID == AFE_CONFIG_SITE_CLED) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_CLED)
+        {
           CLED configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
                                                   &configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_BLINKING) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_BLINKING)
+        {
           CLED_EFFECT_BLINKING configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
                                                   &configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_WAVE) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_WAVE)
+        {
           CLED_EFFECT_WAVE configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
                                                   &configuration);
           configuration = {0};
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT)
+        {
           CLED_EFFECT_FADE_INOUT configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -606,7 +670,8 @@ boolean AFEWebServer::generate(boolean upload) {
 
 #endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-        else if (siteConfig.ID == AFE_CONFIG_SITE_TSL2561) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_TSL2561)
+        {
           TSL2561 configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -615,7 +680,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-        else if (siteConfig.ID == AFE_CONFIG_SITE_MCP23XXX) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_MCP23XXX)
+        {
           MCP23XXX configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -624,7 +690,8 @@ boolean AFEWebServer::generate(boolean upload) {
         }
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #ifdef AFE_CONFIG_HARDWARE_FS3000
-        else if (siteConfig.ID == AFE_CONFIG_SITE_FS3000) {
+        else if (siteConfig.ID == AFE_CONFIG_SITE_FS3000)
+        {
           FS3000_CONFIG configuration;
           get(configuration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
@@ -632,53 +699,76 @@ boolean AFEWebServer::generate(boolean upload) {
           configuration = {0};
         }
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
-
-      } else if (command == AFE_SERVER_CMD_NONE) {
-        if (siteConfig.ID == AFE_CONFIG_SITE_INDEX) {
+      }
+      else if (command == AFE_SERVER_CMD_NONE)
+      {
+        if (siteConfig.ID == AFE_CONFIG_SITE_INDEX)
+        {
           siteConfig.form = false;
           siteConfig.twoColumns = false;
-          if (siteConfig.deviceID > AFE_MODE_NORMAL) {
+          if (siteConfig.deviceID > AFE_MODE_NORMAL)
+          {
             boolean authorize = true;
             PASSWORD accessControl;
             Firmware->API->Flash->getConfiguration(&accessControl);
-            if (accessControl.protect) {
+            if (accessControl.protect)
+            {
               PASSWORD data;
               get(data);
-              if (strcmp(accessControl.password, data.password) != 0) {
+              if (strcmp(accessControl.password, data.password) != 0)
+              {
                 authorize = false;
               }
             }
-            if (authorize) {
+            if (authorize)
+            {
               siteConfig.rebootMode = siteConfig.deviceID;
               siteConfig.ID = AFE_CONFIG_SITE_EXIT;
               siteConfig.reboot = true;
               siteConfig.rebootTime = AFE_SITE_REBOOT;
             }
           }
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_INDEX_MONITOR) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_INDEX_MONITOR)
+        {
           siteConfig.form = false;
           siteConfig.twoColumns = false;
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_EXIT) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_EXIT)
+        {
           siteConfig.reboot = true;
           siteConfig.rebootMode = AFE_MODE_NORMAL;
           siteConfig.rebootTime = AFE_SITE_REBOOT;
           siteConfig.form = false;
           siteConfig.twoColumns = false;
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_FIRMWARE) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_FIRMWARE)
+        {
           siteConfig.form = false;
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_FIRST_TIME) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_FIRST_TIME)
+        {
           siteConfig.twoColumns = false;
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_RESET) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_RESET)
+        {
           siteConfig.formButton = false;
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_UPGRADE) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_UPGRADE)
+        {
           siteConfig.form = false;
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE)
+        {
           siteConfig.form = false;
           siteConfig.rebootTime = AFE_SITE_REBOOT_POST_WAN_UPGRADE;
           siteConfig.twoColumns = false;
-        } else if (siteConfig.ID == AFE_CONFIG_SITE_POST_UPGRADE) {
-          if (!upload) {
+        }
+        else if (siteConfig.ID == AFE_CONFIG_SITE_POST_UPGRADE)
+        {
+          if (!upload)
+          {
             siteConfig.form = false;
             siteConfig.twoColumns = false;
             siteConfig.rebootTime = AFE_SITE_REBOOT_POST_UPGRADE;
@@ -691,38 +781,40 @@ boolean AFEWebServer::generate(boolean upload) {
     }
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-    if (upload) {
+    if (upload)
+    {
       upgradeSuccess = upgradOTAFile();
-    } else {
+    }
+    else
+    {
 #endif // #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #ifdef DEBUG
-      Serial << endl << F("INFO: Building HTTP site response ");
-#ifndef AFE_ESP32
-      Serial << endl
-             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-             << F("kB to build the site");
-#endif // !ESP32
+      Firmware->Debugger->printInformation(F("Building HTTP site response"), F("HTTP Server"));
+      Firmware->Debugger->getFreeMemorySize();
+      Firmware->Debugger->printValue(F(" : starting generating site"));
 #endif
 
       String page;
       /* page.reserve(AFE_MAX_PAGE_SIZE);
-      */
+       */
       server.sendHeader(F("Cache-Control"), F("no-cache"));
       server.setContentLength(CONTENT_LENGTH_UNKNOWN);
 
-      if (siteConfig.twoColumns) {
+      if (siteConfig.twoColumns)
+      {
         Site.generateMenu(page, siteConfig.rebootTime);
-      } else {
+      }
+      else
+      {
         Site.generateEmptyMenu(page, siteConfig.rebootTime);
       }
       Site.setAttributes(&page);
       server.send(200, F("text/html"), page);
 
-#if defined(DEBUG) && !defined(ESP32)
-      Serial << endl
-             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-             << F("kB: header + menu generated");
+#ifdef DEBUG
+      Firmware->Debugger->getFreeMemorySize();
+      Firmware->Debugger->printValue(F(" : menu generate"));
 #endif
 
       page = "";
@@ -731,10 +823,9 @@ boolean AFEWebServer::generate(boolean upload) {
       Site.setAttributes(&page);
       server.sendContent(page);
 
-#if defined(DEBUG) && !defined(ESP32)
-      Serial << endl
-             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-             << F("kB: content generated");
+#ifdef DEBUG
+      Firmware->Debugger->getFreeMemorySize();
+      Firmware->Debugger->printValue(F(" : content generated"));
 #endif
 
       page = "";
@@ -746,30 +837,31 @@ boolean AFEWebServer::generate(boolean upload) {
       Site.setAttributes(&page);
       server.sendContent(page);
 
-#if defined(DEBUG) && !defined(ESP32)
-      Serial << endl
-             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-             << F("kB: footer generated");
+#ifdef DEBUG
+      Firmware->Debugger->getFreeMemorySize();
+      Firmware->Debugger->printValue(F(" : footer generated"));
 #endif
 
       server.sendContent("");
       page = "";
 
-#if defined(DEBUG) && !defined(ESP32)
-      Serial << endl
-             << F("INFO: RAM: ") << system_get_free_heap_size() / 1024
-             << F("kB: site generated and published");
+#ifdef DEBUG
+      Firmware->Debugger->getFreeMemorySize();
+      Firmware->Debugger->printValue(" : content generated");
 #endif
 
       if ((Firmware->Device->getMode() == AFE_MODE_CONFIGURATION ||
            Firmware->Device->getMode() == AFE_MODE_ACCESS_POINT) &&
-          Firmware->Device->configuration.timeToAutoLogOff > 0) {
+          Firmware->Device->configuration.timeToAutoLogOff > 0)
+      {
         howLongInConfigMode = millis();
       }
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-      if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE) {
-        if (upgradeOTAWAN(getOTAFirmwareId())) {
+      if (siteConfig.ID == AFE_CONFIG_SITE_WAN_UPGRADE)
+      {
+        if (upgradeOTAWAN(getOTAFirmwareId()))
+        {
           siteConfig.reboot = true;
           siteConfig.rebootMode = AFE_MODE_CONFIGURATION;
         }
@@ -778,7 +870,8 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
     /* Rebooting device */
-    if (siteConfig.reboot) {
+    if (siteConfig.reboot)
+    {
 #ifdef AFE_CONFIG_HARDWARE_LED
       Firmware->Hardware->SystemLed->on();
 #endif
@@ -797,36 +890,48 @@ boolean AFEWebServer::generate(boolean upload) {
 
 // http://192.168.2.83/?device=BMEX80&name=BMP280&command=get
 
-boolean AFEWebServer::getOptionName() {
+boolean AFEWebServer::getOptionName()
+{
 
   /**
    * @brief HTTP API works only in AFE operating mode
    *
    */
-  if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
-    if (server.hasArg(F("command"))) {
+  if (Firmware->Device->getMode() == AFE_MODE_NORMAL)
+  {
+    if (server.hasArg(F("command")))
+    {
       server.arg(F("command"))
           .toCharArray(httpAPICommand->command,
                        sizeof(httpAPICommand->command));
-      if (server.arg(F("device"))) {
+      if (server.arg(F("device")))
+      {
         server.arg(F("device"))
             .toCharArray(httpAPICommand->device,
                          sizeof(httpAPICommand->device));
-      } else {
+      }
+      else
+      {
         memset(httpAPICommand->device, 0, sizeof httpAPICommand->device);
       }
-      if (server.arg(F("name"))) {
+      if (server.arg(F("name")))
+      {
         server.arg(F("name")).toCharArray(httpAPICommand->name,
                                           sizeof(httpAPICommand->name));
-      } else {
+      }
+      else
+      {
         memset(httpAPICommand->name, 0, sizeof httpAPICommand->name);
       }
 
-      if (server.arg(F("source"))) {
+      if (server.arg(F("source")))
+      {
         server.arg(F("source"))
             .toCharArray(httpAPICommand->source,
                          sizeof(httpAPICommand->source));
-      } else {
+      }
+      else
+      {
         memset(httpAPICommand->source, 0, sizeof httpAPICommand->source);
       }
       receivedHTTPCommand = true;
@@ -835,82 +940,104 @@ boolean AFEWebServer::getOptionName() {
   return receivedHTTPCommand;
 }
 
-uint8_t AFEWebServer::getSiteID() {
+uint8_t AFEWebServer::getSiteID()
+{
 
-  if (Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
+  if (Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET)
+  {
     return AFE_CONFIG_SITE_FIRST_TIME;
-  } else {
+  }
+  else
+  {
     return Firmware->Device->getMode() == AFE_MODE_NORMAL
                ? server.arg(F("o")).toInt() == AFE_CONFIG_SITE_INDEX_MONITOR
                      ? AFE_CONFIG_SITE_INDEX_MONITOR
                      : AFE_CONFIG_SITE_INDEX
-               : server.arg(F("o")).toInt() > 0 ? server.arg(F("o")).toInt()
-                                                : AFE_CONFIG_SITE_DEVICE;
+           : server.arg(F("o")).toInt() > 0 ? server.arg(F("o")).toInt()
+                                            : AFE_CONFIG_SITE_DEVICE;
   }
 }
 
-uint8_t AFEWebServer::getCommand() {
-  if (server.hasArg(F("c"))) {
+uint8_t AFEWebServer::getCommand()
+{
+  if (server.hasArg(F("c")))
+  {
     return server.arg(F("c")).toInt();
-  } else {
+  }
+  else
+  {
     return AFE_SERVER_CMD_NONE;
   }
 }
 
-uint8_t AFEWebServer::getID() {
-  if (server.hasArg(F("i"))) {
+uint8_t AFEWebServer::getID()
+{
+  if (server.hasArg(F("i")))
+  {
     return server.arg(F("i")).toInt();
-  } else {
+  }
+  else
+  {
     return -1;
   }
 }
 
-uint8_t AFEWebServer::getOption() {
-  if (server.hasArg(F("opt"))) {
+uint8_t AFEWebServer::getOption()
+{
+  if (server.hasArg(F("opt")))
+  {
     return server.arg(F("opt")).toInt();
-  } else {
+  }
+  else
+  {
     return AFE_HARDWARE_ITEM_NOT_EXIST;
   }
 }
 
-boolean AFEWebServer::httpAPIlistener() {
-  if (receivedHTTPCommand) {
+boolean AFEWebServer::httpAPIlistener()
+{
+  if (receivedHTTPCommand)
+  {
     receivedHTTPCommand = false;
     return true;
-  } else {
+  }
+  else
+  {
     return false;
   }
 }
 
-void AFEWebServer::listener() {
+void AFEWebServer::listener()
+{
   server.handleClient();
   /* Code for automatic logoff from the config panel */
   if ((Firmware->Device->getMode() == AFE_MODE_CONFIGURATION ||
        Firmware->Device->getMode() == AFE_MODE_ACCESS_POINT) &&
-      Firmware->Device->configuration.timeToAutoLogOff > 0) {
+      Firmware->Device->configuration.timeToAutoLogOff > 0)
+  {
     if (Firmware->Device->configuration.timeToAutoLogOff * 60000 +
             howLongInConfigMode <
-        millis()) {
+        millis())
+    {
 #ifdef DEBUG
-      Serial << endl
-             << endl
-             << F("INFO: SITE: Automatic logout from the config panel after : ")
-             << Firmware->Device->configuration.timeToAutoLogOff
-             << F("min. of idle time");
+      Firmware->Debugger->printInformation(F("Automatic logout from config panel after : "), F("HTTP Server"), 2);
+      Serial
+          << Firmware->Device->configuration.timeToAutoLogOff
+          << F("min. of idle time");
 #endif
       Firmware->Device->reboot(AFE_MODE_NORMAL);
     }
   }
 }
 
-void AFEWebServer::sendJSON(const String &json) {
+void AFEWebServer::sendJSON(const String &json)
+{
 
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: HTTP Server: Pubishing reply") << endl
-         << F("-----") << endl
-         << json << endl
-         << F("-----");
+  Firmware->Debugger->printInformation(F("Pubishing reply"), F("HTTP Server"));
+  Firmware->Debugger->printHeader(1, 0, 32, AFE_DEBUG_HEADER_TYPE_DASH);
+  Serial << json;
+  Firmware->Debugger->printHeader(1, 0, 32, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 
   server.sendHeader(F("Cache-Control"), F("no-cache"));
@@ -921,32 +1048,38 @@ void AFEWebServer::sendJSON(const String &json) {
 
 #ifndef AFE_ESP32 /* ESP82xx */
 void AFEWebServer::handle(const char *uri,
-                          ESP8266WebServer::THandlerFunction handler) {
+                          ESP8266WebServer::THandlerFunction handler)
+{
   server.on(uri, handler);
 }
 
 void AFEWebServer::handleFirmwareUpgrade(
     const char *uri, ESP8266WebServer::THandlerFunction handlerUpgrade,
-    ESP8266WebServer::THandlerFunction handlerUpload) {
+    ESP8266WebServer::THandlerFunction handlerUpload)
+{
   server.on(uri, HTTP_POST, handlerUpgrade, handlerUpload);
 }
 
-void AFEWebServer::onNotFound(ESP8266WebServer::THandlerFunction fn) {
+void AFEWebServer::onNotFound(ESP8266WebServer::THandlerFunction fn)
+{
   server.onNotFound(fn);
 }
 #else /* ESP32 */
 void AFEWebServer::handle(const char *uri,
-                          WebServer::THandlerFunction handler) {
+                          WebServer::THandlerFunction handler)
+{
   server.on(uri, handler);
 }
 
 void AFEWebServer::handleFirmwareUpgrade(
     const char *uri, WebServer::THandlerFunction handlerUpgrade,
-    WebServer::THandlerFunction handlerUpload) {
+    WebServer::THandlerFunction handlerUpload)
+{
   server.on(uri, HTTP_POST, handlerUpgrade, handlerUpload);
 }
 
-void AFEWebServer::onNotFound(WebServer::THandlerFunction fn) {
+void AFEWebServer::onNotFound(WebServer::THandlerFunction fn)
+{
   server.onNotFound(fn);
 }
 #endif
@@ -955,11 +1088,13 @@ void AFEWebServer::onNotFound(WebServer::THandlerFunction fn) {
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
 
-String AFEWebServer::getHeaderValue(String header, String headerName) {
+String AFEWebServer::getHeaderValue(String header, String headerName)
+{
   return header.substring(strlen(headerName.c_str()));
 }
 
-boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
+boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId)
+{
   boolean _success = true;
   WiFiClient WirelessClient;
   long contentLength = 0;
@@ -967,25 +1102,28 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
   char _message[164]; //  calcuated based on L_UPGRADE_SUCCESS_MESSAGE and
                       //  L_UPGRADE_NOT_FULL_LOADED
 
-// firmwareId = 601;
+  // firmwareId = 601;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   Firmware->Hardware->SystemLed->on();
 #endif
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: UPGRADE WAN: Connecting to: api.smartnydom.pl");
+  Firmware->Debugger->printHeader();
+  Firmware->Debugger->printInformation(F("Connecting to: api.smartnydom.pl ... "), F("UPGRADE"));
 #endif
 #ifdef AFE_ESP32
-  if (WirelessClient.connect("api.smartnydom.pl", 80)) {
+  if (WirelessClient.connect("api.smartnydom.pl", 80))
+  {
 #else
-  if (WirelessClient.connect(F("api.smartnydom.pl"), 80)) {
+  if (WirelessClient.connect(F("api.smartnydom.pl"), 80))
+  {
 #endif
 
 #ifdef DEBUG
-    Serial << F("... connected") << endl
-           << F("INFO: UPGRADE WAN: downloading the firmware ID: ")
-           << firmwareId;
+    Firmware->Debugger->printValue(F("... connected"));
+    Firmware->Debugger->printInformation(F("Downloading the firmware ID: "), F("UPGRADE"));
+    Serial << firmwareId;
 #endif
 
     WirelessClient.print(
@@ -994,10 +1132,12 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
         "no-cache\r\nConnection: close\r\n\r\n");
 
     unsigned long timeout = millis();
-    while (WirelessClient.available() == 0) {
-      if (millis() - timeout > 5000) {
+    while (WirelessClient.available() == 0)
+    {
+      if (millis() - timeout > 5000)
+      {
 #ifdef DEBUG
-        Serial << endl << F("ERROR: UPGRADE WAN: ") << F(L_UPGRADE_TIMEOUT);
+        Firmware->Debugger->printError(F(L_UPGRADE_TIMEOUT), F("UPGRADE"));
 #endif
         WirelessClient.stop();
         _success = false;
@@ -1005,20 +1145,22 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
       }
     }
 
-    while (_success && WirelessClient.available()) {
+    while (_success && WirelessClient.available())
+    {
       String line = WirelessClient.readStringUntil('\n');
       line.trim();
-      if (!line.length()) {
+      if (!line.length())
+      {
         break;
       }
 
       /* Expecting reply from the server with HTTP = 200 */
-      if (line.startsWith(F("HTTP/1.1"))) {
-        if (line.indexOf(F("200")) < 0) {
+      if (line.startsWith(F("HTTP/1.1")))
+      {
+        if (line.indexOf(F("200")) < 0)
+        {
 #ifdef DEBUG
-          Serial << endl
-                 << F("ERROR: UPGRADE WAN: Got a NONE 200 status code from "
-                      "server");
+          Firmware->Debugger->printError(F("Got a NONE 200 status code from server"), F("UPGRADE"));
 #endif
           Firmware->API->Flash->saveWelecomeMessage(L_UPGRADE_SERVER_NONE_200);
           _success = false;
@@ -1026,17 +1168,19 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
         }
       }
 
-      if (_success) {
+      if (_success)
+      {
         /* Expeting firmware files size > 0 */
-        if (line.startsWith(F("content-length: "))) {
+        if (line.startsWith(F("content-length: ")))
+        {
           contentLength =
               atol(getHeaderValue(line, "content-length: ").c_str());
 #ifdef DEBUG
-          Serial << endl
-                 << F("INFO: UPGRADE WAN: Got ") << (contentLength / 1024)
-                 << F("kB from server");
+          Firmware->Debugger->printInformation(F("Got: "), F("UPGRADE"));
+          Serial << (contentLength / 1024) << F("kB from server");
 #endif
-          if (contentLength == 0) {
+          if (contentLength == 0)
+          {
             _success = false;
             Firmware->API->Flash->saveWelecomeMessage(
                 L_UPGRADE_FIRMWARE_SIZE_0);
@@ -1045,10 +1189,13 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
         }
       } // Success of content-length
 
-      if (_success) {
-        if (line.startsWith(F("content-type: "))) {
+      if (_success)
+      {
+        if (line.startsWith(F("content-type: ")))
+        {
           if (getHeaderValue(line, F("content-type: ")) !=
-              F("application/octet-stream")) {
+              F("application/octet-stream"))
+          {
             _success = false;
             Firmware->API->Flash->saveWelecomeMessage(
                 L_UPGRADE_WRONG_CONTENT_TYPE);
@@ -1057,82 +1204,91 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
         }
       } // Success of content-type
 
-      if (line.startsWith(F("content-disposition: attachment; filename="))) {
+      if (line.startsWith(F("content-disposition: attachment; filename=")))
+      {
         getHeaderValue(line, F("content-disposition: attachment; filename="))
             .toCharArray(firmwareFileName, AFE_FIRMARE_FILE_NAME_LENGTH);
 #ifdef DEBUG
-        Serial << endl
-               << F("INFO: UPGRADE WAN: Firmware file name: ")
-               << firmwareFileName;
+        Firmware->Debugger->printInformation(F("Firmware file name: "), F("UPGRADE"));
+        Firmware->Debugger->printValue(firmwareFileName);
+
 #endif
       }
     }
-
-  } else {
+  }
+  else
+  {
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: UPGRADE WAN: ")
-           << F(L_UPGRADE_CANNOT_CONNECT_TO_SERVER);
+    Firmware->Debugger->printError(F(L_UPGRADE_CANNOT_CONNECT_TO_SERVER), F("UPGRADE"));
 #endif
     Firmware->API->Flash->saveWelecomeMessage(
         L_UPGRADE_CANNOT_CONNECT_TO_SERVER);
     _success = false;
   }
 
-  if (_success) {
+  if (_success)
+  {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: UPGRADE WAN: Upgrade started. Device might be quite "
-                "for a while");
+    Firmware->Debugger->printInformation(F("Upgrade started. Device might be quite for a while"), F("UPGRADE"));
 #endif
-    if (Update.begin(contentLength)) {
+    if (Update.begin(contentLength))
+    {
       size_t written = Update.writeStream(WirelessClient);
 
-      if (written != contentLength) {
+      if (written != contentLength)
+      {
         _success = false;
         sprintf(_message, L_UPGRADE_NOT_FULL_LOADED, written / 1024,
                 (uint16_t)(contentLength / 1024));
         Firmware->API->Flash->saveWelecomeMessage(_message);
 #ifdef DEBUG
-        Serial << endl << F("ERROR: UPGRADE WAN: ") << _message;
-      } else {
-        Serial << endl
-               << F("INFO: UPGRADE WAN: Written : ") << (written / 1024)
+        Firmware->Debugger->printError(_message, F("UPGRADE"));
+      }
+      else
+      {
+        Firmware->Debugger->printInformation(F("Written: "), F("UPGRADE"));
+        Serial << (written / 1024)
                << F("kB successfully");
 #endif
       }
 
-      if (Update.end()) {
+      if (Update.end())
+      {
 #ifdef DEBUG
-        Serial << endl << F("INFO: UPGRADE WAN: Upgrade done!");
+        Firmware->Debugger->printInformation(F("Firmware saved in flash"), F("UPGRADE"));
+        Firmware->Debugger->printInformation(F("Upgrading..."), F("UPGRADE"));
 #endif
-        if (Update.isFinished()) {
+        if (Update.isFinished())
+        {
           sprintf(_message, L_UPGRADE_SUCCESS_MESSAGE, firmwareFileName,
                   (uint16_t)(contentLength / 1024));
           Firmware->API->Flash->saveWelecomeMessage(_message);
 #ifdef DEBUG
-          Serial << endl
-                 << F("INFO: UPGRADE WAN: Update successfully completed");
+          Firmware->Debugger->printInformation(F("Upgrade successfully completed"), F("UPGRADE"));
 #endif
-        } else {
+        }
+        else
+        {
 #ifdef DEBUG
-          Serial << endl
-                 << F("ERROR: UPGRADE WAN: Update not finished. Something went "
-                      "wrong");
+          Firmware->Debugger->printError(F("Upgrade failure"), F("UPGRADE"));
 #endif
           _success = false;
         }
-      } else {
+      }
+      else
+      {
         sprintf(_message, L_UPGRADE_SOMETHING_WRONG, Update.getError());
 #ifdef DEBUG
-        Serial << endl << F("ERROR: UPGRADE WAN: ") << _message;
+        Firmware->Debugger->printError(_message, F("UPGRADE"));
 #endif
         Firmware->API->Flash->saveWelecomeMessage(_message);
         _success = false;
       }
-    } else {
+    }
+    else
+    {
 #ifdef DEBUG
-      Serial << endl << F("ERROR: UPGRADE WAN: ") << F(L_UPGRADE_NO_SPACE);
+      Firmware->Debugger->printError(F(L_UPGRADE_NO_SPACE), F("UPGRADE"));
 #endif
       Firmware->API->Flash->saveWelecomeMessage(L_UPGRADE_NO_SPACE);
       WirelessClient.flush();
@@ -1143,51 +1299,49 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
   Firmware->Hardware->SystemLed->off();
 #endif
 
+#ifdef DEBUG
+  Firmware->Debugger->printHeader();
+#endif
+
   return _success;
 }
 
-boolean AFEWebServer::upgradOTAFile(void) {
+boolean AFEWebServer::upgradOTAFile(void)
+{
+#ifdef DEBUG
+  Firmware->Debugger->printHeader();
+#endif
   HTTPUpload &upload = server.upload();
   String _updaterError;
   boolean _success = false;
-  if (upload.status == UPLOAD_FILE_START) {
+  if (upload.status == UPLOAD_FILE_START)
+  {
 #ifndef AFE_ESP32
     WiFiUDP::stopAll();
 #endif
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: UPGRADE: Firmware file name: ")
-           << upload.filename.c_str();
+    Firmware->Debugger->printInformation(F("Firmware file name: "), F("UPGRADE"));
+    Serial << upload.filename.c_str();
+    Firmware->Debugger->getFirmwareFlashInformation();
+    Firmware->Debugger->printInformation(F(">"), F("UPGRADE"));
 #endif
 
-#ifdef AFE_ESP32
+#ifdef AFE_ESP32 // TODO can be moved to other class, is used also in debug class
     uint32_t maxSketchSpace = UPDATE_SIZE_UNKNOWN;
 #else  // ESP8266
     uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
 #endif // AFE_ESP32
 
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: UPGRADE: Current Firmware size: ")
-           << (ESP.getSketchSize() / 1024) << F("Kb") << endl
-           << F("INFO: UPGRADE: Free space size: ")
-           << (ESP.getFreeSketchSpace() / 1024) << F("Kb") << endl
-           << F("INFO: UPGRADE: Max free space size for this hardware: ")
-           << (maxSketchSpace / 1024) << F("Kb") << endl
-#ifdef AFE_ESP32
-           << F("INFO: UPGRADE: Max size: ")
-           << (UPDATE_SIZE_UNKNOWN / 1024 / 1024) << F("KB") << endl
-#endif // ESP32
-           << F("INFO: UPGRADE: ");
-#endif
-
-    if (!Update.begin(maxSketchSpace)) {
+    if (!Update.begin(maxSketchSpace))
+    {
 #ifdef DEBUG
       Update.printError(Serial);
 #endif
     }
-  } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
+  }
+  else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length())
+  {
 #ifdef AFE_CONFIG_HARDWARE_LED
     Firmware->Hardware->SystemLed->toggle();
 #endif
@@ -1196,35 +1350,43 @@ boolean AFEWebServer::upgradOTAFile(void) {
     Serial << F(">");
 #endif
 
-    if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
+    if (Update.write(upload.buf, upload.currentSize) != upload.currentSize)
+    {
 #ifdef DEBUG
       Serial << endl;
       Update.printError(Serial);
 #endif
     }
-  } else if (upload.status == UPLOAD_FILE_END && !_updaterError.length()) {
-    if (Update.end(true)) { // true to set the size to the current
+  }
+  else if (upload.status == UPLOAD_FILE_END && !_updaterError.length())
+  {
+    if (Update.end(true))
+    { // true to set the size to the current
       // progress
       _success = true;
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: UPGRADE: Success. Firmware size: ") << upload.totalSize
-             << endl
-             << F("INFO: UPGRADE: Rebooting...");
+      Firmware->Debugger->printInformation(F("Success. New firmware size: "), F("UPGRADE"));
+      Serial << upload.totalSize;
+      Firmware->Debugger->printInformation(F("Rebooting..."), F("UPGRADE"));
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       Update.printError(Serial);
     }
 #endif
-  } else if (upload.status == UPLOAD_FILE_ABORTED) {
+  }
+  else if (upload.status == UPLOAD_FILE_ABORTED)
+  {
     Update.end();
 #ifdef DEBUG
-    Serial << endl << F("ERROR: UPGRADE: Update was aborted");
+    Firmware->Debugger->printError(F("Update was aborted"), F("UPGRADE"));
 #endif
   }
-  // yield(); // @TODO removed with T7
+#ifdef DEBUG
+  Firmware->Debugger->printHeader();
+#endif
   return _success;
 }
 
@@ -1232,14 +1394,18 @@ boolean AFEWebServer::upgradOTAFile(void) {
 
 /* Reading Server data */
 
-void AFEWebServer::get(DEVICE &data) {
+void AFEWebServer::get(DEVICE &data)
+{
 
   _refreshConfiguration =
       true; // it will cause that device configuration will be refeshed
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -1297,7 +1463,8 @@ void AFEWebServer::get(DEVICE &data) {
 #endif
 
 #if defined(T3_CONFIG)
-  for (uint8_t i = 0; i < sizeof(Firmware->Device->configuration.isPIR); i++) {
+  for (uint8_t i = 0; i < sizeof(Firmware->Device->configuration.isPIR); i++)
+  {
     data.isPIR[i] = server.arg(F("p")).toInt() > i ? true : false;
   }
 #endif
@@ -1398,102 +1565,145 @@ void AFEWebServer::get(DEVICE &data) {
       server.arg(F("al")).length() > 0 ? AFE_AUTOLOGOFF_DEFAULT_TIME : 0;
 }
 
-void AFEWebServer::get(NETWORK &data) {
+void AFEWebServer::get(NETWORK &data)
+{
 
-  if (server.arg(F("s")).length() > 0) {
+  if (server.arg(F("s")).length() > 0)
+  {
     server.arg(F("s")).toCharArray(data.primary.ssid,
                                    sizeof(data.primary.ssid));
-  } else {
+  }
+  else
+  {
     data.primary.ssid[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("sb")).length() > 0) {
+  if (server.arg(F("sb")).length() > 0)
+  {
     server.arg(F("sb")).toCharArray(data.secondary.ssid,
                                     sizeof(data.secondary.ssid));
-  } else {
+  }
+  else
+  {
     data.secondary.ssid[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("p")).length() > 0) {
+  if (server.arg(F("p")).length() > 0)
+  {
     server.arg(F("p")).toCharArray(data.primary.password,
                                    sizeof(data.primary.password));
-  } else {
+  }
+  else
+  {
     data.primary.password[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("pb")).length() > 0) {
+  if (server.arg(F("pb")).length() > 0)
+  {
     server.arg(F("pb")).toCharArray(data.secondary.password,
                                     sizeof(data.secondary.password));
-  } else {
+  }
+  else
+  {
     data.secondary.password[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i1")).length() > 0) {
+  if (server.arg(F("i1")).length() > 0)
+  {
     server.arg(F("i1")).toCharArray(data.primary.ip, sizeof(data.primary.ip));
-  } else {
+  }
+  else
+  {
     data.primary.ip[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i2")).length() > 0) {
+  if (server.arg(F("i2")).length() > 0)
+  {
     server.arg(F("i2")).toCharArray(data.primary.gateway,
                                     sizeof(data.primary.gateway));
-  } else {
+  }
+  else
+  {
     data.primary.gateway[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i3")).length() > 0) {
+  if (server.arg(F("i3")).length() > 0)
+  {
     server.arg(F("i3")).toCharArray(data.primary.subnet,
                                     sizeof(data.primary.subnet));
-  } else {
+  }
+  else
+  {
     data.primary.subnet[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i4")).length() > 0) {
+  if (server.arg(F("i4")).length() > 0)
+  {
     server.arg(F("i4")).toCharArray(data.primary.dns1,
                                     sizeof(data.primary.dns1));
-  } else {
+  }
+  else
+  {
     data.primary.dns1[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i5")).length() > 0) {
+  if (server.arg(F("i5")).length() > 0)
+  {
     server.arg(F("i5")).toCharArray(data.primary.dns2,
                                     sizeof(data.primary.dns2));
-  } else {
+  }
+  else
+  {
     data.primary.dns2[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i1b")).length() > 0) {
+  if (server.arg(F("i1b")).length() > 0)
+  {
     server.arg(F("i1b")).toCharArray(data.secondary.ip,
                                      sizeof(data.secondary.ip));
-  } else {
+  }
+  else
+  {
     data.secondary.ip[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i2b")).length() > 0) {
+  if (server.arg(F("i2b")).length() > 0)
+  {
     server.arg(F("i2b")).toCharArray(data.secondary.gateway,
                                      sizeof(data.secondary.gateway));
-  } else {
+  }
+  else
+  {
     data.secondary.gateway[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i3b")).length() > 0) {
+  if (server.arg(F("i3b")).length() > 0)
+  {
     server.arg(F("i3b")).toCharArray(data.secondary.subnet,
                                      sizeof(data.secondary.subnet));
-  } else {
+  }
+  else
+  {
     data.secondary.subnet[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i4b")).length() > 0) {
+  if (server.arg(F("i4b")).length() > 0)
+  {
     server.arg(F("i4b")).toCharArray(data.secondary.dns1,
                                      sizeof(data.secondary.dns1));
-  } else {
+  }
+  else
+  {
     data.secondary.dns1[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("i5b")).length() > 0) {
+  if (server.arg(F("i5b")).length() > 0)
+  {
     server.arg(F("i5b")).toCharArray(data.secondary.dns2,
                                      sizeof(data.secondary.dns2));
-  } else {
+  }
+  else
+  {
     data.secondary.dns2[0] = AFE_EMPTY_STRING;
   }
 
@@ -1528,32 +1738,44 @@ void AFEWebServer::get(NETWORK &data) {
 #endif
 }
 
-void AFEWebServer::get(MQTT &data) {
-  if (server.arg(F("h")).length() > 0) {
+void AFEWebServer::get(MQTT &data)
+{
+  if (server.arg(F("h")).length() > 0)
+  {
     server.arg(F("h")).toCharArray(data.host, sizeof(data.host));
-  } else {
+  }
+  else
+  {
     data.host[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("a")).length() > 0) {
+  if (server.arg(F("a")).length() > 0)
+  {
     server.arg(F("a")).toCharArray(data.ip, sizeof(data.ip));
-
-  } else {
+  }
+  else
+  {
     data.ip[0] = AFE_EMPTY_STRING;
   }
 
   data.port = server.arg(F("p")).length() > 0 ? server.arg(F("p")).toInt()
                                               : AFE_CONFIG_MQTT_DEFAULT_PORT;
 
-  if (server.arg(F("u")).length() > 0) {
+  if (server.arg(F("u")).length() > 0)
+  {
     server.arg(F("u")).toCharArray(data.user, sizeof(data.user));
-  } else {
+  }
+  else
+  {
     data.user[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("s")).length() > 0) {
+  if (server.arg(F("s")).length() > 0)
+  {
     server.arg(F("s")).toCharArray(data.password, sizeof(data.password));
-  } else {
+  }
+  else
+  {
     data.password[0] = AFE_EMPTY_STRING;
   }
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -1561,16 +1783,22 @@ void AFEWebServer::get(MQTT &data) {
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
 
-  if (server.arg(F("t0")).length() > 0) {
+  if (server.arg(F("t0")).length() > 0)
+  {
     server.arg(F("t0")).toCharArray(data.lwt.topic, sizeof(data.lwt.topic));
-  } else {
+  }
+  else
+  {
     data.lwt.topic[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("t1")).length() > 0) {
+  if (server.arg(F("t1")).length() > 0)
+  {
     server.arg(F("t1")).toCharArray(data.status.topic,
                                     sizeof(data.status.topic));
-  } else {
+  }
+  else
+  {
     data.status.topic[0] = AFE_EMPTY_STRING;
   }
 
@@ -1584,40 +1812,56 @@ void AFEWebServer::get(MQTT &data) {
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-void AFEWebServer::get(DOMOTICZ &data) {
+void AFEWebServer::get(DOMOTICZ &data)
+{
 
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     data.protocol = server.arg(F("t")).toInt();
   }
 
-  if (server.arg(F("h")).length() > 0) {
+  if (server.arg(F("h")).length() > 0)
+  {
     server.arg(F("h")).toCharArray(data.host, sizeof(data.host));
-  } else {
+  }
+  else
+  {
     data.host[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("p")).length() > 0) {
+  if (server.arg(F("p")).length() > 0)
+  {
     data.port = server.arg(F("p")).toInt();
   }
 
-  if (server.arg(F("u")).length() > 0) {
+  if (server.arg(F("u")).length() > 0)
+  {
     server.arg(F("u")).toCharArray(data.user, sizeof(data.user));
-  } else {
+  }
+  else
+  {
     data.user[0] = AFE_EMPTY_STRING;
   }
-  if (server.arg(F("s")).length() > 0) {
+  if (server.arg(F("s")).length() > 0)
+  {
     server.arg(F("s")).toCharArray(data.password, sizeof(data.password));
-  } else {
+  }
+  else
+  {
     data.password[0] = AFE_EMPTY_STRING;
   }
 }
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-void AFEWebServer::get(HOME_ASSISTANT_CONFIG &data) {
+void AFEWebServer::get(HOME_ASSISTANT_CONFIG &data)
+{
 
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.discovery.topic,
                                    sizeof(data.discovery.topic));
-  } else {
+  }
+  else
+  {
     data.discovery.topic[0] = AFE_EMPTY_STRING;
   }
   data.addingComponents = server.arg(F("a")).length() > 0 ? true : false;
@@ -1627,7 +1871,8 @@ void AFEWebServer::get(HOME_ASSISTANT_CONFIG &data) {
 #endif // AFE_FIRMWARE_API
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-void AFEWebServer::get(RELAY &data) {
+void AFEWebServer::get(RELAY &data)
+{
 
   data.gpio = server.arg(F("g")).length() ? server.arg(F("g")).toInt() : 0;
 
@@ -1639,9 +1884,12 @@ void AFEWebServer::get(RELAY &data) {
   data.state.powerOn =
       server.arg(F("pr")).length() > 0 ? server.arg(F("pr")).toInt() : 0;
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -1653,9 +1901,12 @@ void AFEWebServer::get(RELAY &data) {
                           ? server.arg(F("x")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -1682,7 +1933,8 @@ void AFEWebServer::get(RELAY &data) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-void AFEWebServer::get(SWITCH &data) {
+void AFEWebServer::get(SWITCH &data)
+{
   data.type = server.arg(F("m")).length() > 0 ? server.arg(F("m")).toInt()
                                               : AFE_SWITCH_TYPE_MONO;
 
@@ -1707,9 +1959,12 @@ void AFEWebServer::get(SWITCH &data) {
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -1726,20 +1981,28 @@ void AFEWebServer::get(SWITCH &data) {
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
-void AFEWebServer::get(PASSWORD &data) {
-  if (server.arg(F("p")).length() > 0) {
+void AFEWebServer::get(PASSWORD &data)
+{
+  if (server.arg(F("p")).length() > 0)
+  {
     server.arg(F("p")).toCharArray(data.password, sizeof(data.password));
-  } else {
+  }
+  else
+  {
     data.password[0] = AFE_EMPTY_STRING;
   }
 
   data.protect = server.arg(F("r")).length() > 0 ? true : false;
 }
 
-void AFEWebServer::get(PRO_VERSION &data) {
-  if (server.arg(F("k")).length() > 0) {
+void AFEWebServer::get(PRO_VERSION &data)
+{
+  if (server.arg(F("k")).length() > 0)
+  {
     server.arg(F("k")).toCharArray(data.serial, sizeof(data.serial));
-  } else {
+  }
+  else
+  {
     data.serial[0] = AFE_EMPTY_STRING;
   }
 
@@ -1747,10 +2010,14 @@ void AFEWebServer::get(PRO_VERSION &data) {
 }
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-void AFEWebServer::get(REGULATOR &data) {
-  if (server.arg(F("n")).length() > 0) {
+void AFEWebServer::get(REGULATOR &data)
+{
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -1792,9 +2059,12 @@ void AFEWebServer::get(REGULATOR &data) {
                           ? server.arg(F("x")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -1802,10 +2072,14 @@ void AFEWebServer::get(REGULATOR &data) {
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-void AFEWebServer::get(THERMAL_PROTECTOR &data) {
-  if (server.arg(F("n")).length() > 0) {
+void AFEWebServer::get(THERMAL_PROTECTOR &data)
+{
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -1826,9 +2100,12 @@ void AFEWebServer::get(THERMAL_PROTECTOR &data) {
                           ? server.arg(F("x")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -1836,7 +2113,8 @@ void AFEWebServer::get(THERMAL_PROTECTOR &data) {
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFEWebServer::get(CONTACTRON &data) {
+void AFEWebServer::get(CONTACTRON &data)
+{
   data.type = server.arg(F("y")).length() > 0
                   ? server.arg(F("y")).toInt()
                   : AFE_CONFIG_HARDWARE_CONTACTRON_DEFAULT_OUTPUT_TYPE;
@@ -1852,9 +2130,12 @@ void AFEWebServer::get(CONTACTRON &data) {
 
   data.gpio = server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt() : 0;
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -1863,9 +2144,12 @@ void AFEWebServer::get(CONTACTRON &data) {
                           ? server.arg(F("x")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -1873,11 +2157,15 @@ void AFEWebServer::get(CONTACTRON &data) {
 #endif // AFE_CONFIG_HARDWARE_CONTACTRON
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-void AFEWebServer::get(GATE &data) {
+void AFEWebServer::get(GATE &data)
+{
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -1892,7 +2180,8 @@ void AFEWebServer::get(GATE &data) {
                               ? server.arg(F("c2")).toInt()
                               : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  for (uint8_t i = 0; i < sizeof(data.states.state); i++) {
+  for (uint8_t i = 0; i < sizeof(data.states.state); i++)
+  {
     data.states.state[i] = server.arg("s" + String(i)).length() > 0
                                ? server.arg("s" + String(i)).toInt()
                                : AFE_GATE_UNKNOWN;
@@ -1905,9 +2194,12 @@ void AFEWebServer::get(GATE &data) {
                                  ? server.arg(F("z")).toInt()
                                  : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -1915,7 +2207,8 @@ void AFEWebServer::get(GATE &data) {
 #endif // AFE_CONFIG_HARDWARE_GATE
 
 #if defined(T3_CONFIG)
-void AFEWebServer::getPIRData(uint8_t id, PIR *data) {
+void AFEWebServer::getPIRData(uint8_t id, PIR *data)
+{
 
   if (server.arg(F("g" + String(id)).length() > 0) {
     data.gpio = server.arg(F("g" + String(id)).toInt();
@@ -1951,7 +2244,8 @@ void AFEWebServer::getPIRData(uint8_t id, PIR *data) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWebServer::get(LED &data) {
+void AFEWebServer::get(LED &data)
+{
   data.gpio = server.arg(F("g")).length() > 0
                   ? server.arg(F("g")).toInt()
                   : AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
@@ -1969,26 +2263,34 @@ void AFEWebServer::get(LED &data) {
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 }
 
-uint8_t AFEWebServer::getSystemLEDData() {
+uint8_t AFEWebServer::getSystemLEDData()
+{
   return server.arg(F("l")).length() > 0 ? server.arg(F("l")).toInt()
                                          : AFE_HARDWARE_ITEM_NOT_EXIST;
 }
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-void AFEWebServer::get(DS18B20 &data) {
+void AFEWebServer::get(DS18B20 &data)
+{
   AFESensorDS18B20 _Sensor;
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
-  if (server.arg(F("a")).length() > 0) {
+  if (server.arg(F("a")).length() > 0)
+  {
     char address[17];
     server.arg(F("a")).toCharArray(address, 17);
     _Sensor.addressToInt(address, data.address);
-  } else {
+  }
+  else
+  {
     _Sensor.addressNULL(data.address);
   }
   data.gpio = server.arg(F("g")).length() > 0
@@ -2018,9 +2320,12 @@ void AFEWebServer::get(DS18B20 &data) {
                           ? server.arg(F("x")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -2029,11 +2334,15 @@ void AFEWebServer::get(DS18B20 &data) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEWebServer::get(DHT &data) {
+void AFEWebServer::get(DHT &data)
+{
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -2102,9 +2411,12 @@ void AFEWebServer::get(DHT &data) {
                                            : AFE_DOMOTICZ_DEFAULT_IDX;
 
 #else
-  if (server.arg(F("m")).length() > 0) {
+  if (server.arg(F("m")).length() > 0)
+  {
     server.arg(F("m")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -2112,7 +2424,8 @@ void AFEWebServer::get(DHT &data) {
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-void AFEWebServer::getSerialPortData(SERIALPORT *data) {
+void AFEWebServer::getSerialPortData(SERIALPORT *data)
+{
 
   data->RXD = server.arg(F("r")).length() > 0
                   ? server.arg(F("r")).toInt()
@@ -2124,7 +2437,8 @@ void AFEWebServer::getSerialPortData(SERIALPORT *data) {
 #endif // AFE_CONFIG_HARDWARE_UART
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-void AFEWebServer::get(I2CPORT &data) {
+void AFEWebServer::get(I2CPORT &data)
+{
   data.SDA = server.arg(F("a")).length() > 0
                  ? server.arg(F("a")).toInt()
                  : AFE_CONFIG_HARDWARE_I2C_0_DEFAULT_SDA;
@@ -2140,7 +2454,8 @@ void AFEWebServer::get(I2CPORT &data) {
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-void AFEWebServer::get(HPMA115S0 &data) {
+void AFEWebServer::get(HPMA115S0 &data)
+{
   data.interval = server.arg(F("f")).length() > 0
                       ? server.arg(F("f")).toInt()
                       : AFE_CONFIG_HARDWARE_HPMA115S_DEFAULT_INTERVAL;
@@ -2172,23 +2487,30 @@ void AFEWebServer::get(HPMA115S0 &data) {
                                       ? server.arg(F("x4")).toInt()
                                       : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 };
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-void AFEWebServer::get(BMEX80 &data) {
+void AFEWebServer::get(BMEX80 &data)
+{
   data.type = server.arg(F("b")).length() > 0 ? server.arg(F("b")).toInt()
                                               : AFE_BMX_UNKNOWN_SENSOR;
 
@@ -2296,23 +2618,30 @@ void AFEWebServer::get(BMEX80 &data) {
                                            ? server.arg(F("i15")).toInt()
                                            : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEWebServer::get(BH1750_CONFIG &data) {
+void AFEWebServer::get(BH1750_CONFIG &data)
+{
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   data.wirePortId = server.arg(F("wr")).length() > 0
@@ -2335,27 +2664,37 @@ void AFEWebServer::get(BH1750_CONFIG &data) {
                           ? server.arg(F("d")).toInt()
                           : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-void AFEWebServer::get(AS3935 &data) {
+void AFEWebServer::get(AS3935 &data)
+{
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -2399,9 +2738,12 @@ void AFEWebServer::get(AS3935 &data) {
   data.domoticz.idx =
       server.arg(F("d")).length() > 0 ? server.arg(F("d")).toInt() : 0;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -2409,10 +2751,14 @@ void AFEWebServer::get(AS3935 &data) {
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-void AFEWebServer::get(ANEMOMETER &data) {
-  if (server.arg(F("n")).length() > 0) {
+void AFEWebServer::get(ANEMOMETER &data)
+{
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -2441,9 +2787,12 @@ void AFEWebServer::get(ANEMOMETER &data) {
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -2451,7 +2800,8 @@ void AFEWebServer::get(ANEMOMETER &data) {
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-void AFEWebServer::get(ADCINPUT &data) {
+void AFEWebServer::get(ADCINPUT &data)
+{
   data.gpio = server.arg(F("g")).length() > 0
                   ? server.arg(F("g")).toInt()
                   : AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_GPIO;
@@ -2461,9 +2811,12 @@ void AFEWebServer::get(ADCINPUT &data) {
                       : AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_INTERVAL;
 
 #ifdef AFE_ESP32
-  if (server.arg(F("l")).length() > 0) {
+  if (server.arg(F("l")).length() > 0)
+  {
     server.arg(F("l")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -2497,9 +2850,12 @@ void AFEWebServer::get(ADCINPUT &data) {
                                         ? server.arg(F("x3")).toInt()
                                         : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -2520,10 +2876,13 @@ void AFEWebServer::get(ADCINPUT &data) {
                                   ? server.arg(F("x")).toInt()
                                   : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("bt")).length() > 0) {
+  if (server.arg(F("bt")).length() > 0)
+  {
     server.arg(F("bt")).toCharArray(data.battery.mqtt.topic,
                                     sizeof(data.battery.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.battery.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -2533,11 +2892,15 @@ void AFEWebServer::get(ADCINPUT &data) {
 #endif // AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-void AFEWebServer::get(RAINMETER &data) {
+void AFEWebServer::get(RAINMETER &data)
+{
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -2561,9 +2924,12 @@ void AFEWebServer::get(RAINMETER &data) {
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
@@ -2571,10 +2937,14 @@ void AFEWebServer::get(RAINMETER &data) {
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEWebServer::get(BINARY_SENSOR &data) {
-  if (server.arg(F("n")).length() > 0) {
+void AFEWebServer::get(BINARY_SENSOR &data)
+{
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -2602,9 +2972,12 @@ void AFEWebServer::get(BINARY_SENSOR &data) {
   data.domoticz.idx =
       server.arg(F("x")).length() > 0 ? server.arg(F("x")).toInt() : 0;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -2612,16 +2985,21 @@ void AFEWebServer::get(BINARY_SENSOR &data) {
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
-uint16_t AFEWebServer::getOTAFirmwareId() {
+uint16_t AFEWebServer::getOTAFirmwareId()
+{
   return server.arg(F("f")).length() > 0 ? server.arg(F("f")).toInt() : 0;
 }
 #endif // AFE_CONFIG_OTA_NOT_UPGRADABLE
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-void AFEWebServer::get(PN532_SENSOR &data) {
-  if (server.arg(F("n")).length() > 0) {
+void AFEWebServer::get(PN532_SENSOR &data)
+{
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -2663,15 +3041,19 @@ void AFEWebServer::get(PN532_SENSOR &data) {
 #endif
 
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 }
 
-void AFEWebServer::processMiFareCard() {
+void AFEWebServer::processMiFareCard()
+{
   AFESensorPN532 PN532Sensor;
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
@@ -2687,11 +3069,15 @@ void AFEWebServer::processMiFareCard() {
   char label[3];
 
   for (uint8_t i = 0;
-       i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+       i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++)
+  {
     sprintf(label, "t%d", i);
-    if (server.arg(label).length() > 0) {
+    if (server.arg(label).length() > 0)
+    {
       server.arg(label).toCharArray(tag, AFE_HARDWARE_PN532_BLOCK_SIZE + 1);
-    } else {
+    }
+    else
+    {
       tag[0] = AFE_EMPTY_STRING;
     }
 
@@ -2704,11 +3090,15 @@ void AFEWebServer::processMiFareCard() {
   }
 
   for (uint8_t i = 0;
-       i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++) {
+       i < AFE_HARDWARE_PN532_NUMBER_OF_WRITABLE_BLOCKS_PER_SECTOR; i++)
+  {
     sprintf(label, "t%d", i + 4);
-    if (server.arg(label).length() > 0) {
+    if (server.arg(label).length() > 0)
+    {
       server.arg(label).toCharArray(tag, AFE_HARDWARE_PN532_BLOCK_SIZE + 1);
-    } else {
+    }
+    else
+    {
       tag[0] = AFE_EMPTY_STRING;
     }
 
@@ -2721,10 +3111,14 @@ void AFEWebServer::processMiFareCard() {
   }
 }
 
-void AFEWebServer::get(MIFARE_CARD &data) {
-  if (server.arg(F("m")).length() > 0) {
+void AFEWebServer::get(MIFARE_CARD &data)
+{
+  if (server.arg(F("m")).length() > 0)
+  {
     server.arg(F("m")).toCharArray(data.cardId, sizeof(data.cardId));
-  } else {
+  }
+  else
+  {
     data.cardId[0] = AFE_EMPTY_STRING;
   }
 
@@ -2746,16 +3140,20 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   char label[3];
 
-  for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
+  for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++)
+  {
     sprintf(label, "x%d", i);
     data.domoticz[i].idx =
         server.arg(label).length() > 0 ? server.arg(label).toInt() : 0;
   }
 
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
@@ -2764,7 +3162,8 @@ void AFEWebServer::get(MIFARE_CARD &data) {
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-void AFEWebServer::get(CLED &data) {
+void AFEWebServer::get(CLED &data)
+{
   data.gpio =
       server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt() : AFE_NONE;
 
@@ -2796,9 +3195,12 @@ void AFEWebServer::get(CLED &data) {
                             ? server.arg(F("ft")).toInt()
                             : AFE_CONFIG_HARDWARE_CLED_DEFAULT_CHANGE_TIME;
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 
@@ -2809,15 +3211,21 @@ void AFEWebServer::get(CLED &data) {
                         ? server.arg(F("ed")).toInt()
                         : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("ct")).length() > 0) {
+  if (server.arg(F("ct")).length() > 0)
+  {
     server.arg(F("ct")).toCharArray(data.cled.topic, sizeof(data.cled.topic));
-  } else {
+  }
+  else
+  {
     data.cled.topic[0] = AFE_EMPTY_STRING;
   }
-  if (server.arg(F("et")).length() > 0) {
+  if (server.arg(F("et")).length() > 0)
+  {
     server.arg(F("et")).toCharArray(data.effect.topic,
                                     sizeof(data.effect.topic));
-  } else {
+  }
+  else
+  {
     data.effect.topic[0] = AFE_EMPTY_STRING;
   }
 
@@ -2831,7 +3239,8 @@ void AFEWebServer::get(CLED &data) {
 #endif
 }
 
-void AFEWebServer::get(CLED_EFFECT_BLINKING &data) {
+void AFEWebServer::get(CLED_EFFECT_BLINKING &data)
+{
 
   data.on.color.red = server.arg(F("or")).length() > 0
                           ? server.arg(F("or")).toInt()
@@ -2877,14 +3286,18 @@ void AFEWebServer::get(CLED_EFFECT_BLINKING &data) {
           ? server.arg(F("ft")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
 
-void AFEWebServer::get(CLED_EFFECT_WAVE &data) {
+void AFEWebServer::get(CLED_EFFECT_WAVE &data)
+{
   data.on.color.red = server.arg(F("or")).length() > 0
                           ? server.arg(F("or")).toInt()
                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
@@ -2919,14 +3332,18 @@ void AFEWebServer::get(CLED_EFFECT_WAVE &data) {
           ? server.arg(F("z")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIMEOUT;
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
 
-void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {
+void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data)
+{
   data.in.color.red = server.arg(F("or")).length() > 0
                           ? server.arg(F("or")).toInt()
                           : AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
@@ -2954,9 +3371,12 @@ void AFEWebServer::get(CLED_EFFECT_FADE_INOUT &data) {
           ? server.arg(F("z")).toInt()
           : AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
@@ -3017,7 +3437,8 @@ void AFEWebServer::get(CLED &CLEDData, CLED_BACKLIGHT &CLEDBacklightData) {
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-void AFEWebServer::get(TSL2561 &data) {
+void AFEWebServer::get(TSL2561 &data)
+{
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   data.wirePortId = server.arg(F("wr")).length() > 0
@@ -3053,23 +3474,30 @@ void AFEWebServer::get(TSL2561 &data) {
                                     ? server.arg(F("d2")).toInt()
                                     : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-void AFEWebServer::get(MCP23XXX &data) {
+void AFEWebServer::get(MCP23XXX &data)
+{
 
 #if defined(AFE_ESP32)
   data.wirePortId = server.arg(F("wr")).length() > 0
@@ -3080,16 +3508,20 @@ void AFEWebServer::get(MCP23XXX &data) {
   data.address = server.arg(F("a")).length() > 0 ? server.arg(F("a")).toInt()
                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_FS3000
-void AFEWebServer::get(FS3000_CONFIG &data) {
+void AFEWebServer::get(FS3000_CONFIG &data)
+{
 
 #if defined(AFE_CONFIG_HARDWARE_I2C) && defined(AFE_ESP32)
   data.wirePortId = server.arg(F("wr")).length() > 0
@@ -3109,9 +3541,8 @@ void AFEWebServer::get(FS3000_CONFIG &data) {
                    : AFE_CONFIG_HARDWARE_FS3000_DEFAULT_RANGE;
 
   data.r = server.arg(F("re")).length() > 0
-                   ? server.arg(F("re")).toInt()
-                   : AFE_CONFIG_HARDWARE_FS3000_DEFAULT_R;
-
+               ? server.arg(F("re")).toInt()
+               : AFE_CONFIG_HARDWARE_FS3000_DEFAULT_R;
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   data.domoticz.raw.idx = server.arg(F("d1")).length() > 0
@@ -3127,20 +3558,26 @@ void AFEWebServer::get(FS3000_CONFIG &data) {
                                        : AFE_DOMOTICZ_DEFAULT_IDX;
 
   data.domoticz.meters3PerHour.idx = server.arg(F("d4")).length() > 0
-                                          ? server.arg(F("d4")).toInt()
-                                          : AFE_DOMOTICZ_DEFAULT_IDX;
+                                         ? server.arg(F("d4")).toInt()
+                                         : AFE_DOMOTICZ_DEFAULT_IDX;
 
 #else
-  if (server.arg(F("t")).length() > 0) {
+  if (server.arg(F("t")).length() > 0)
+  {
     server.arg(F("t")).toCharArray(data.mqtt.topic, sizeof(data.mqtt.topic));
-  } else {
+  }
+  else
+  {
     data.mqtt.topic[0] = AFE_EMPTY_STRING;
   }
 #endif
 
-  if (server.arg(F("n")).length() > 0) {
+  if (server.arg(F("n")).length() > 0)
+  {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));
-  } else {
+  }
+  else
+  {
     data.name[0] = AFE_EMPTY_STRING;
   }
 }

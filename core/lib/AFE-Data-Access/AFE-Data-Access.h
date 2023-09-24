@@ -36,10 +36,9 @@ private:
   void printFileOpeningError(const __FlashStringHelper *fileName, uint8_t id = AFE_NONE);
   void printFileWritingInformation();
   void printFileContentInformation();
-  void printJSONNotPharsed();
-
-  
+  void printJSONNotPharsed();  
 #endif
+
 
 public:
   AFEDataAccess();

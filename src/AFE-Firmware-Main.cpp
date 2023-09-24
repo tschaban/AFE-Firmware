@@ -1,34 +1,41 @@
 #include "AFE-Firmware-Main.h"
 
-void setup() {
+void setup()
+{
 
   boolean _success = false;
 
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
-  Firmware->Debugger->printValue(F(AFE_D_WELCOME_MESSAGE));
-  getESPInformation();
+  Firmware->Debugger->printHeader(2);
+  Firmware->Debugger->printInformation(F("All classes and global variables initialized"), F("BOOT"));
+  Firmware->Debugger->printInformation(F("Initializing device"), F("BOOT"));
+  Firmware->Debugger->getESPHardwareInformation();
+  Firmware->Debugger->printHeader(1, 1);
 #endif
 
 #ifdef AFE_ESP32
 #else // ESP8266
 // Erase all config
 #ifdef DEBUG
-  Firmware->Debugger->printInformation(F("Internally stored configuration: erased: "),F("ESP"));
+  Firmware->Debugger->printInformation(F("Internally stored configuration: erased: "), F("ESP"));
 #endif
   _success = ESP.eraseConfig();
 #ifdef DEBUG
-  if (_success) {
-    Firmware->Debugger->printValue(F("success"),0,1);
-  } else {
-    Firmware->Debugger->printValue(F("FAILURE"),0,1);
+  if (_success)
+  {
+    Firmware->Debugger->printValue(F("success"), 0, 1);
+  }
+  else
+  {
+    Firmware->Debugger->printValue(F("FAILURE"), 0, 1);
   }
 #endif
 #endif // ESP32/ESP8266
 
 #ifdef DEBUG
-  Firmware->Debugger->printInformation(F("Configuring global Objects"),F("BOOT"));
+  Firmware->Debugger->printInformation(F("Configuring global Objects"), F("BOOT"));
 #endif
 
   Firmware->begin();
@@ -50,20 +57,23 @@ void setup() {
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
-  Firmware->Debugger->printInformation(F("Checking, if WiFi was configured"),F("WIFI"));
+  Firmware->Debugger->printInformation(F("Checking, if WiFi was configured"), F("WIFI"));
 #endif
-  if (Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
+  if (Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET)
+  {
 #ifdef DEBUG
-    Firmware->Debugger->printValue(F("No"),0);
+    Firmware->Debugger->printValue(F("No"), 0);
 #endif
-  } else {
+  }
+  else
+  {
 /**
  * @brief Checking if the firmware has been upgraded
  *
  */
 #ifdef DEBUG
-    Firmware->Debugger->printValue(F("Yes"),0);
-    Firmware->Debugger->printInformation(F("Checking if firmware should be upgraded?"),F("FIRMWARE"));
+    Firmware->Debugger->printValue(F("Yes"), 0);
+    Firmware->Debugger->printInformation(F("Checking if firmware should be upgraded?"), F("FIRMWARE"));
 #endif
     AFEUpgrader *Upgrader = new AFEUpgrader(Firmware);
     Upgrader->upgraded();
@@ -88,7 +98,8 @@ void setup() {
   /* Initializing: Remaining Hardware item components */
   Hardware->initHardwareItems();
 
-  if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+  if (Firmware->Device->getMode() == AFE_MODE_NORMAL)
+  {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
     initializeRegulator();
@@ -135,12 +146,12 @@ void setup() {
     initializeHTTPAPI();
   }
 
-// Firmware->API->REST = RestAPI;
+  // Firmware->API->REST = RestAPI;
 
-/**
- * @brief Initializing Events handler
- *
- */
+  /**
+   * @brief Initializing Events handler
+   *
+   */
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   Event->begin(Firmware, Hardware, MqttAPI, HttpDomoticzAPI);
@@ -148,11 +159,11 @@ void setup() {
   Event->begin(Firmware, Hardware, MqttAPI);
 #endif
 
-/**
- * @brief End of initialization for operating mode. Initialization for all
- * devices modes
- *
- */
+  /**
+   * @brief End of initialization for operating mode. Initialization for all
+   * devices modes
+   *
+   */
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   Firmware->Hardware->SystemLed->off();
@@ -161,47 +172,40 @@ void setup() {
    *
    */
   if (Firmware->Device->getMode() == AFE_MODE_ACCESS_POINT ||
-      Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
+      Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET)
+  {
     Firmware->Hardware->SystemLed->blinkingOn(100);
   }
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
-  Serial << endl
-         << F("############################################################"
-              "####"
-              "########")
-         << endl
-         << F("#                           BOOTING COMPLETED               "
-              "    "
-              "       #")
-         << endl
-         << F("#                            STARTING DEVICE                "
-              "    "
-              "       #");
-  if (Firmware->Device->getMode() != AFE_MODE_NORMAL) {
-    Serial << endl
-           << F("#                           CONFIGURATION MODE            "
-                "    "
-                "         #");
+  Firmware->Debugger->getFreeMemorySize();
+  Firmware->Debugger->printHeader(2);
+  Firmware->Debugger->printValue(F("BOOTING COMPLETED"), 1);
+  Firmware->Debugger->printValue(F("STARTING DEVICE"), 1);
+  if (Firmware->Device->getMode() == AFE_MODE_NORMAL)
+  {
+    Firmware->Debugger->printValue(F("NORMAL MODE"));
   }
-
-  Serial << endl
-         << F("############################################################"
-              "####"
-              "########");
-  getAvailableMem();
-  Firmware->Debugger->printValue(F(": Booting completed"),0);
+  else
+  {
+    Firmware->Debugger->printValue(F("CONFIGURATION MODE"));
+  }
+  Firmware->Debugger->printHeader(1, 1);
 
 #endif
 }
 
-void loop() {
+void loop()
+{
 
   if (Firmware->Device->getMode() == AFE_MODE_NORMAL ||
-      Firmware->Device->getMode() == AFE_MODE_CONFIGURATION) {
-    if (Firmware->API->Network->connected()) {
-      if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+      Firmware->Device->getMode() == AFE_MODE_CONFIGURATION)
+  {
+    if (Firmware->API->Network->connected())
+    {
+      if (Firmware->Device->getMode() == AFE_MODE_NORMAL)
+      {
 
         /**
          * @brief If MQTT API is on it listens for MQTT messages. If the
@@ -209,7 +213,8 @@ void loop() {
          * is not connected to MQTT Broker, it connects the device to it
          *
          */
-        if (Firmware->Device->configuration.api.mqtt) {
+        if (Firmware->Device->configuration.api.mqtt)
+        {
           MqttAPI->listener();
         }
 
@@ -275,13 +280,15 @@ void loop() {
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
         PN532EventsListener();
 #endif
-
-      } else { /**
-       * @brief Device runs in configuration mode over WiFi
-       *
-       */
+      }
+      else
+      { /**
+         * @brief Device runs in configuration mode over WiFi
+         *
+         */
 #ifdef AFE_CONFIG_HARDWARE_LED
-        if (!Firmware->Hardware->SystemLed->isBlinking()) {
+        if (!Firmware->Hardware->SystemLed->isBlinking())
+        {
           Firmware->Hardware->SystemLed->blinkingOn(100);
         }
 #endif
@@ -291,9 +298,11 @@ void loop() {
     }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    else {
+    else
+    {
       if (Firmware->Device->getMode() == AFE_MODE_CONFIGURATION &&
-          Firmware->Hardware->SystemLed->isBlinking()) {
+          Firmware->Hardware->SystemLed->isBlinking())
+      {
         Firmware->Hardware->SystemLed->blinkingOff();
       }
     }
@@ -309,7 +318,8 @@ void loop() {
      *
      */
 
-    if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+    if (Firmware->Device->getMode() == AFE_MODE_NORMAL)
+    {
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
       DS18B20SensorEventsListener();
 #endif
@@ -333,8 +343,9 @@ void loop() {
      */
 
     Event->listener();
-
-  } else {
+  }
+  else
+  {
     /**
      * @brief Device runs in Access Point mode
      *
@@ -358,14 +369,4 @@ void loop() {
 #ifdef AFE_CONFIG_HARDWARE_LED
   Firmware->Hardware->SystemLed->loop();
 #endif
-
-/**
- * @brief Debug information
- *
- */
-#ifdef DEBUG
-  if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
-    //  debugListener();
-  }
-#endif // DEBUG
 }

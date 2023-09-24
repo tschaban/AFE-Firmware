@@ -15,10 +15,13 @@
 /* Serial port speed */
 #define AFE_CONFIG_SERIAL_SPEED 115200
 
-/* Turn On/Off debbuging of Ping class */
+/* Configs releated to Debugger Enabled */
 #ifdef DEBUG
+
+/* Turn On/Off debbuging of Ping class */
 #define ENABLE_DEBUG_PING
-#endif
+
+#endif // DEBUG
 
 /* Urls */
 #define AFE_URL_DOCUMENTATION "https://afe.smartnydom.pl"

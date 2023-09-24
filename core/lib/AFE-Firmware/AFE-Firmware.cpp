@@ -112,10 +112,13 @@ void AFEFirmware::initializeIIC(void)
     API->Flash->getConfiguration(0, &I2CBUSConfiguration);
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: I2C[0]: SDA: ") << I2CBUSConfiguration.SDA
-           << F(", SCL: ") << I2CBUSConfiguration.SCL << F(", Frequency: ")
-           << (I2CBUSConfiguration.frequency / 1000) << F("Hz");
+    Debugger->printInformation(F("Initialization"), F("I2C[0]"));
+    Debugger->printBulletPoint(F("SDA: "));
+    Debugger->printValue(I2CBUSConfiguration.SDA);
+    Debugger->printBulletPoint(F("SCL: "));
+    Debugger->printValue(I2CBUSConfiguration.SCL);
+    Debugger->printBulletPoint(F("Frequency: "));
+    Serial << (I2CBUSConfiguration.frequency / 1000) << F("Hz");
 #endif
 
     success = Hardware->WirePort0->begin(I2CBUSConfiguration.SDA,
@@ -127,9 +130,9 @@ void AFEFirmware::initializeIIC(void)
 #ifdef DEBUG
 
   Debugger->printInformation(F("Initialization"), F("I2C"));
-  Debugger->printBulletPoint("SDA:");
+  Debugger->printBulletPoint(F("SDA: "));
   Debugger->printValue(I2CBUSConfiguration.SDA);
-  Debugger->printBulletPoint("SCL:");
+  Debugger->printBulletPoint(F("SCL: "));
   Debugger->printValue(I2CBUSConfiguration.SCL);
 
 #endif
@@ -146,7 +149,7 @@ void AFEFirmware::initializeIIC(void)
     }
     else
     {
-      I2CBus->begin(Hardware->WirePort0);
+      I2CBus->begin(Hardware->WirePort0, Debugger);
       I2CBus->scanAll();
     }
 #endif // DEBUG
@@ -159,10 +162,13 @@ void AFEFirmware::initializeIIC(void)
     API->Flash->getConfiguration(1, &I2CBUSConfiguration);
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: I2C[1]: SDA: ") << I2CBUSConfiguration.SDA
-           << F(", SCL: ") << I2CBUSConfiguration.SCL << F(", Frequency: ")
-           << I2CBUSConfiguration.frequency / 1000 << F("Hz");
+    Debugger->printInformation(F("Initialization"), F("I2C[2]"));
+    Debugger->printBulletPoint(F("SDA: "));
+    Debugger->printValue(I2CBUSConfiguration.SDA);
+    Debugger->printBulletPoint(F("SCL: "));
+    Debugger->printValue(I2CBUSConfiguration.SCL);
+    Debugger->printBulletPoint(F("Frequency: "));
+    Serial << (I2CBUSConfiguration.frequency / 1000) << F("Hz");
 #endif // DEBUG
 
     success = Hardware->WirePort1->begin(I2CBUSConfiguration.SDA,
@@ -173,13 +179,12 @@ void AFEFirmware::initializeIIC(void)
 
     if (!success)
     {
-      Serial << endl
-             << F("ERROR: I2C[1]: Bus doesn't work");
+     
+     Debugger->printError(F("Bus doesn't work"), F("I2C[1]"));
+      
     }
     else
     {
-      Serial << endl
-             << F("INFO: I2C[1]: Scannings for devices");
       I2CBus->begin(Hardware->WirePort1);
       I2CBus->scanAll();
     }

@@ -5,9 +5,16 @@
 
 #ifdef DEBUG
 
+extern "C" {
+#include "user_interface.h"
+}
+
 #include <Streaming.h>
 
-#define DEBUG_INTERVAL 60
+#include <FS.h>
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+#include <LittleFS.h>
+#endif
 
 /* Type for messages */
 #define AFE_DEBUG_TYPE_LINE 0
@@ -16,15 +23,26 @@
 #define AFE_DEBUG_TYPE_WARNING 8
 #define AFE_DEBUG_TYPE_ERROR 9
 
+/* Header char types */
+#define AFE_DEBUG_HEADER_TYPE_HASH 0
+#define AFE_DEBUG_HEADER_TYPE_DASH 1
+
+/* Header default length */
+#define AFE_DEBUG_HEADER_DEFAULT_LENGTH 72
+
 class AFEDebugger
 {
 
 private:
+
+    FSInfo fileSystem;
+
     void print(const char *text, const __FlashStringHelper *messageCategory, uint8_t type, uint8_t newLineBefore, uint8_t newLineAfter, uint8_t intent);
     void print(const __FlashStringHelper *text, const __FlashStringHelper *messageCategory, uint8_t type, uint8_t newLineBefore, uint8_t newLineAfter, uint8_t intent);
     void addMessageHeader(uint8_t type, const __FlashStringHelper *messageCategory, uint8_t newLineBefore, uint8_t noOfIntents);
     void addNewLines(uint8_t noOfLines);
     void addAdditionalText(const __FlashStringHelper *text, uint8_t newLineAfter);
+
 
 public:
     AFEDebugger();
@@ -58,6 +76,15 @@ public:
     void printValue(float number, uint8_t newLineAfter = 0);
     void printValue(float number, const __FlashStringHelper *text, uint8_t newLineAfter = 0);
 
+    void printHeader(uint8_t newLineBefore = 1, uint8_t newLineAfter = 0, uint8_t items = AFE_DEBUG_HEADER_DEFAULT_LENGTH, uint8_t type = AFE_DEBUG_HEADER_TYPE_HASH);
+
+    void getFreeMemorySize();
+    void getFileSystemDubugInformation();
+    void getESPHardwareInformation();
+    void getFirmwareFlashInformation();
+    
+    void getFirmwareAllDebugInformation();
+    
 
 };
 #endif

@@ -33,9 +33,6 @@
 #include <Wire.h>
 #endif // AFE_CONFIG_HARDWARE_I2C
 
-#ifdef DEBUG
-#include <Streaming.h>
-#endif
 
 struct AFE_SITE_PARAMETERS {
   uint8_t ID;

@@ -4734,9 +4734,17 @@ void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
 
   AFEI2CScanner I2CScanner;
 #ifdef AFE_ESP32
+#ifdef DEBUG
+I2CScanner.begin(wirePortId == 0 ? WirePort0 : WirePort1,Firmware->Debugger));
+else
   I2CScanner.begin(wirePortId == 0 ? WirePort0 : WirePort1);
+  #endif
 #else
+  #ifdef DEBUG
+  I2CScanner.begin(WirePort0,Firmware->Debugger);
+  #else
   I2CScanner.begin(WirePort0);
+  #endif
 #endif
 
   addSelectFormItemOpen(item, F("a"), F("I2C " L_ADDRESS));

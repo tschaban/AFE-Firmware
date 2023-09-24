@@ -37,3 +37,24 @@ Flash: [======    ]  55.6% (used 580981 bytes from 1044464 bytes)
 
 RAM:   [=====     ]  52.8% (used 43268 bytes from 81920 bytes)
 Flash: [======    ]  55.6% (used 580985 bytes from 1044464 bytes)
+
+Po zrobieniu AFEDataAccess
+RAM:   [=====     ]  52.8% (used 43236 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578501 bytes from 1044464 bytes)
+
+Po dodaniu funkcji do Debug i refaktorinug main.cpp
+RAM:   [=====     ]  52.8% (used 43236 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578581 bytes from 1044464 bytes)
+
+Po dodanie Debugger do WebServer
+RAM:   [=====     ]  52.8% (used 43264 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578397 bytes from 1044464 bytes)
+
+Po dodaniu Debugger do I2C class
+RAM:   [=====     ]  52.8% (used 43252 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578293 bytes from 1044464 bytes)
+
+Po dodaniu Debugger do Event
+RAM:   [=====     ]  52.8% (used 43252 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578229 bytes from 1044464 bytes)
+

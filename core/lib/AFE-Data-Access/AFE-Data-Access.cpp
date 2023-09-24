@@ -704,7 +704,7 @@ void AFEDataAccess::createDeviceConfigurationFile()
   printFileCreatingInformation(F(AFE_FILE_DEVICE_CONFIGURATION));
 #endif
   DEVICE configuration;
-  sprintf(configuration.name, "AFE-Device");
+  sprintf(configuration.name, "%s", F("AFE-Device"));
   configuration.timeToAutoLogOff = AFE_AUTOLOGOFF_DEFAULT_TIME;
   /* APIs */
   configuration.api.mqtt = false;
@@ -925,8 +925,8 @@ void AFEDataAccess::createFirmwareConfigurationFile()
   printFileCreatingInformation(F(AFE_FILE_FIRMWARE_CONFIGURATION));
 #endif
   FIRMWARE firmwareConfiguration;
-  sprintf(firmwareConfiguration.installed_version, AFE_FIRMWARE_VERSION);
-  sprintf(firmwareConfiguration.latest_version, AFE_FIRMWARE_VERSION);
+  sprintf(firmwareConfiguration.installed_version, "%s", F(AFE_FIRMWARE_VERSION));
+  sprintf(firmwareConfiguration.latest_version, "%s", F(AFE_FIRMWARE_VERSION));
   firmwareConfiguration.type = AFE_FIRMWARE_TYPE;
   firmwareConfiguration.api = AFE_FIRMWARE_API;
   saveConfiguration(&firmwareConfiguration);
@@ -1098,7 +1098,7 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration)
       sprintf(configuration->secondary.subnet, root["subnetBackup"] | "");
 
       exists = root["dns1"];
-      sprintf(configuration->primary.dns1,
+      sprintf(configuration->primary.dns1, 
               root["dns1"] | AFE_CONFIG_NETWORK_DEFAULT_DNS1);
 
       exists = root["dns2"];
@@ -1688,7 +1688,7 @@ void AFEDataAccess::createHomeAssistantConfigurationFile()
 #ifdef AFE_CONFIG_HARDWARE_LED
 void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration)
 {
-  char fileName[18];
+  char fileName[sizeof(AFE_FILE_LED_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_LED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1755,7 +1755,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration)
 
 void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration)
 {
-  char fileName[18];
+  char fileName[sizeof(AFE_FILE_LED_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_LED_CONFIGURATION, id);
 
 #ifdef DEBUG
@@ -1872,7 +1872,7 @@ uint8_t AFEDataAccess::getSystemLedID()
 {
   uint8_t id = 0;
 #ifdef DEBUG
-printFileOpeningInformation(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
+  printFileOpeningInformation(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LittleFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "r");
@@ -1955,15 +1955,15 @@ void AFEDataAccess::saveSystemLedID(uint8_t id)
 #ifdef DEBUG
   else
   {
-   printFileOpeningError(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
+    printFileOpeningError(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
   }
 #endif
 }
 void AFEDataAccess::createSystemLedIDConfigurationFile()
 {
 #ifdef DEBUG
-printFileCreatingInformation(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
- 
+  printFileCreatingInformation(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
+
 #endif
   saveSystemLedID(0);
 }
@@ -1974,11 +1974,11 @@ printFileCreatingInformation(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
 boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration)
 {
   boolean _ret = false;
-  char fileName[sizeof(AFE_FILE_RELAY_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_RELAY_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
-printFileOpeningInformation(F(AFE_FILE_RELAY_CONFIGURATION),id);
+  printFileOpeningInformation(F(AFE_FILE_RELAY_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2049,18 +2049,18 @@ printFileOpeningInformation(F(AFE_FILE_RELAY_CONFIGURATION),id);
 #ifdef DEBUG
   else
   {
-    printFileOpeningError(F(AFE_FILE_RELAY_CONFIGURATION),id);
+    printFileOpeningError(F(AFE_FILE_RELAY_CONFIGURATION), id);
   }
 #endif
   return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration)
 {
-  char fileName[20];
+  char fileName[sizeof(AFE_FILE_RELAY_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_RELAY_CONFIGURATION, id);
 
 #ifdef DEBUG
-  printFileOpeningInformation(F(AFE_FILE_RELAY_CONFIGURATION),id);
+  printFileOpeningInformation(F(AFE_FILE_RELAY_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2112,7 +2112,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration)
 #ifdef DEBUG
   else
   {
-   printFileOpeningError(F(AFE_FILE_RELAY_CONFIGURATION),id);
+    printFileOpeningError(F(AFE_FILE_RELAY_CONFIGURATION), id);
   }
 #endif
 }
@@ -2278,8 +2278,7 @@ void AFEDataAccess::createRelayConfigurationFile()
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++)
   {
 #ifdef DEBUG
-printFileCreatingInformation(F(AFE_FILE_RELAY_CONFIGURATION),i);
-   
+    printFileCreatingInformation(F(AFE_FILE_RELAY_CONFIGURATION), i);
 #endif
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_RELAY
@@ -2294,12 +2293,11 @@ printFileCreatingInformation(F(AFE_FILE_RELAY_CONFIGURATION),i);
 boolean AFEDataAccess::getRelayState(uint8_t id)
 {
   boolean state = false;
-  char fileName[26];
-  sprintf(fileName, AFE_FILE_RELAY_STATE_CONFIGURATION, id);
+  char fileName[sizeof(AFE_FILE_RELAY_STATE_CONFIGURATION) + 1];
+  sprintf(fileName, "%s", F(AFE_FILE_RELAY_STATE_CONFIGURATION), id); // @TODO test it such safe RAM but increase Flash
 
 #ifdef DEBUG
-printFileOpeningInformation(F(AFE_FILE_RELAY_STATE_CONFIGURATION),id);
- 
+  printFileOpeningInformation(F(AFE_FILE_RELAY_STATE_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2343,21 +2341,18 @@ printFileOpeningInformation(F(AFE_FILE_RELAY_STATE_CONFIGURATION),id);
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_RELAY_STATE_CONFIGURATION), id);
   }
 #endif
   return state;
 }
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state)
 {
-  char fileName[26];
-  sprintf(fileName, AFE_FILE_RELAY_STATE_CONFIGURATION, id);
+  char fileName[sizeof(AFE_FILE_RELAY_STATE_CONFIGURATION) + 1];
+  sprintf(fileName, "%s", F(AFE_FILE_RELAY_STATE_CONFIGURATION), id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_RELAY_STATE_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2390,24 +2385,22 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_RELAY_STATE_CONFIGURATION), id);
   }
 #endif
 }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration)
+boolean
+AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration)
 {
   boolean _ret = false;
   char fileName[sizeof(AFE_FILE_SWITCH_CONFIGURATION) + 1];
-  sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
+  sprintf(fileName, "%s", F(AFE_FILE_SWITCH_CONFIGURATION), id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_SWITCH_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2439,11 +2432,13 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration)
 #ifdef AFE_CONFIG_HARDWARE_RELAY
       configuration->relayID = root["relayID"];
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_CLED
       JsonVariant exists = root["rgbLedID"];
       configuration->rgbLedID =
           exists.success() ? root["rgbLedID"] : AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
       configuration->domoticz.idx = root["idx"] | AFE_DOMOTICZ_DEFAULT_IDX;
 
@@ -2473,8 +2468,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_SWITCH_CONFIGURATION), id);
   }
 #endif
   return _ret;
@@ -2482,13 +2476,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration)
 
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration)
 {
-  char fileName[21];
+  char fileName[sizeof(AFE_FILE_SWITCH_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_SWITCH_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_SWITCH_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2512,9 +2504,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration)
 #ifdef AFE_CONFIG_HARDWARE_RELAY
     root["relayID"] = configuration->relayID;
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_CLED
     root["rgbLedID"] = configuration->rgbLedID;
 #endif
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     root["idx"] = configuration->domoticz.idx;
 #else
@@ -2540,11 +2534,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_SWITCH_CONFIGURATION), id);
   }
 #endif
 }
+
 void AFEDataAccess::createSwitchConfigurationFile()
 {
   SWITCH SwitchConfiguration;
@@ -2666,9 +2660,9 @@ void AFEDataAccess::createSwitchConfigurationFile()
          i++)
     {
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: Creating file: cfg-switch-") << i << F(".json");
+      printFileCreatingInformation(F(AFE_FILE_RELAY_CONFIGURATION), i);
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
       SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
@@ -2679,23 +2673,28 @@ void AFEDataAccess::createSwitchConfigurationFile()
 #endif // AFE_CONFIG_HARDWARE_SWITCH
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+
 #ifdef AFE_ESP32
 void AFEDataAccess::getConfiguration(uint8_t id, ADCINPUT *configuration)
 {
-  char fileName[26];
+  char fileName[sizeof(AFE_FILE_ADC_CONFIGURATION) + 1];
   sprintf(fileName, AFE_FILE_ADC_CONFIGURATION, id);
-#else
-void AFEDataAccess::getConfiguration(ADCINPUT *configuration)
-{
-  char fileName[23];
-  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION);
-#endif // AFE_ESP32
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_ADC_CONFIGURATION), id);
 #endif
+
+#else // AFE_ESP32
+void AFEDataAccess::getConfiguration(ADCINPUT *configuration)
+{
+  char fileName[sizeof(AFE_FILE_ADC_CONFIGURATION) + 1];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION);
+
+#ifdef DEBUG
+  printFileOpeningInformation(F(AFE_FILE_ADC_CONFIGURATION));
+#endif
+
+#endif // AFE_ESP32
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LittleFS.open(fileName, "r");
@@ -2774,29 +2773,36 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+#ifdef AFE_ESP32
+    printFileOpeningError(F(AFE_FILE_ADC_CONFIGURATION), id);
+#else
+    printFileOpeningError(F(AFE_FILE_ADC_CONFIGURATION));
+#endif // AFE_ESP32
   }
-#endif
+#endif // DEBUG
 }
 
 #ifdef AFE_ESP32
 void AFEDataAccess::saveConfiguration(uint8_t id, ADCINPUT *configuration)
 {
-  char fileName[26];
+  char fileName[sizeof(AFE_FILE_ADC_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_ADC_CONFIGURATION, id);
-#else
-void AFEDataAccess::saveConfiguration(ADCINPUT *configuration)
-{
-  char fileName[23];
-  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION);
-#endif
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_ADC_CONFIGURATION), id);
 #endif
+
+#else // AFE_ESP32
+void AFEDataAccess::saveConfiguration(ADCINPUT *configuration)
+{
+  char fileName[sizeof(AFE_FILE_ADC_CONFIGURATION)+1];
+  sprintf(fileName, AFE_FILE_ADC_CONFIGURATION);
+
+#ifdef DEBUG
+  printFileOpeningInformation(F(AFE_FILE_ADC_CONFIGURATION));
+#endif
+
+#endif // AFE_ESP32
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LittleFS.open(fileName, "w");
@@ -2862,18 +2868,18 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+#ifdef AFE_ESP32
+    printFileOpeningError(F(AFE_FILE_ADC_CONFIGURATION), id);
+#else
+    printFileOpeningError(F(AFE_FILE_ADC_CONFIGURATION));
+#endif // AFE_ESP32
   }
-#endif
+#endif // DEBUG
 };
 
 void AFEDataAccess::createADCInputConfigurationFile()
 {
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating file: ") << F(AFE_FILE_ADC_CONFIGURATION);
-#endif
+
   ADCINPUT AnalogInputConfiguration;
   AnalogInputConfiguration.gpio = AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_GPIO;
   AnalogInputConfiguration.interval =
@@ -2909,25 +2915,34 @@ void AFEDataAccess::createADCInputConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS; i++)
   {
     sprintf(AnalogInputConfiguration.name, "ADC%d", i);
+
+#ifdef DEBUG
+    printFileCreatingInformation(F(AFE_FILE_ADC_CONFIGURATION), i);
+#endif
+
     saveConfiguration(i, &AnalogInputConfiguration);
   }
-#else
+#else // AFE_ESP32
+
+#ifdef DEBUG
+  printFileCreatingInformation(F(AFE_FILE_ADC_CONFIGURATION));
   saveConfiguration(&AnalogInputConfiguration);
 #endif
-}
+
+#endif // AFE_ESP32
+};
+
 #endif //  AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
 void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration)
 {
 
-  char fileName[22];
+  char fileName[sizeof(AFE_FILE_DS18B20_SENSOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -2989,21 +3004,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id);
   }
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration)
 {
 
-  char fileName[22];
+  char fileName[sizeof(AFE_FILE_DS18B20_SENSOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_DS18B20_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3049,8 +3061,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id);
   }
 #endif
 }
@@ -3078,8 +3089,7 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void)
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: /cfg-ds18b20-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), i);
 #endif
     sprintf(configuration.name, "DS18B20-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -3091,13 +3101,11 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void)
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
 void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration)
 {
-  char fileName[24];
+  char fileName[sizeof(AFE_FILE_CONTACTRON_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CONTACTRON_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_CONTACTRON_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3152,21 +3160,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_CONTACTRON_CONFIGURATION), id);
   }
 #endif
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration)
 {
-  char fileName[24];
+  char fileName[sizeof(AFE_FILE_CONTACTRON_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CONTACTRON_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_CONTACTRON_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3209,8 +3214,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_CONTACTRON_CONFIGURATION), id);
   }
 #endif
 }
@@ -3266,8 +3270,7 @@ void AFEDataAccess::createContractonConfigurationFile()
        i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-contactron-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_CONTACTRON_CONFIGURATION), i);
 #endif
     sprintf(ContactronConfiguration.name, "C%d", i + 1);
     saveConfiguration(i, &ContactronConfiguration);
@@ -3279,13 +3282,11 @@ void AFEDataAccess::createContractonConfigurationFile()
 
 void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration)
 {
-  char fileName[18];
+  char fileName[sizeof(AFE_FILE_GATE_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_GATE_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_GATE_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3346,21 +3347,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_GATE_CONFIGURATION), id);
   }
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration)
 {
 
-  char fileName[18];
+  char fileName[sizeof(AFE_FILE_GATE_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_GATE_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_GATE_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3421,8 +3419,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_GATE_CONFIGURATION), id);
   }
 #endif
 }
@@ -3463,8 +3460,7 @@ void AFEDataAccess::createGateConfigurationFile()
        i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-gate-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_GATE_CONFIGURATION), i);
 #endif
     sprintf(GateConfiguration.name, "G%d", i + 1);
     saveConfiguration(i, &GateConfiguration);
@@ -3476,13 +3472,11 @@ uint8_t AFEDataAccess::getGateState(uint8_t id)
 {
   uint8_t state = AFE_GATE_CLOSED;
 
-  char fileName[24];
+  char fileName[sizeof(AFE_FILE_GATE_STATE_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_GATE_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_GATE_STATE_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3526,8 +3520,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_GATE_STATE_CONFIGURATION), id);
   }
 #endif
 
@@ -3536,13 +3529,11 @@ uint8_t AFEDataAccess::getGateState(uint8_t id)
 void AFEDataAccess::saveGateState(uint8_t id, uint8_t state)
 {
 
-  char fileName[24];
+  char fileName[sizeof(AFE_FILE_GATE_STATE_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_GATE_STATE_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_GATE_STATE_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3579,8 +3570,7 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_GATE_STATE_CONFIGURATION), id);
   }
 #endif
 }
@@ -3590,13 +3580,11 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state)
 void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration)
 {
 
-  char fileName[24];
+  char fileName[sizeof(AFE_FILE_REGULATOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_REGULATOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3665,21 +3653,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_REGULATOR_CONFIGURATION), id);
   }
 #endif
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration)
 {
-  char fileName[24];
+  char fileName[sizeof(AFE_FILE_REGULATOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_REGULATOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_REGULATOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3729,8 +3714,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_REGULATOR_CONFIGURATION), id);
   }
 #endif
 }
@@ -3763,8 +3747,7 @@ void AFEDataAccess::createRegulatorConfigurationFile(void)
   {
     sprintf(configuration.name, "regulator-%d", i + 1);
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating regulator configuration file: ") << i;
+    printFileCreatingInformation(F(AFE_FILE_REGULATOR_CONFIGURATION), i);
 #endif
     saveConfiguration(i, &configuration);
   }
@@ -3776,13 +3759,11 @@ void AFEDataAccess::getConfiguration(uint8_t id,
                                      THERMAL_PROTECTOR *configuration)
 {
 
-  char fileName[33];
+  char fileName[sizeof(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3824,7 +3805,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #ifdef DEBUG
-      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR,
+      printBufforSizeInfo(F(AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR),
                           jsonBuffer.size());
 #endif
     }
@@ -3841,8 +3822,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id);
   }
 #endif
 }
@@ -3850,13 +3830,11 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       THERMAL_PROTECTOR *configuration)
 {
-  char fileName[33];
+  char fileName[sizeof(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -3898,8 +3876,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id);
   }
 #endif
 }
@@ -3923,10 +3900,10 @@ void AFEDataAccess::createThermalProtectorConfigurationFile(void)
   {
     sprintf(configuration.name, "protector-%d", i + 1);
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating thermal protection configuration file: ") << i;
+
+    printFileCreatingInformation(F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), i)
 #endif
-    saveConfiguration(i, &configuration);
+        saveConfiguration(i, &configuration);
   }
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
@@ -3959,13 +3936,11 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state)
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
 void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration)
 {
-  char fileName[23];
+  char fileName[sizeof(AFE_FILE_HPMA114S0_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_HPMA114S0_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_HPMA114S0_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4029,20 +4004,17 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_HPMA114S0_CONFIGURATION), id);
   }
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration)
 {
-  char fileName[23];
+  char fileName[sizeof(AFE_FILE_HPMA114S0_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_HPMA114S0_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_HPMA114S0_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4091,8 +4063,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_HPMA114S0_CONFIGURATION), id);
   }
 #endif
 }
@@ -4119,10 +4090,9 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-hpma115s0-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_HPMA114S0_CONFIGURATION), i)
 #endif
-    sprintf(configuration.name, "HPMA115S0-%d", i + 1);
+        sprintf(configuration.name, "HPMA115S0-%d", i + 1);
     saveConfiguration(i, &configuration);
   }
 }
@@ -4132,10 +4102,7 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile()
 void AFEDataAccess::getConfiguration(SERIALPORT *configuration)
 {
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << F(AFE_FILE_UART_CONFIGURATION)
-         << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_UART_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LittleFS.open(AFE_FILE_UART_CONFIGURATION, "r");
@@ -4179,19 +4146,14 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << F(AFE_FILE_UART_CONFIGURATION)
-           << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_UART_CONFIGURATION));
   }
 #endif
 }
 void AFEDataAccess::saveConfiguration(SERIALPORT *configuration)
 {
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << F(AFE_FILE_UART_CONFIGURATION)
-         << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_UART_CONFIGURATION));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4222,16 +4184,15 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_UART_CONFIGURATION));
   }
 #endif
 }
 void AFEDataAccess::createSerialConfigurationFile()
 {
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating file: ") << F(AFE_FILE_UART_CONFIGURATION);
+  printFileCreatingInformation(F());
+  << F(AFE_FILE_UART_CONFIGURATION);
 #endif
   SERIALPORT configuration;
   configuration.RXD = AFE_CONFIG_HARDWARE_UART_DEFAULT_RXD;
@@ -4247,19 +4208,22 @@ void AFEDataAccess::getConfiguration(uint8_t id, I2CPORT *configuration)
 void AFEDataAccess::getConfiguration(I2CPORT *configuration)
 #endif
 {
-  char fileName[17];
+  char fileName[sizeof(AFE_FILE_I2C_CONFIGURATION)+1];
 
 #ifdef AFE_ESP32
   sprintf(fileName, AFE_FILE_I2C_CONFIGURATION, id);
-#else
-  sprintf(fileName, AFE_FILE_I2C_CONFIGURATION);
+#ifdef DEBUG
+  printFileOpeningInformation(F(AFE_FILE_I2C_CONFIGURATION), id);
 #endif
 
+#else
+  sprintf(fileName, AFE_FILE_I2C_CONFIGURATION);
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_I2C_CONFIGURATION));
 #endif
+
+#endif
+
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LittleFS.open(fileName, "r");
 #else
@@ -4307,9 +4271,11 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << F(AFE_FILE_I2C_CONFIGURATION)
-           << F(" not opened");
+#ifdef AFE_ESP32
+    printFileOpeningError(F(AFE_FILE_I2C_CONFIGURATION), id);
+#else
+    printFileOpeningError(F(AFE_FILE_I2C_CONFIGURATION));
+#endif
   }
 #endif
 }
@@ -4319,18 +4285,21 @@ void AFEDataAccess::saveConfiguration(uint8_t id, I2CPORT *configuration)
 void AFEDataAccess::saveConfiguration(I2CPORT *configuration)
 #endif
 {
-  char fileName[17];
+  char fileName[sizeof(AFE_FILE_I2C_CONFIGURATION)+1];
 
 #ifdef AFE_ESP32
   sprintf(fileName, AFE_FILE_I2C_CONFIGURATION, id);
-#else
-  sprintf(fileName, AFE_FILE_I2C_CONFIGURATION);
-#endif
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_I2C_CONFIGURATION), id);
+#endif
+
+#else
+  sprintf(fileName, AFE_FILE_I2C_CONFIGURATION);
+#ifdef DEBUG
+  printFileOpeningInformation(F(AFE_FILE_I2C_CONFIGURATION));
+#endif
+
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4366,16 +4335,18 @@ void AFEDataAccess::saveConfiguration(I2CPORT *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+#ifdef AFE_ESP32
+    printFileOpeningError(F(AFE_FILE_I2C_CONFIGURATION), id);
+#else
+    printFileOpeningError(F(AFE_FILE_I2C_CONFIGURATION));
+#endif
   }
 #endif
 }
 void AFEDataAccess::createI2CConfigurationFile()
 {
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating I2C confifuration file: ");
+  printFileCreatingInformation(F(AFE_FILE_I2C_CONFIGURATION));
 #endif
   I2CPORT configuration;
 #ifdef AFE_ESP32
@@ -4397,13 +4368,11 @@ void AFEDataAccess::createI2CConfigurationFile()
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration)
 {
-  char fileName[20];
+  char fileName[sizeof(AFE_FILE_BMX680_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_BMX680_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_BMX680_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4497,20 +4466,17 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_BMX680_CONFIGURATION), id);
   }
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration)
 {
-  char fileName[20];
+  char fileName[sizeof(AFE_FILE_BMX680_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_BMX680_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_BMX680_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4586,11 +4552,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_BMX680_CONFIGURATION), id);
   }
 #endif
-}
+};
+
 void AFEDataAccess::createBMEX80SensorConfigurationFile()
 {
 
@@ -4635,11 +4601,10 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-BMEX80-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_BMX680_CONFIGURATION), i);
 #endif
 
-    sprintf(configuration.name, "BMEX80-%d", i + 1);
+    sprintf(configuration.name, "BMEX80-%d", (i + 1));
     saveConfiguration(i, &configuration);
   }
 }
@@ -4650,13 +4615,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         BH1750_CONFIG *configuration)
 {
   boolean _ret = true;
-  char fileName[20];
+  char fileName[sizeof(AFE_FILE_BH1750_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_BH1750_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4720,8 +4683,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_BH1750_CONFIGURATION), id);
 #endif
   }
 
@@ -4730,13 +4692,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       BH1750_CONFIG *configuration)
 {
-  char fileName[20];
+  char fileName[sizeof(AFE_FILE_BH1750_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_BH1750_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_BH1750_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4783,8 +4743,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_BH1750_CONFIGURATION), id);
   }
 #endif
 }
@@ -4808,8 +4767,7 @@ void AFEDataAccess::createBH1750SensorConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-bh1750-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_BH1750_CONFIGURATION), i);
 #endif
 
     sprintf(configuration.name, "BH1750-%d", i + 1);
@@ -4821,13 +4779,11 @@ void AFEDataAccess::createBH1750SensorConfigurationFile()
 #ifdef AFE_CONFIG_HARDWARE_AS3935
 void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration)
 {
-  char fileName[20];
+  char fileName[sizeof(AFE_FILE_AS3935_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_AS3935_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_AS3935_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4888,8 +4844,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_AS3935_CONFIGURATION), id);
   }
 #endif
 }
@@ -4897,13 +4852,11 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration)
 void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration)
 {
 
-  char fileName[20];
+  char fileName[sizeof(AFE_FILE_AS3935_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_AS3935_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_AS3935_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -4951,8 +4904,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_AS3935_CONFIGURATION), id);
   }
 #endif
 }
@@ -4980,8 +4932,7 @@ void AFEDataAccess::createAS3935SensorConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-as3935-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_AS3935_CONFIGURATION), i);
 #endif
     sprintf(configuration.name, "AS3935-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -4993,13 +4944,11 @@ void AFEDataAccess::createAS3935SensorConfigurationFile()
 void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration)
 {
 
-  char fileName[17];
+  char fileName[sizeof(AFE_FILE_DHT_SENSOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_DHT_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5089,21 +5038,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id);
   }
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration)
 {
 
-  char fileName[17];
+  char fileName[sizeof(AFE_FILE_DHT_SENSOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_DHT_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5160,8 +5106,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id);
   }
 #endif
 }
@@ -5198,8 +5143,7 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void)
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: /cfg-dht-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_DHT_SENSOR_CONFIGURATION), i);
 #endif
     sprintf(configuration.name, "DHT-%d", i + 1);
     saveConfiguration(i, &configuration);
@@ -5214,11 +5158,11 @@ IPAddress AFEDataAccess::IPfromString(const char *address)
   if (!ip.fromString(address))
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: converting from IP String (") << address
-           << F(") to IP address");
+    Debugger->printError(F("Conversion from String to IP Address: "), F("TOOLS"));
+    Debugger->printBulletPoint(address);
 #endif
   };
+
   return ip;
 }
 
@@ -5228,20 +5172,15 @@ IPAddress AFEDataAccess::IPfromString(const char *address)
 DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration()
 {
   DEVICE_T0_200 configuration;
+
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("----------------- Reading File -------------------");
-  Serial << endl
-         << F("Opening file: cfg-device.json : ");
-  Serial << endl
-         << F("THIS IS OLD VERSION OF THE DEVICE FILE ");
+  printFileOpeningInformation(F(AFE_FILE_DEVICE_CONFIGURATION));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open("cfg-device.json", "r");
+  File configFile = LittleFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #else
-  File configFile = SPIFFS.open("cfg-device.json", "r");
+  File configFile = SPIFFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #endif
 
   if (configFile)
@@ -5253,7 +5192,7 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration()
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<526> jsonBuffer;
+    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
     if (root.success())
     {
@@ -5292,16 +5231,14 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration()
 #endif
 
 #ifdef DEBUG
-      Serial << endl
-             << F("success") << endl
-             << F("JSON Buffer size: ") << jsonBuffer.size();
+      printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_DEVICE, jsonBuffer.size());
 #endif
     }
 
 #ifdef DEBUG
     else
     {
-      Serial << F("failure");
+      printJSONNotPharsed();
     }
 #endif
   }
@@ -5309,10 +5246,8 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration()
 #ifdef DEBUG
   else
   {
-    Serial << F("failure");
+    printFileOpeningError(F(AFE_FILE_DEVICE_CONFIGURATION));
   }
-  Serial << endl
-         << F("--------------------------------------------------");
 #endif
 
   return configuration;
@@ -5324,10 +5259,7 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration)
 {
   boolean _ret = true;
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ")
-         << F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION) << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5388,9 +5320,7 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration)
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ")
-           << F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION) << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION));
 #endif
   }
   return _ret;
@@ -5399,10 +5329,7 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration)
 void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration)
 {
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ")
-         << F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION) << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5443,8 +5370,7 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION));
   }
 #endif
 }
@@ -5452,9 +5378,7 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration)
 void AFEDataAccess::createAnemometerSensorConfigurationFile()
 {
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating file: ")
-         << F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION);
+  printFileCreatingInformation(F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION));
 #endif
   ANEMOMETER configuration;
   configuration.sensitiveness = AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
@@ -5482,10 +5406,7 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration)
 {
   boolean _ret = true;
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ")
-         << F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION) << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "r");
@@ -5540,9 +5461,7 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration)
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ")
-           << F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION) << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION));
 #endif
   }
 
@@ -5552,10 +5471,7 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration)
 void AFEDataAccess::saveConfiguration(RAINMETER *configuration)
 {
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ")
-         << F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION) << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5594,8 +5510,7 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION));
   }
 #endif
 }
@@ -5603,9 +5518,7 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration)
 void AFEDataAccess::createRainmeterSensorConfigurationFile()
 {
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating file: ")
-         << F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION);
+  printFileCreatingInformation(F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION));
 #endif
   RAINMETER configuration;
   configuration.sensitiveness = AFE_HARDWARE_RAINMETER_DEFAULT_BOUNCING;
@@ -5627,10 +5540,7 @@ void AFEDataAccess::createRainmeterSensorConfigurationFile()
 void AFEDataAccess::get(RAINMETER_DATA *data)
 {
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << AFE_FILE_RAINMETER_SENSOR_DATA
-         << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_RAINMETER_SENSOR_DATA));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5694,19 +5604,14 @@ void AFEDataAccess::get(RAINMETER_DATA *data)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ")
-           << F(AFE_FILE_RAINMETER_SENSOR_DATA) << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_RAINMETER_SENSOR_DATA));
   }
 #endif
 }
 void AFEDataAccess::save(RAINMETER_DATA *data)
 {
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << F(AFE_FILE_RAINMETER_SENSOR_DATA)
-         << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_RAINMETER_SENSOR_DATA));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5757,8 +5662,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_RAINMETER_SENSOR_DATA));
   }
 #endif
 }
@@ -5766,8 +5670,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data)
 void AFEDataAccess::createRainmeterSensorDataConfigurationFile()
 {
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating file: ") << F(AFE_FILE_RAINMETER_SENSOR_DATA);
+  printFileCreatingInformation(F(AFE_FILE_RAINMETER_SENSOR_DATA));
 #endif
   RAINMETER_DATA data;
   data.index1h = 0;
@@ -5796,13 +5699,11 @@ void AFEDataAccess::createRainmeterSensorDataConfigurationFile()
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration)
 {
-  char fileName[28];
+  char fileName[sizeof(AFE_FILE_BINARY_SENSOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_BINARY_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5870,21 +5771,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id);
   }
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       BINARY_SENSOR *configuration)
 {
-  char fileName[28];
+  char fileName[sizeof(AFE_FILE_BINARY_SENSOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_BINARY_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -5933,8 +5831,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id);
   }
 #endif
 }
@@ -5970,12 +5867,10 @@ void AFEDataAccess::createBinarySensorConfigurationFile()
        i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-binary-sensor-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), i);
 #endif
 
     sprintf(configuration.name, "binary-%d", i + 1);
-
     saveConfiguration(i, &configuration);
   }
 }
@@ -5984,13 +5879,11 @@ void AFEDataAccess::createBinarySensorConfigurationFile()
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration)
 {
-  char fileName[27];
+  char fileName[sizeof(AFE_FILE_PN532_SENSOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6053,21 +5946,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id);
   }
 #endif
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration)
 {
-  char fileName[27];
+  char fileName[sizeof(AFE_FILE_PN532_SENSOR_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_PN532_SENSOR_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6116,8 +6006,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id);
   }
 #endif
 }
@@ -6125,7 +6014,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration)
 void AFEDataAccess::createPN532ConfigurationFile()
 {
   PN532_SENSOR configuration;
-  sprintf(configuration.name, "pn532");
+  sprintf(configuration.name, "%s", F("pn532"));
   configuration.interface = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.tx = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.rx = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -6149,8 +6038,7 @@ void AFEDataAccess::createPN532ConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-pn532-sensor-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_PN532_SENSOR_CONFIGURATION), i);
 #endif
 
     saveConfiguration(i, &configuration);
@@ -6159,13 +6047,11 @@ void AFEDataAccess::createPN532ConfigurationFile()
 
 void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration)
 {
-  char fileName[26];
+  char fileName[sizeof(AFE_FILE_MIFARE_CARD_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_MIFARE_CARD_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6222,21 +6108,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id);
   }
 #endif
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration)
 {
-  char fileName[26];
+  char fileName[sizeof(AFE_FILE_MIFARE_CARD_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_MIFARE_CARD_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6283,8 +6166,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id);
   }
 #endif
 }
@@ -6311,8 +6193,7 @@ void AFEDataAccess::createMiFareCardConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-mifare-card-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_MIFARE_CARD_CONFIGURATION), i);
 #endif
 
     saveConfiguration(i, &configuration);
@@ -6325,13 +6206,11 @@ void AFEDataAccess::createMiFareCardConfigurationFile()
 boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration)
 {
   boolean _ret = true;
-  char fileName[strlen(AFE_FILE_LED_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_CLED_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_LED_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6436,21 +6315,18 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration)
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_LED_CONFIGURATION), id);
 #endif
   }
   return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration)
 {
-  char fileName[strlen(AFE_FILE_CLED_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_CLED_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CLED_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_LED_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6503,8 +6379,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_LED_CONFIGURATION), id);
   }
 #endif
 }
@@ -6534,16 +6409,16 @@ void AFEDataAccess::createCLEDConfigurationFile()
 #endif // AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
 #endif // AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating file: cfg-cled-X.json");
-#endif
-
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++)
   {
     configuration.gpio = i == 0 ? AFE_CONFIG_HARDWARE_CLED_0_GPIO
                                 : AFE_CONFIG_HARDWARE_CLED_1_GPIO;
+    AFE_FILE_LED_CONFIGURATION
     sprintf(configuration.name, "RGBLED-%d", i + 1);
+#ifdef DEBUG
+    printFileCreatingInformation(F(AFE_FILE_LED_CONFIGURATION), i);
+#endif
+
     saveConfiguration(i, &configuration);
   }
 }
@@ -6553,13 +6428,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_EFFECT_BLINKING *configuration)
 {
   boolean _ret = true;
-  char fileName[strlen(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6620,8 +6493,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id);
 #endif
   }
   return _ret;
@@ -6629,13 +6501,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       CLED_EFFECT_BLINKING *configuration)
 {
-  char fileName[strlen(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6682,8 +6552,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id);
   }
 #endif
 }
@@ -6706,14 +6575,12 @@ void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile()
   configuration.offTimeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
 
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating CLED EFFECT Blinking configuration file");
-#endif
-
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++)
   {
     sprintf(configuration.name, "BLINK-%d", i + 1);
+#ifdef DEBUG
+    printFileCreatingInformation(F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), i);
+#endif
     saveConfiguration(i, &configuration);
   }
 }
@@ -6723,13 +6590,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_EFFECT_WAVE *configuration)
 {
   boolean _ret = true;
-  char fileName[strlen(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6788,8 +6653,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id);
 #endif
   }
   return _ret;
@@ -6797,13 +6661,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       CLED_EFFECT_WAVE *configuration)
 {
-  char fileName[strlen(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6850,8 +6712,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id);
   }
 #endif
 }
@@ -6870,15 +6731,16 @@ void AFEDataAccess::createCLEDEffectWaveConfigurationFile()
   configuration.timeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIMEOUT;
 
-#ifdef DEBUG
   Serial << endl
          << F("INFO: Creating CLED EFFECT Wave configuration file");
-#endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++)
   {
     sprintf(configuration.name, "WAVE-%d", i + 1);
     saveConfiguration(i, &configuration);
+#ifdef DEBUG
+    printFileCreatingInformation(F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), i)
+#endif
   }
 }
 
@@ -6887,13 +6749,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         CLED_EFFECT_FADE_INOUT *configuration)
 {
   boolean _ret = true;
-  char fileName[strlen(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6950,8 +6810,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id);
 #endif
   }
   return _ret;
@@ -6959,13 +6818,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       CLED_EFFECT_FADE_INOUT *configuration)
 {
-  char fileName[strlen(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION) + 1];
+  char fileName[sizeof(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -7008,8 +6865,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id);
   }
 #endif
 }
@@ -7027,202 +6883,26 @@ void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile()
   configuration.timeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
 
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating CLED EFFECT FadeInOut configuration file");
-#endif
-
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++)
   {
     sprintf(configuration.name, "FADE-%d", i + 1);
+#ifdef DEBUG
+    printFileCreatingInformation(F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), i);
+#endif
     saveConfiguration(i, &configuration);
   }
 }
-/* @TODO T5
-#ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-boolean AFEDataAccess::getConfiguration(uint8_t id,
-                                        CLED_BACKLIGHT *configuration) {
-  boolean _ret = true;
-  char fileName[28];
-  sprintf(fileName, AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, id);
-
-#ifdef DEBUG
-  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
-#endif
-
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
-#else
-  File configFile = SPIFFS.open(fileName, "r");
-#endif
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << F("success") << endl << F("INFO: JSON: ");
-#endif
-
-    size_t size = configFile.size();
-    std::unique_ptr<char[]> buf(new char[size]);
-    configFile.readBytes(buf.get(), size);
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT> jsonBuffer;
-    JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
-#ifdef DEBUG
-      root.printTo(Serial);
-#endif
-
-      configuration->lightSensorId = root["lightSensorId"].as<int>();
-
-      for (uint8_t i = 0;
-           i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS; i++) {
-
-        configuration->config[i].luxLevel =
-            root["configs"][i]["luxLevel"].as<int>();
-        configuration->config[i].brightness =
-            root["configs"][i]["brightness"].as<int>();
-        configuration->config[i].color = root["configs"][i]["color"].as<int>();
-        sprintf(configuration->name, root["name"]);
-      }
-
-#ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT
-             << F(", actual JSON size: ") << jsonBuffer.size();
-      if (AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT < jsonBuffer.size() + 10) {
-        Serial << endl << F("WARN: Too small buffer size");
-      }
-#endif
-    } else {
-      _ret = false;
-#ifdef DEBUG
-      printJSONNotPharsed();
-
-#endif
-    }
-    configFile.close();
-  } else {
-    _ret = false;
-#ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
-#endif
-  }
-  return _ret;
-}
-void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      CLED_BACKLIGHT *configuration) {
-  char fileName[28];
-  sprintf(fileName, AFE_FILE_CLED_BACKLIGHT_CONFIGURATION, id);
-
-#ifdef DEBUG
-  Serial << endl << endl << F("INFO: Opening file: ") << fileName << F(" ... ");
-#endif
-
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
-#else
-  File configFile = SPIFFS.open(fileName, "w");
-#endif
-
-  if (configFile) {
-#ifdef DEBUG
-    Serial << F("success") << endl << F("INFO: Writing JSON: ");
-#endif
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
-    JsonArray &configs = root.createNestedArray("configs");
-    JsonObject &l1 = configs.createNestedObject();
-    JsonObject &l2 = configs.createNestedObject();
-    JsonObject &l3 = configs.createNestedObject();
-
-    root["lightSensorId"] = configuration->lightSensorId;
-
-    l1["luxLevel"] = configuration->config[0].luxLevel;
-    l1["color"] = configuration->config[0].color;
-    l1["brightness"] = configuration->config[0].brightness;
-
-    l2["luxLevel"] = configuration->config[1].luxLevel;
-    l2["color"] = configuration->config[1].color;
-    l2["brightness"] = configuration->config[1].brightness;
-
-    l3["luxLevel"] = configuration->config[2].luxLevel;
-    l3["color"] = configuration->config[2].color;
-    l3["brightness"] = configuration->config[2].brightness;
-
-    root["name"] = configuration->name;
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-    root["idx"] = configuration->domoticz.idx;
-#else
-    root["mqttTopic"] = configuration->mqtt.topic;
-#endif
-
-    root.printTo(configFile);
-
-#ifdef DEBUG
-    root.printTo(Serial);
-#endif
-    configFile.close();
-
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: Data saved") << endl
-           << F("INFO: JSON: Buffer size: ")
-           << AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT << F(", actual JSON size: ")
-           << jsonBuffer.size();
-    if (AFE_CONFIG_FILE_BUFFER_CLED_BACKIGHT < jsonBuffer.size() + 10) {
-      Serial << endl << F("WARN: Too small buffer size");
-    }
-#endif
-  }
-#ifdef DEBUG
-  else {
-    Serial << endl << F("ERROR: failed to open file for writing");
-  }
-#endif
-}
-void AFEDataAccess::createCLEDBacklightConfigurationFile() {
-#ifdef DEBUG
-  Serial << endl
-         << F("INFO: Creating file: ")
-         << F(AFE_FILE_CLED_BACKLIGHT_CONFIGURATION);
-#endif
-  CLED_BACKLIGHT data;
-
-  data.lightSensorId = AFE_HARDWARE_ITEM_NOT_EXIST;
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_BACKLIGHT_LEVELS;
-       i++) {
-
-    data.config[i].luxLevel = 0;
-    data.config[i].color = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_COLOR;
-    data.config[i].brightness = AFE_CONFIG_HARDWARE_CLED_BACKLIGHT_BRIGHTNESS;
-  }
-
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
-#ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-cled-backlight-") << i << F(".json");
-#endif
-
-    saveConfiguration(i, &data);
-  }
-}
-
-#endif // AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
-*/
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
 boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration)
 {
   boolean _ret = true;
-  char fileName[22];
+  char fileName[sizeof(AFE_FILE_TSL2561_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_TSL2561_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -7293,22 +6973,20 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration)
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_CONFIG_FILE_BUFFER_TSL2561), id);
 #endif
   }
 
   return _ret;
 }
+
 void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration)
 {
-  char fileName[22];
+  char fileName[sizeof(AFE_FILE_TSL2561_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_TSL2561_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_CONFIG_FILE_BUFFER_TSL2561), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -7361,11 +7039,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_CONFIG_FILE_BUFFER_TSL2561), id);
   }
 #endif
 }
+
 void AFEDataAccess::createTSL2561SensorConfigurationFile()
 {
   TSL2561 configuration;
@@ -7390,11 +7068,10 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-tls2561-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_CONFIG_FILE_BUFFER_TSL2561), i);
 #endif
 
-    sprintf(configuration.name, "TSL2561-%d", i + 1);
+    sprintf(configuration.name, "TSL2561-%d", (i + 1));
     saveConfiguration(i, &configuration);
   }
 }
@@ -7404,13 +7081,11 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile()
 boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration)
 {
   boolean _ret = true;
-  char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)];
+  char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_MCP23XXX_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_MCP23XXX_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -7461,8 +7136,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration)
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_MCP23XXX_CONFIGURATION), id);
 #endif
   }
 
@@ -7471,13 +7145,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration)
 
 void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration)
 {
-  char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)];
+  char fileName[sizeof(AFE_FILE_MCP23XXX_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_MCP23XXX_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_MCP23XXX_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -7515,11 +7187,11 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_MCP23XXX_CONFIGURATION), id);
   }
 #endif
 }
+
 void AFEDataAccess::createMCP23XXXConfigurationFile()
 {
   MCP23XXX configuration;
@@ -7532,10 +7204,8 @@ void AFEDataAccess::createMCP23XXXConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MCP23017; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-mcp23xxx-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_MCP23XXX_CONFIGURATION), i);
 #endif
-
     sprintf(configuration.name, "MCP23XXX-%d", i + 1);
     saveConfiguration(i, &configuration);
   }
@@ -7547,13 +7217,11 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
                                         FS3000_CONFIG *configuration)
 {
   boolean _ret = true;
-  char fileName[sizeof(AFE_FILE_FS3000_CONFIGURATION)];
+  char fileName[sizeof(AFE_FILE_FS3000_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_FS3000_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_FS3000_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -7624,23 +7292,21 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   {
     _ret = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_FS3000_CONFIGURATION), id);
 #endif
   }
 
   return _ret;
 }
+
 void AFEDataAccess::saveConfiguration(uint8_t id,
                                       FS3000_CONFIG *configuration)
 {
-  char fileName[sizeof(AFE_FILE_FS3000_CONFIGURATION)];
+  char fileName[sizeof(AFE_FILE_FS3000_CONFIGURATION)+1];
   sprintf(fileName, AFE_FILE_FS3000_CONFIGURATION, id);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_FS3000_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -7694,8 +7360,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_FS3000_CONFIGURATION), id);
   }
 #endif
 }
@@ -7723,8 +7388,7 @@ void AFEDataAccess::createFS3000SensorConfigurationFile()
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561; i++)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Creating file: cfg-fs3000-") << i << F(".json");
+    printFileCreatingInformation(F(AFE_FILE_FS3000_CONFIGURATION), i);
 #endif
 
     sprintf(configuration.name, "FS3000-%d", i + 1);
@@ -7736,13 +7400,11 @@ void AFEDataAccess::createFS3000SensorConfigurationFile()
 unsigned long AFEDataAccess::getRebootCounter(boolean increase)
 {
   unsigned long _ret = 1;
-  char fileName[strlen(AFE_FILE_REBOOTS_COUNTER) + 1];
+  char fileName[sizeof(AFE_FILE_REBOOTS_COUNTER) + 1];
   sprintf(fileName, AFE_FILE_REBOOTS_COUNTER);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_REBOOTS_COUNTER));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -7752,11 +7414,11 @@ unsigned long AFEDataAccess::getRebootCounter(boolean increase)
   }
   File configFile = LittleFS.open(fileName, "r");
 #else
-  if (!SPIFFS.exists(fileName))
-  {
-    saveRebootCounter(0);
-  }
-  File configFile = SPIFFS.open(fileName, "r");
+      if (!SPIFFS.exists(fileName))
+      {
+        saveRebootCounter(0);
+      }
+      File configFile = SPIFFS.open(fileName, "r");
 #endif
 
   if (configFile)
@@ -7779,15 +7441,7 @@ unsigned long AFEDataAccess::getRebootCounter(boolean increase)
       _ret = root["reboots"].as<unsigned long>();
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: JSON: Buffer size: ")
-             << AFE_FILE_BUFFER_REBOOTS_COUNTER << F(", actual JSON size: ")
-             << jsonBuffer.size();
-      if (AFE_FILE_BUFFER_REBOOTS_COUNTER < jsonBuffer.size() + 10)
-      {
-        Serial << endl
-               << F("WARN: Too small buffer size");
-      }
+      printBufforSizeInfo(AFE_FILE_BUFFER_REBOOTS_COUNTER, jsonBuffer.size());
 #endif
     }
     else
@@ -7795,7 +7449,6 @@ unsigned long AFEDataAccess::getRebootCounter(boolean increase)
       _ret = 0;
 #ifdef DEBUG
       printJSONNotPharsed();
-
 #endif
     }
     configFile.close();
@@ -7804,8 +7457,7 @@ unsigned long AFEDataAccess::getRebootCounter(boolean increase)
   {
     _ret = 0;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Configuration file: ") << fileName << F(" not opened");
+    printFileOpeningError(F(AFE_FILE_REBOOTS_COUNTER));
 #endif
   }
   if (increase)
@@ -7817,19 +7469,17 @@ unsigned long AFEDataAccess::getRebootCounter(boolean increase)
 
 void AFEDataAccess::saveRebootCounter(unsigned long counter)
 {
-  char fileName[strlen(AFE_FILE_REBOOTS_COUNTER) + 1];
+  char fileName[sizeof(AFE_FILE_REBOOTS_COUNTER) + 1];
   sprintf(fileName, AFE_FILE_REBOOTS_COUNTER);
 
 #ifdef DEBUG
-  Serial << endl
-         << endl
-         << F("INFO: Opening file: ") << fileName << F(" ... ");
+  printFileOpeningInformation(F(AFE_FILE_REBOOTS_COUNTER));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile = LittleFS.open(fileName, "w");
 #else
-  File configFile = SPIFFS.open(fileName, "w");
+      File configFile = SPIFFS.open(fileName, "w");
 #endif
 
   if (configFile)
@@ -7856,8 +7506,7 @@ void AFEDataAccess::saveRebootCounter(unsigned long counter)
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: failed to open file for writing");
+    printFileOpeningError(F(AFE_FILE_REBOOTS_COUNTER));
   }
 #endif
 }
@@ -7874,13 +7523,18 @@ void AFEDataAccess::addReference(AFEDebugger *_Debugger)
 void AFEDataAccess::printBufforSizeInfo(uint16_t bufferSize,
                                         uint16_t jsonSize)
 {
-  Serial << endl
-         << F("INFO: JSON: Buffer size: ") << bufferSize
-         << F(", actual JSON size: ") << jsonSize;
-  if (bufferSize < jsonSize + 10)
+
+  Debugger->printInformation(F("Buffer size: "), F("JSON"));
+  Serial << bufferSize;
+  Debugger->printValue(F(", actual JSON size: "));
+  Serial << jsonSize;
+  if (jsonSize > bufferSize - 10 && jsonSize < bufferSize)
   {
-    Serial << endl
-           << F("WARN: BUFFER TOO SMALL");
+    Debugger->printWarning(F("Buffor might be too small"), F("JSON"));
+  }
+  else if (jsonSize > bufferSize)
+  {
+    Debugger->printError(F("Buffor is too small"), F("JSON"));
   }
 }
 
@@ -7934,35 +7588,34 @@ void AFEDataAccess::printFileCreatingInformation(const __FlashStringHelper *file
   }
 }
 
-#endif
+#endif // DEBUG
 
 boolean AFEDataAccess::initializeFileSystem()
 {
   boolean _ret;
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: FILES SYSTEM: Mounting file system...");
+  Debugger->printInformation(F("Mounting file system..."), F("FS"));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   _ret = LittleFS.begin();
 #else
-  _ret = SPIFFS.begin();
-  if (_ret)
-  {
-    yield();
-    SPIFFS.gc();
-  }
+      _ret = SPIFFS.begin();
+      if (_ret)
+      {
+        yield();
+        SPIFFS.gc();
+      }
 #endif
 
 #ifdef DEBUG
   if (_ret)
   {
-    Serial << F(" Success");
+    Debugger->printValue(F("Success"));
   }
   else
   {
-    Serial << F(" FAILURE") << endl;
+    Debugger->printValue(F("FAILURE"), 1);
   }
 #endif
 
@@ -7975,9 +7628,8 @@ boolean AFEDataAccess::setDefaultConfiguration()
 /* Turning devicve LED on */
 #ifdef AFE_CONFIG_HARDWARE_LED
 #ifdef DEBUG
-  Serial << endl
-         << F("Turning on system LED on GPIO ")
-         << AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
+  Debugger->printInformation(F("Turning on system LED on GPIO "),F("FS"));
+  Serial << AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO;
 #endif
   pinMode(AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO, OUTPUT);
   digitalWrite(AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO, LOW);
@@ -8011,7 +7663,7 @@ boolean AFEDataAccess::setDefaultConfiguration()
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     createDomoticzConfigurationFile();
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-    createHomeAssistantConfigurationFile();
+        createHomeAssistantConfigurationFile();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -8112,8 +7764,7 @@ boolean AFEDataAccess::setDefaultConfiguration()
 #ifdef DEBUG
   else
   {
-    Serial << endl
-           << F("ERROR: Formating failed");
+    Debugger->printError(F("Formating failed"),F("FS"));
   }
 #endif
   return _ret;
