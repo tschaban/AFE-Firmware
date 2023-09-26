@@ -23,9 +23,6 @@
 #include <ESP8266HTTPClient.h>
 #endif // ESP32 / 8266
 
-#ifdef DEBUG
-#include <Streaming.h>
-#endif
 
 class AFEAPIHTTPDomoticz {
 

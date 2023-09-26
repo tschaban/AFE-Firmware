@@ -12,7 +12,7 @@
 #include <ArduinoJson.h>
 
 #include <WiFiClient.h>
-//#include <AsyncPing.h>
+// #include <AsyncPing.h>
 
 #ifdef AFE_ESP32 /* ESP32 */
 #include <HTTPClient.h>
@@ -22,7 +22,6 @@
 #include <ESP8266Ping.h>
 #endif
 
-
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
 #else
@@ -30,24 +29,29 @@
 #endif
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
 const char JSONRPC_MESSAGE[] PROGMEM = "{\"jsonrpc\":\"2.0\",\"method\":\"{{"
                                        "json.method}}\",\"params\":{{json."
                                        "params}},\"id\":1}";
 
-class AFEJSONRPC {
+class AFEJSONRPC
+{
 private:
   WiFiClient WirelessClient;
-  HTTPClient *http = new HTTPClient();  
+  HTTPClient *http = new HTTPClient();
   AFEDevice *Device;
-  AFEDataAccess *Data;  
+  AFEDataAccess *Data;
   String message;
-  //AsyncPing Pings;
+  // AsyncPing Pings;
   PingClass *Ping = new PingClass();
   boolean _PingResponded = false;
-  
+
+#ifdef DEBUG
+  AFEDebugger *Debugger;
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
 #endif
@@ -59,10 +63,13 @@ private:
 #endif
 
 public:
-
   boolean isStableConnection = true;
-    
+
   AFEJSONRPC();
+
+#ifdef DEBUG
+  void addReference(AFEDebugger *_Debugger);
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   void begin(AFEDataAccess *, AFEDevice *, AFELED *);

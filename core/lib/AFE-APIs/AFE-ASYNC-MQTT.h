@@ -18,16 +18,17 @@
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
 
-class AFEAsyncMQTTClient {
+class AFEAsyncMQTTClient
+{
 
-private:  
+private:
   char _DeviceName[33 + AFE_CONFIG_DEVICE_ID_SIZE + 1];
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -36,6 +37,10 @@ private:
 #endif
 
   unsigned long _reconnectionTimeout = 0;
+
+#ifdef DEBUG
+  AFEDebugger *Debugger;
+#endif
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   /**
@@ -55,7 +60,6 @@ public:
    */
   static boolean eventConnected;
   static boolean eventDisconnected;
-
 
   /**
    * @brief is true when device is connected to MQTT broker
@@ -80,6 +84,10 @@ public:
    *
    */
   AFEAsyncMQTTClient();
+
+#ifdef DEBUG
+  void addReference(AFEDebugger *_Debugger);
+#endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   boolean begin(AFEDataAccess *, AFEDevice *, AFELED *);
@@ -106,7 +114,6 @@ public:
    * @return boolean
    */
   boolean disconnectedEvent();
-
 
   /**
    * @brief publishes a message to MQTT Broker

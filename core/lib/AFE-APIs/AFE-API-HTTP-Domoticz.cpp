@@ -52,7 +52,8 @@ boolean AFEAPIHTTPDomoticz::callURL(const String url) {
 #endif
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: Publishing to Domoticz: ") << url;
+  _Firmware->Debugger->printInformation(F("Publishing: "),F("HTTP-Domoticz"));
+  Serial << url;
 #endif
   http->begin(client, url);
   _return = http->GET() == 200 ? true : false;

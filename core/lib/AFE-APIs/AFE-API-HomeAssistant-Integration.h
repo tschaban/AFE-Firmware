@@ -34,7 +34,8 @@
 #include <Streaming.h>
 #endif
 
-class AFEAPIHomeAssistantIntegration {
+class AFEAPIHomeAssistantIntegration
+{
 
 private:
   AFEFirmware *_Firmware;
@@ -47,7 +48,8 @@ private:
 
   boolean _initialize = false;
 
-  struct HA_DEVICE_CONFIG {
+  struct HA_DEVICE_CONFIG
+  {
     /**
      * @brief Unique ID of the type of the hardware. Require to generate the
      * hardware item ID in HA
@@ -262,12 +264,15 @@ private:
   void publishFS3000(void);
 #endif
 
-
   /**
    * @brief publishes firmware version
    *
    */
   void publishFirmwareVersion(void);
+
+#ifdef DEBUG
+  void printPublishDeviceItemMessage(const __FlashStringHelper *deviceItemName, uint8_t id = AFE_NONE);
+#endif
 
 public:
   /**

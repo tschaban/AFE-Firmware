@@ -58,3 +58,22 @@ Po dodaniu Debugger do Event
 RAM:   [=====     ]  52.8% (used 43252 bytes from 81920 bytes)
 Flash: [======    ]  55.4% (used 578229 bytes from 1044464 bytes)
 
+Po dodaniu Site i linku to panelu
+RAM:   [=====     ]  52.8% (used 43252 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578385 bytes from 1044464 bytes)
+
+Debugger dodany do ASYNC-MQTT
+RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578369 bytes from 1044464 bytes)
+
+Debugger dodany do Standard-MQTT
+RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578289 bytes from 1044464 bytes)
+
+Debugger dodany do Standard-HTTP-API
+RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578273 bytes from 1044464 bytes)
+
+Debugger dodany do HA-API
+RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
+Flash: [======    ]  55.4% (used 578197 bytes from 1044464 bytes)

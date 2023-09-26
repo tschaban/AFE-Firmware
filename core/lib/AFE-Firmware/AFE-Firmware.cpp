@@ -10,8 +10,10 @@ void AFEFirmware::begin()
   timer->hours = 0;
   timer->days = 0;
   timer->months = 0;
-
+#ifdef DEBUG
   API->Flash->addReference(Debugger);
+  API->REST->addReference(Debugger);
+#endif
   API->Flash->initializeFileSystem();
 
   Device->begin();
@@ -179,9 +181,8 @@ void AFEFirmware::initializeIIC(void)
 
     if (!success)
     {
-     
-     Debugger->printError(F("Bus doesn't work"), F("I2C[1]"));
-      
+
+      Debugger->printError(F("Bus doesn't work"), F("I2C[1]"));
     }
     else
     {

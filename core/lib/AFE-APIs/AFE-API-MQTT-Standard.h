@@ -16,7 +16,8 @@
 #include <ArduinoJson.h>
 #include <hardwares/AFE-RGB-LED.h>
 
-struct CLED_COMMAND {
+struct CLED_COMMAND
+{
   char command[10];
   uint32_t color;
   uint8_t brightness;
@@ -24,11 +25,8 @@ struct CLED_COMMAND {
 
 #endif
 
-#ifdef DEBUG
-#include <Streaming.h>
-#endif
-
-class AFEAPIMQTTStandard {
+class AFEAPIMQTTStandard
+{
 
 private:
   AFEFirmware *_Firmware;
@@ -77,8 +75,12 @@ private:
    */
   char mqttCommandTopic[AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH];
 
-public:
+#ifdef DEBUG
+  void printYesNo(boolean state);
+  void printCommandNotImpementedWarning();
+#endif
 
+public:
   AFEAsyncMQTTClient *Mqtt = new AFEAsyncMQTTClient();
 
   /**
@@ -226,8 +228,6 @@ public:
   void processFS3000(uint8_t *id);
   boolean publishFS3000SensorData(uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_FS3000
-
-
 };
 
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED

@@ -619,7 +619,6 @@ void AFESitesGenerator::siteDevice(String &page) {
   closeSection(page);
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-
   if (Firmware->Device->configuration.noOfRelays > 0) {
 
 #if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) ||                             \
@@ -713,7 +712,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
 #endif // AFE_ESP32
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: WIFI: Searching for WiFis: ");
+Firmware->Debugger->printInformation(F("Searching for WiFis: "),F("WIFI"));
 #endif
     numberOfNetworks = WiFi.scanNetworks();
 #ifdef DEBUG
@@ -2169,9 +2168,8 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
     }
 
 #ifdef DEBUG
-    Serial << endl
-           << F("Number of contactros set for the gate: ")
-           << numberOfContractons;
+    Firmware->Debugger->printInformation(F("Number of contactros set for the gate: "),F("SITE"));
+    Firmware->Debugger->printValue(numberOfContractons);
 #endif
 
     if (numberOfContractons > 0) {
@@ -3296,6 +3294,11 @@ void AFESitesGenerator::siteConnecting(String &page) {
   page.replace(F("{{I}}"), F(L_NETWORK_DEVICE_CONNECTS));
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_NETWORK_CONNECT_TO));
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace(F("{{I}}"), F(L_NETWORK_CONNECT_TO_PANEL));
+  char _deviceLocalLANAddress[AFE_CONFIG_DEVICE_ID_SIZE];
+  Firmware->API->Flash->getDeviceID(_deviceLocalLANAddress);
+  page.replace(F("{{A}}"), _deviceLocalLANAddress);
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_NETWORK_SEARCH_FOR_IP_ADDRESS));
   page.replace(F("{{M}}"), WiFi.macAddress());
