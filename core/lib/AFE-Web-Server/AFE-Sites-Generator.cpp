@@ -3297,7 +3297,7 @@ void AFESitesGenerator::siteConnecting(String &page) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_NETWORK_CONNECT_TO_PANEL));
   char _deviceLocalLANAddress[AFE_CONFIG_DEVICE_ID_SIZE];
-  Firmware->API->Flash->getDeviceID(_deviceLocalLANAddress);
+  Firmware->API->Flash->getDeviceID(_deviceLocalLANAddress,true);
   page.replace(F("{{A}}"), _deviceLocalLANAddress);
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_NETWORK_SEARCH_FOR_IP_ADDRESS));

@@ -77,8 +77,7 @@ public:
     void printValue(float number, uint8_t newLineAfter = 0);
     void printValue(float number, const __FlashStringHelper *text, uint8_t newLineAfter = 0);
 
-    void printHeader(uint8_t newLineBefore = 1, uint8_t newLineAfter = 0, uint8_t length = AFE_DEBUG_HEADER_DEFAULT_LENGTH, uint8_t type = AFE_DEBUG_HEADER_TYPE_HASH);
-    void printTextHeader(const __FlashStringHelper *text, uint8_t length = AFE_DEBUG_HEADER_DEFAULT_LENGTH, uint8_t type = AFE_DEBUG_HEADER_TYPE_DASH, uint8_t newLineBefore = 1, uint8_t newLineAfter = 0);
+    void printHeader(uint8_t newLineBefore = 1, uint8_t newLineAfter = 1, uint8_t length = AFE_DEBUG_HEADER_DEFAULT_LENGTH, uint8_t type = AFE_DEBUG_HEADER_TYPE_HASH);
 
     void getFreeMemorySize();
     void getFileSystemDubugInformation();

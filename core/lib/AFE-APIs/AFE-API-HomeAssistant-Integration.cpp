@@ -46,7 +46,8 @@ void AFEAPIHomeAssistantIntegration::publish()
 {
 
 #ifdef DEBUG
-  _Firmware->Debugger->printTextHeader(F("Publishing Auto-Discovery configuration to MQTT"), 72, AFE_DEBUG_HEADER_TYPE_DASH, 2);
+  _Firmware->Debugger->printHeader();
+  _Firmware->Debugger->printValue(F("Publishing Auto-Discovery configuration to MQTT"));
 #endif
 
   publishFirmwareVersion();
@@ -122,7 +123,8 @@ void AFEAPIHomeAssistantIntegration::publish()
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   publishContactron();
 #endif
-  _Firmware->Debugger->printTextHeader(F("Auto-Discovery configuration sent to MQTT"), 72, AFE_DEBUG_HEADER_TYPE_DASH, 1, 2);
+  _Firmware->Debugger->printHeader();
+  _Firmware->Debugger->printValue(F("Auto-Discovery configuration sent to MQTT"));
 }
 
 void AFEAPIHomeAssistantIntegration::publishFirmwareVersion(void)
@@ -133,14 +135,14 @@ void AFEAPIHomeAssistantIntegration::publishFirmwareVersion(void)
   }
   resetDeviceConfiguration();
   _deviceConfiguration->type = AFE_CONFIG_HA_ITEM_FIRMWARE_STATUS;
-  sprintf(_deviceConfiguration->deviceClass, "%s",
+  sprintf(_deviceConfiguration->deviceClass, (const char*)
           F(AFE_CONFIG_HA_DEVICE_CLASS_FIRMWARE));
   _deviceConfiguration->entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_UPDATE;
 
-  sprintf(_deviceConfiguration->entityCategory, "%s",
+  sprintf(_deviceConfiguration->entityCategory, (const char*)
           F(AFE_CONFIG_HA_ENTITY_CATEGORY_CONFIG));
 
-  sprintf(_deviceConfiguration->label, "%s", F(L_FIRMWARE));
+  sprintf(_deviceConfiguration->label, (const char*) F(L_FIRMWARE));
   sprintf(_deviceConfiguration->mqtt.topic,
           _MqttAPI->Mqtt->configuration->status.topic);
   publishItemToHomeAssistantMQTTDiscovery(_deviceConfiguration);

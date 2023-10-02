@@ -192,14 +192,6 @@ void AFEDebugger::printHeader(uint8_t newLineBefore, uint8_t newLineAfter, uint8
   addNewLines(newLineAfter);
 }
 
-void AFEDebugger::printTextHeader(const __FlashStringHelper *text, uint8_t length, uint8_t type, uint8_t newLineBefore, uint8_t newLineAfter) {
-  uint8_t margin = (length - 2 - sizeof(text)) / 2;
-  // @TODO 3.8.0 zaokraglanie w dol i w gore
-  printHeader(newLineBefore,0,margin, type);
-  Serial << F(" ") << text << F(" ");
-  printHeader(0,newLineAfter,margin, type);
-}
-
 void AFEDebugger::getFreeMemorySize()
 {
   printInformation(F("Free: "), F("RAM"));

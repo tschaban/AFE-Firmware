@@ -9,6 +9,8 @@
 #include <IPAddress.h>
 #include <Arduino.h>
 
+#include <AFE-Data-JSON-templates.h>
+
 #ifdef AFE_ESP32
 #include <LittleFS.h>
 #include <WiFi.h>

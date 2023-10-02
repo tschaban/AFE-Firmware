@@ -77,3 +77,17 @@ Flash: [======    ]  55.4% (used 578273 bytes from 1044464 bytes)
 Debugger dodany do HA-API
 RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
 Flash: [======    ]  55.4% (used 578197 bytes from 1044464 bytes)
+
+After adding NETWORK saving from template as char
+RAM:   [=====     ]  53.3% (used 43688 bytes from 81920 bytes)
+Flash: [======    ]  55.2% (used 576972 bytes from 1044464 bytes)
+
+After adding NETWORK saving from template as char
+RAM:   [=====     ]  52.8% (used 43288 bytes from 81920 bytes)
+Flash: [======    ]  55.2% (used 576980 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  52.6% (used 43080 bytes from 81920 bytes)
+Flash: [======    ]  55.2% (used 576912 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  52.5% (used 43016 bytes from 81920 bytes)
+Flash: [======    ]  55.3% (used 577112 bytes from 1044464 bytes)

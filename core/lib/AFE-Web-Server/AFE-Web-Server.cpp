@@ -847,7 +847,7 @@ boolean AFEWebServer::generate(boolean upload)
 
 #ifdef DEBUG
       Firmware->Debugger->getFreeMemorySize();
-      Firmware->Debugger->printValue(" : content generated");
+      Firmware->Debugger->printValue(F(" : content generated"));
 #endif
 
       if ((Firmware->Device->getMode() == AFE_MODE_CONFIGURATION ||
@@ -1299,18 +1299,13 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId)
   Firmware->Hardware->SystemLed->off();
 #endif
 
-#ifdef DEBUG
-  Firmware->Debugger->printHeader();
-#endif
 
   return _success;
 }
 
 boolean AFEWebServer::upgradOTAFile(void)
 {
-#ifdef DEBUG
-  Firmware->Debugger->printHeader();
-#endif
+
   HTTPUpload &upload = server.upload();
   String _updaterError;
   boolean _success = false;
@@ -1321,6 +1316,7 @@ boolean AFEWebServer::upgradOTAFile(void)
 #endif
 
 #ifdef DEBUG
+  Firmware->Debugger->printHeader();
     Firmware->Debugger->printInformation(F("Firmware file name: "), F("UPGRADE"));
     Serial << upload.filename.c_str();
     Firmware->Debugger->getFirmwareFlashInformation();
@@ -1367,6 +1363,7 @@ boolean AFEWebServer::upgradOTAFile(void)
 #ifdef DEBUG
       Firmware->Debugger->printInformation(F("Success. New firmware size: "), F("UPGRADE"));
       Serial << upload.totalSize;
+      Firmware->Debugger->printHeader();
       Firmware->Debugger->printInformation(F("Rebooting..."), F("UPGRADE"));
 #endif
     }
@@ -1384,9 +1381,6 @@ boolean AFEWebServer::upgradOTAFile(void)
     Firmware->Debugger->printError(F("Update was aborted"), F("UPGRADE"));
 #endif
   }
-#ifdef DEBUG
-  Firmware->Debugger->printHeader();
-#endif
   return _success;
 }
 

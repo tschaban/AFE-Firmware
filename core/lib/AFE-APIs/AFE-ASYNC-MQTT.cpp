@@ -223,7 +223,10 @@ boolean AFEAsyncMQTTClient::publish(const char *topic, const char *message)
     _Led->on();
 #endif
 #ifdef DEBUG
-    Debugger->printTextHeader(F("Publish MQTT"), 40, AFE_DEBUG_HEADER_TYPE_DASH);
+
+    Debugger->printHeader(1,1,40,AFE_DEBUG_HEADER_TYPE_DASH);
+  Debugger->printValue(F("Publish MQTT"));
+
     Debugger->printBulletPoint(F("Topic: "));
     Debugger->printValue(topic);
     Debugger->printBulletPoint(F("Message: "));

@@ -363,7 +363,7 @@ void AFEJSONRPC::checkAccessToWAN(void)
       Debugger->printBulletPoint((_PingResponded ? F("") : F("NOT ")));
       Serial << F("Connected to Internet");
       Debugger->printBulletPoint(F("Average time: "));
-      Serial << Ping->averageTime();
+      Serial << Ping->averageTime() << F("msec");
 #endif
 }
 

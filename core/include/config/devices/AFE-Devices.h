@@ -16,7 +16,7 @@
  * @brief Size of a Device ID + 1 for '\0
  * 
  */
-#define AFE_CONFIG_DEVICE_ID_SIZE 18 
+#define AFE_CONFIG_DEVICE_ID_SIZE 22 // afe-5CecCF93-7Fd3D37f
 
 #if defined(AFE_DEVICE_SONOFF_BASIC_V1)
 #define AFE_DEVICE_MANUFACTURER "Itead"

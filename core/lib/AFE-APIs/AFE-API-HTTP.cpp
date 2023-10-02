@@ -52,7 +52,9 @@ void AFEAPIHTTP::processRequest(HTTPCOMMAND *request)
 {
 
 #ifdef DEBUG
-  _Firmware->Debugger->printTextHeader(F("HTTP Request recieved"), 30, AFE_DEBUG_HEADER_TYPE_DASH, 2);
+  _Firmware->Debugger->printHeader(1,1,30,AFE_DEBUG_HEADER_TYPE_DASH);
+  _Firmware->Debugger->printValue(F("HTTP Request recievedT"));
+
   _Firmware->Debugger->printBulletPoint(F("Device: "));
   _Firmware->Debugger->printValue(request->device);
   _Firmware->Debugger->printBulletPoint(F("Name: "));

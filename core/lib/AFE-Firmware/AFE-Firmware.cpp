@@ -28,8 +28,8 @@ void AFEFirmware::begin()
   unsigned long _counter = API->Flash->getRebootCounter();
 #ifdef DEBUG
 
-  Debugger->printInformation(F("Firmware rebooted"), F("BOOT"), 0, 0);
-  Debugger->printValue(_counter, F("times"));
+  Debugger->printInformation(F("Firmware rebooted: "), F("BOOT"));
+  Debugger->printValue(_counter, F("x"));
 
 #endif
 
