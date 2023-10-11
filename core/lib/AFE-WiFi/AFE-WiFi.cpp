@@ -279,10 +279,10 @@ void AFEWiFi::listener() {
             }
 
             if (isPrimaryConfiguration) {
-              WirelessNetwork.begin(configuration.ssid, configuration.password);
+              WirelessNetwork.begin(configuration.ssid, configuration.password,0,0,true);
             } else {
               WirelessNetwork.begin(configuration.ssidBackup,
-                                    configuration.passwordBackup);
+                                    configuration.passwordBackup,0,0,true);
             }
 
 #ifdef DEBUG
