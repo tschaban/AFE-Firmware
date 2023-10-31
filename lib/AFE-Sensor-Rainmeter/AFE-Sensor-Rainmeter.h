@@ -10,14 +10,15 @@
 #include <AFE-Impulse-Catcher.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFERainmeter {
+class AFERainmeter
+{
 
 public:
   RAINMETER *configuration = new RAINMETER;
-  
+
   RAINMETER_DATA *current = new RAINMETER_DATA;
   float rainLevelLast1Minute = 0;
   float rainLevelLastHour = 0;
@@ -29,9 +30,12 @@ public:
   /* Constructors */
   AFERainmeter();
 
-  /* Init switch */
+/* Init switch */
+#ifdef DEBUG
+  boolean begin(AFEDataAccess *, AFEImpulseCatcher *, AFEDebugger *);
+#else
   boolean begin(AFEDataAccess *, AFEImpulseCatcher *);
-
+#endif
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
 
@@ -43,6 +47,10 @@ private:
   boolean _initialized = false;
   uint32_t startTime = 0;
   uint32_t start60Sec = 0;
+#ifdef DEBUG
+  AFEDebugger *Debugger;
+  boolean begin(AFEDataAccess *, AFEImpulseCatcher *);
+#endif
 };
 
 #endif // AFE_CONFIG_HARDWARE_RAINMETER

@@ -16,16 +16,16 @@
 #include <en_EN.h>
 #endif
 
-
-
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFESensorDHT : public AFESensorsCommon {
+class AFESensorDHT : public AFESensorsCommon
+{
 
 private:
   AFEDataAccess *Data;
+  AFEDebugger *Debugger;
 
   boolean _initialized = false;
 
@@ -33,9 +33,12 @@ private:
 
   DHTesp *dht = new DHTesp();
 
+#ifdef DEBUG
+  void begin(AFEDataAccess *, uint8_t id);
+#endif
+
 public:
   DHT *configuration = new DHT;
-
 
   float currentTemperature;
   float currentHumidity;
@@ -43,16 +46,19 @@ public:
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorDHT();
 
+#ifdef DEBUG
+  /* Initializing method with Debugger on */
+  void begin(AFEDataAccess *, AFEDebugger *, int8_t id);
+#else
   /* Initializing method */
   void begin(AFEDataAccess *, uint8_t id);
-
+#endif
   /* Method should be added to the main loop to check temperature / humidity in
    * defined time frame */
   boolean listener();
 
-    /* Returns the sensor data in JSON format */
+  /* Returns the sensor data in JSON format */
   void getJSON(char *json);
-
 };
 
 #endif // AFE_CONFIG_HARDWARE_DHT

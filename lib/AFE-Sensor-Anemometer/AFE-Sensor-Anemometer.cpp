@@ -6,8 +6,18 @@
 
 AFEAnemometer::AFEAnemometer(){};
 
+#ifdef DEBUG
+/* Init switch */
+boolean AFEAnemometer::begin(AFEDataAccess *Data, AFEImpulseCatcher *Sensor, AFEDebugger *_Debugger)
+{
+  Debugger = _Debugger;
+  return begin(Data, Sensor);
+}
+#endif
+
 boolean AFEAnemometer::begin(AFEDataAccess *Data,
-                                   AFEImpulseCatcher *Sensor) {
+                             AFEImpulseCatcher *Sensor)
+{
   _Data = Data;
   _Sensor = Sensor;
   startTime = millis();
@@ -15,7 +25,8 @@ boolean AFEAnemometer::begin(AFEDataAccess *Data,
   _Sensor->begin(configuration->sensitiveness);
   _initialized = true;
 
-  switch (configuration->impulseDistanceUnit) {
+  switch (configuration->impulseDistanceUnit)
+  {
   case AFE_DISTANCE_CENTIMETER:
     oneImpulseDistanceCM = configuration->impulseDistance;
     break;
@@ -28,36 +39,41 @@ boolean AFEAnemometer::begin(AFEDataAccess *Data,
   default:
     _initialized = true;
 #ifdef DEBUG
-    Serial << endl
-           << F("ERROR: Anemometer sensor NOT initialized. Wrong distance unit "
-                "for "
-                "impulse: ")
-           << configuration->impulseDistanceUnit;
+    Debugger->printError(F("Anemometer sensor NOT initialized. Wrong distance unit for impulse: "), F("ANEMOMETER"));
+    Debugger->printValue(configuration->impulseDistanceUnit);
 #endif
     break;
   }
 
-  if (_initialized) {
+  if (_initialized)
+  {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Anemometer sensor initialized and working") << endl
-           << F(" - GPIO: ") << configuration->gpio << endl
-           << F(" - Interval: ") << configuration->interval << endl
-           << F(" - 1 impulse distance: ") << configuration->impulseDistance
-           << endl
-           << F(" - 1 impulse distance unit: ")
-           << configuration->impulseDistanceUnit << endl
-           << F(" - Boucing: ") << configuration->sensitiveness;
+    Debugger->printHeader(2, 1, 50, AFE_DEBUG_HEADER_TYPE_DASH);
+    Debugger->printBulletPoint(F("Anemometer sensor initialized and working"));
+    Debugger->printBulletPoint(F("GPIO: "));
+    Debugger->printValue(configuration->gpio);
+    Debugger->printBulletPoint(F("Interval: "));
+    Serial << configuration->interval;
+    Debugger->printBulletPoint(F("1 impulse distance:: "));
+    Debugger->printValue(configuration->impulseDistance);
+    Debugger->printBulletPoint(F("1 impulse unit:: "));
+    Debugger->printValue(configuration->impulseDistanceUnit);
+    Debugger->printBulletPoint(F("Boucing: "));
+    Debugger->printValue(configuration->sensitiveness);
+    Debugger->printHeader(1, 2, 50, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
   }
 
   return _initialized;
 }
 
-boolean AFEAnemometer::listener(void) {
+boolean AFEAnemometer::listener(void)
+{
   boolean _ret = false;
-  if (_initialized) {
-    if ((millis() - startTime >= configuration->interval * 1000)) {
+  if (_initialized)
+  {
+    if ((millis() - startTime >= configuration->interval * 1000))
+    {
 
       uint32_t noOfImpulses;
       uint32_t duration;
@@ -68,12 +84,17 @@ boolean AFEAnemometer::listener(void) {
       lastSpeedKMH = lastSpeedMS * 18 / 5;
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: Anemometer speed: ") << lastSpeedMS << F("m/s, ")
-             << lastSpeedKMH << F("km/h") << endl
-             << F(" - no of impulses: ") << noOfImpulses << endl
-             << F(" - duration: ") << duration << F("msec. [")
-             << duration / 1000 << F("sec]");
+      Debugger->printHeader(1, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
+      Debugger->printBulletPoint(F("Reading data from Anemometer sensor"));
+      Debugger->printBulletPoint(F("Speed [m/s]: "));
+      Serial << lastSpeedMS;
+      Debugger->printBulletPoint(F("Speed [km/h]:  speed: "));
+      Serial << lastSpeedKMH;
+      Debugger->printBulletPoint(F("Number of impulses: "));
+      Serial << noOfImpulses;
+      Debugger->printBulletPoint(F("Interval [msec]: "));
+      Serial << duration;
+      Debugger->printHeader(1, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
       startTime = millis();
       _ret = true;
@@ -82,18 +103,20 @@ boolean AFEAnemometer::listener(void) {
   return _ret;
 }
 
-void AFEAnemometer::newImpulse(void) {
-    impulseCounter++;
+void AFEAnemometer::newImpulse(void)
+{
+  impulseCounter++;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: New impulse. Total: ") << impulseCounter
-           << F(", during: ") << ((millis() - counterStarted) / 1000) << F("sec.");
+  Debugger->printInformation(F("New impulse. Total: "), F("ANEMOMETER"));
+  Serial << impulseCounter << F(", during: ") << ((millis() - counterStarted) / 1000) << F("sec.");
 #endif
 }
 
-void AFEAnemometer::get(uint32_t &noOfImpulses, uint32_t &duration) {
+void AFEAnemometer::get(uint32_t &noOfImpulses, uint32_t &duration)
+{
   duration = millis() - counterStarted;
-  if (duration < 0) { // used previous duration if timer rollouts
+  if (duration < 0)
+  { // used previous duration if timer rollouts
     duration = _previousDuration;
   }
   noOfImpulses = impulseCounter;
@@ -101,14 +124,15 @@ void AFEAnemometer::get(uint32_t &noOfImpulses, uint32_t &duration) {
   impulseCounter = 0;
   counterStarted = millis();
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Reading data from Binary sensor: Impulses: ") << noOfImpulses
+  Debugger->printInformation(F("Reading data from Binary sensor: Impulses: "), F("ANEMOMETER"));
+  Serial << noOfImpulses
          << F(", during: ") << (duration / 1000) << F("sec.");
 #endif
 }
-void AFEAnemometer::getJSON(char *json) {
+void AFEAnemometer::getJSON(char *json)
+{
   sprintf(json,
-          "{\"anemometer\":[{\"value\":%.2f,\"unit\":\"%s\"},{\"value\":%.2f,\"unit\":\"%s\"}]}",
+          (const char *)F("{\"anemometer\":[{\"value\":%.2f,\"unit\":\"%s\"},{\"value\":%.2f,\"unit\":\"%s\"}]}"),
           lastSpeedMS, AFE_UNIT_MS, lastSpeedKMH, AFE_UNIT_KMH);
 }
 

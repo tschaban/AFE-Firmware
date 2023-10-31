@@ -1080,7 +1080,7 @@ void AFEAPIMQTTStandard::publishAnemometerSensorData() {
 
 void AFEAPIMQTTStandard::processAnemometerSensor() {
 #ifdef DEBUG
-  _Firmware->Debugger->printProcessingRequest(F("Anemometer"));
+  _Firmware->Debugger->printProcessingRequest(F("Anemometer"),AFE_NONE,F("MQTT"));
 #endif
   if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishAnemometerSensorData();
@@ -1105,7 +1105,7 @@ void AFEAPIMQTTStandard::publishRainSensorData() {
 
 void AFEAPIMQTTStandard::processRainSensor() {
 #ifdef DEBUG
-  _Firmware->Debugger->printProcessingRequest(F("Rainmeter"));
+  _Firmware->Debugger->printProcessingRequest(F("Rainmeter"),AFE_NONE,F("MQTT"));
 #endif
   if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishRainSensorData();

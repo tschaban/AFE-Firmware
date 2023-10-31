@@ -4,34 +4,41 @@ AFEHardware::AFEHardware(AFEFirmware *Firmware) { _Firmware = Firmware; };
 
 void AFEHardware::begin(void) {}
 
-void AFEHardware::initPriorityHardwareItems(void) {
+void AFEHardware::initPriorityHardwareItems(void)
+{
 #ifdef DEBUG
-  Serial << endl << F("INFO: HARDWARE: Starting priortized hardware items");
+  Serial << endl
+         << F("INFO: HARDWARE: Starting priortized hardware items");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-  if (_Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT) {
+  if (_Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT)
+  {
     initRGBLED();
   }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  if (_Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+  if (_Firmware->Device->getMode() == AFE_MODE_NORMAL)
+  {
     initRelay();
   }
 #endif // AFE_CONFIG_HARDWARE_RELAY
 }
 
-void AFEHardware::initHardwareItems(void) {
+void AFEHardware::initHardwareItems(void)
+{
 #ifdef DEBUG
-  Serial << endl << F("INFO: HARDWARE: Starting hardware");
+  Serial << endl
+         << F("INFO: HARDWARE: Starting hardware");
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   initSwitch();
 #endif
 
-  if (_Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+  if (_Firmware->Device->getMode() == AFE_MODE_NORMAL)
+  {
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
     initADC();
 #endif
@@ -79,8 +86,10 @@ void AFEHardware::initHardwareItems(void) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-void AFEHardware::initSwitch(void) {
-  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfSwitches; i++) {
+void AFEHardware::initSwitch(void)
+{
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfSwitches; i++)
+  {
     Switch[i] = new AFESwitch();
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     Switch[i]->addMCP23017Reference(MCP23017Broker);
@@ -95,13 +104,16 @@ void AFEHardware::initSwitch(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-void AFEHardware::initRelay(void) {
+void AFEHardware::initRelay(void)
+{
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: HARDWARE: Initializing Relays");
+  Serial << endl
+         << F("INFO: HARDWARE: Initializing Relays");
 #endif
 
-  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfRelays; i++) {
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfRelays; i++)
+  {
     Relay[i] = new AFERelay();
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     Relay[i]->addMCP23017Reference(MCP23017Broker);
@@ -112,13 +124,16 @@ void AFEHardware::initRelay(void) {
 /* Setting relay state after restoring power is not required when the relay is
  * assigned to a gate*/
 #ifdef AFE_CONFIG_HARDWARE_GATE
-    if (Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (Relay[i]->gateId == AFE_HARDWARE_ITEM_NOT_EXIST)
+    {
 #endif
       Relay[i]->setRelayAfterRestoringPower();
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #ifdef DEBUG
-    } else {
+    }
+    else
+    {
       Serial << endl
              << F("INFO: RELAY: Restoring relay state is not required for a "
                   "relay assigned to a gate");
@@ -130,19 +145,24 @@ void AFEHardware::initRelay(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
-void AFEHardware::initADC(void) {
+void AFEHardware::initADC(void)
+{
 #ifdef DEBUG
-  Serial << endl << F("INFO: HARDWARE: Initializing ADC");
+  Serial << endl
+         << F("INFO: HARDWARE: Initializing ADC");
 #endif
-  if (_Firmware->Configuration->Pro->valid) {
+  if (_Firmware->Configuration->Pro->valid)
+  {
 #ifdef AFE_ESP32
     for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfAnalogInputs;
-         i++) {
+         i++)
+    {
       AnalogInput[i] = new AFEAnalogInput();
       AnalogInput[i]->begin(i);
     }
 #else
-    if (_Firmware->Device->configuration.isAnalogInput) {
+    if (_Firmware->Device->configuration.isAnalogInput)
+    {
       AnalogInput = new AFEAnalogInput();
       AnalogInput->begin();
     }
@@ -152,21 +172,26 @@ void AFEHardware::initADC(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-void AFEHardware::initRGBLED(void) {
-  if (_Firmware->Device->configuration.noOfCLEDs > 0) {
+void AFEHardware::initRGBLED(void)
+{
+  if (_Firmware->Device->configuration.noOfCLEDs > 0)
+  {
     RGBLEDStrip->begin(_Firmware->API->Flash, _Firmware->Device);
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
-void AFEHardware::initGate(void) {
-  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfGates; i++) {
+void AFEHardware::initGate(void)
+{
+  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfGates; i++)
+  {
     Gate[i] = new AFEGate();
     Gate[i]->begin(i, _Firmware->Device, _Firmware->API->Flash);
     GatesCurrentStates->state[i] = AFE_GATE_UNKNOWN;
     /* Assigning Gate ID to a contactron */
-    for (uint8_t j = 0; j < Gate[i]->getNoOfContactrons(); j++) {
+    for (uint8_t j = 0; j < Gate[i]->getNoOfContactrons(); j++)
+    {
       Contactron[Gate[i]->getContactronId(j)]->gateId = i;
 #ifdef DEBUG
       Serial << endl
@@ -176,39 +201,56 @@ void AFEHardware::initGate(void) {
     }
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: GATE: ") << i << F(" initialized");
+    Serial << endl
+           << F("INFO: GATE: ") << i << F(" initialized");
 #endif
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFEHardware::initContactron(void) {
+void AFEHardware::initContactron(void)
+{
 #ifdef DEBUG
-  Serial << endl << F("INFO: BOOT: Initializing contractons");
+  Serial << endl
+         << F("INFO: BOOT: Initializing contractons");
 #endif
   for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfContactrons;
-       i++) {
+       i++)
+  {
     Contactron[i] = new AFEContactron();
     Contactron[i]->begin(i, _Firmware->Device, _Firmware->API->Flash);
 #ifdef DEBUG
-    Serial << endl << F("INFO: BOOT: Contactron: ") << i << F(" initialized");
+    Serial << endl
+           << F("INFO: BOOT: Contactron: ") << i << F(" initialized");
 #endif
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-void AFEHardware::initTSL2562(void) {
-  if (_Firmware->Device->configuration.noOfTSL2561s > 0) {
+void AFEHardware::initTSL2562(void)
+{
+  if (_Firmware->Device->configuration.noOfTSL2561s > 0)
+  {
     for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfTSL2561s;
-         i++) {
+         i++)
+    {
       TSL2561Sensor[i] = new AFESensorTSL2561();
+#ifdef DEBUG
+#ifdef AFE_ESP32
+      TSL2561Sensor[i]->begin(i, _Firmware->Hardware->WirePort0,
+                              _Firmware->Hardware->WirePort1, _Firmware->Debugger);
+#else
+      TSL2561Sensor[i]->begin(i, _Firmware->Hardware->WirePort0, _Firmware->Debugger);
+#endif
+#else
 #ifdef AFE_ESP32
       TSL2561Sensor[i]->begin(i, _Firmware->Hardware->WirePort0,
                               _Firmware->Hardware->WirePort1);
 #else
       TSL2561Sensor[i]->begin(i, _Firmware->Hardware->WirePort0);
+#endif
 #endif
     }
   }
@@ -216,15 +258,32 @@ void AFEHardware::initTSL2562(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
-void AFEHardware::initBH1750(void) {
-  if (_Firmware->Device->configuration.noOfBH1750s > 0) {
-    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfBH1750s; i++) {
+void AFEHardware::initBH1750(void)
+{
+  if (_Firmware->Device->configuration.noOfBH1750s > 0)
+  {
+    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfBH1750s; i++)
+    {
       BH1750Sensor[i] = new AFESensorBH1750();
+
 #ifdef AFE_ESP32
+
+#ifdef DEBUG
+      BH1750Sensor[i]->begin(i, _Firmware->Hardware->WirePort0,
+                             _Firmware->Hardware->WirePort1, _Firmware->Debugger);
+#else
       BH1750Sensor[i]->begin(i, _Firmware->Hardware->WirePort0,
                              _Firmware->Hardware->WirePort1);
+#endif
+
+#else // ESP8266
+
+#ifdef DEBUG
+      BH1750Sensor[i]->begin(i, _Firmware->Hardware->WirePort0, _Firmware->Debugger);
 #else
       BH1750Sensor[i]->begin(i, _Firmware->Hardware->WirePort0);
+#endif
+
 #endif
     }
   }
@@ -232,15 +291,27 @@ void AFEHardware::initBH1750(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-void AFEHardware::initBMX80(void) {
-  if (_Firmware->Device->configuration.noOfBMEX80s > 0) {
-    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfBMEX80s; i++) {
+void AFEHardware::initBMX80(void)
+{
+  if (_Firmware->Device->configuration.noOfBMEX80s > 0)
+  {
+    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfBMEX80s; i++)
+    {
       BMEX80Sensor[i] = new AFESensorBMEX80();
 #ifdef AFE_ESP32
+#ifdef DEBUG
+      BMEX80Sensor[i]->begin(i, _Firmware->Hardware->WirePort0,
+                             _Firmware->Hardware->WirePort1, _Firmware->Debugger);
+#else
       BMEX80Sensor[i]->begin(i, _Firmware->Hardware->WirePort0,
                              _Firmware->Hardware->WirePort1);
+#endif
+#else
+#ifdef DEBUG
+      BMEX80Sensor[i]->begin(i, _Firmware->Hardware->WirePort0, _Firmware->Debugger);
 #else
       BMEX80Sensor[i]->begin(i, _Firmware->Hardware->WirePort0);
+#endif
 #endif
     }
   }
@@ -248,9 +319,11 @@ void AFEHardware::initBMX80(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEHardware::initBinarySensor(void) {
+void AFEHardware::initBinarySensor(void)
+{
   for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfBinarySensors;
-       i++) {
+       i++)
+  {
     BinarySensor[i] = new AFESensorBinary();
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     BinarySensor[i]->addMCP23017Reference(MCP23017Broker);
@@ -258,39 +331,57 @@ void AFEHardware::initBinarySensor(void) {
     BinarySensor[i]->begin(i, _Firmware->API->Flash);
   }
 #ifdef DEBUG
-  Serial << endl << F("INFO: BOOT: Binary sensors initialized");
+  Serial << endl
+         << F("INFO: BOOT: Binary sensors initialized");
 #endif
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-void AFEHardware::initDS18B20(void) {
-  if (_Firmware->Device->configuration.noOfDS18B20s > 0) {
+void AFEHardware::initDS18B20(void)
+{
+  if (_Firmware->Device->configuration.noOfDS18B20s > 0)
+  {
     for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfDS18B20s;
-         i++) {
+         i++)
+    {
       DS18B20Sensor[i] = new AFESensorDS18B20();
+#ifdef DEBUG
+      DS18B20Sensor[i]->begin(_Firmware->API->Flash, _Firmware->Debugger, i);
+#else
       DS18B20Sensor[i]->begin(_Firmware->API->Flash, i);
+#endif
     }
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEHardware::initDHT(void) {
-  if (_Firmware->Device->configuration.noOfDHTs > 0) {
-    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfDHTs; i++) {
+void AFEHardware::initDHT(void)
+{
+  if (_Firmware->Device->configuration.noOfDHTs > 0)
+  {
+    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfDHTs; i++)
+    {
       DHTSensor[i] = new AFESensorDHT();
+#ifdef DEBUG
+      DHTSensor[i]->begin(_Firmware->API->Flash, _Firmware->Debugger, i);
+#else
       DHTSensor[i]->begin(_Firmware->API->Flash, i);
+#endif
     }
   }
 }
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-void AFEHardware::initHPMA115S0(void) {
-  if (_Firmware->Device->configuration.noOfHPMA115S0s > 0) {
+void AFEHardware::initHPMA115S0(void)
+{
+  if (_Firmware->Device->configuration.noOfHPMA115S0s > 0)
+  {
     for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfHPMA115S0s;
-         i++) {
+         i++)
+    {
       HPMA115S0Sensor[i] = new AFESensorHPMA115S0();
       HPMA115S0Sensor[i]->begin(i);
     }
@@ -298,14 +389,72 @@ void AFEHardware::initHPMA115S0(void) {
 }
 #endif
 
-
 #ifdef AFE_CONFIG_HARDWARE_FS3000
-void AFEHardware::initFS3000(void) {
-  if (_Firmware->Device->configuration.noOfFS3000s > 0) {
-    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfFS3000s; i++) {
+void AFEHardware::initFS3000(void)
+{
+  if (_Firmware->Device->configuration.noOfFS3000s > 0)
+  {
+    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfFS3000s; i++)
+    {
       FS3000Sensor[i] = new AFESensorFS3000();
+      #ifdef DEBUG
+       FS3000Sensor[i]->begin(i, _Firmware->API->Flash, _Firmware->Debugger);
+      #else
       FS3000Sensor[i]->begin(i, _Firmware->API->Flash);
+      #endif
     }
   }
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_RAINMETER
+
+boolean AFEHardware::initRainmeter(void)
+{
+  boolean status = false;
+  if (_Firmware->Device->configuration.noOfRainmeterSensors > 0)
+  {
+#ifdef DEBUG
+    status = RainmeterSensor->begin(_Firmware->API->Flash, RainImpulse, _Firmware->Debugger);
+#else
+    status = RainmeterSensor->begin(_Firmware->API->Flash, RainImpulse)
+#endif
+
+    if (status)
+    {
+      pinMode(RainmeterSensor->configuration->gpio, INPUT_PULLUP);
+#ifdef DEBUG
+      _Firmware->Debugger->printInformation(F("Rainmeter sensor configured on GPIO: "), F("RAINMETER"));
+      _Firmware->Debugger->printValue(RainmeterSensor->configuration->gpio);
+#endif
+    }
+  }
+  return status;
+}
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+
+boolean AFEHardware::initAnemometer(void)
+{
+  boolean status = false;
+  if (_Firmware->Device->configuration.noOfAnemometerSensors > 0)
+  {
+#ifdef DEBUG
+    status = AnemometerSensor->begin(_Firmware->API->Flash, WindImpulse, _Firmware->Debugger);
+#else
+    status = AnemometerSensor->begin(_Firmware->API->Flash, WindImpulse)
+#endif
+
+    if (status)
+    {
+      pinMode(AnemometerSensor->configuration->gpio, INPUT_PULLUP);
+#ifdef DEBUG
+      _Firmware->Debugger->printInformation(F("Rainmeter sensor configured on GPIO: "), F("ANENOMETER"));
+      _Firmware->Debugger->printValue(AnemometerSensor->configuration->gpio);
+#endif
+    }
+  }
+  return status;
 }
 #endif

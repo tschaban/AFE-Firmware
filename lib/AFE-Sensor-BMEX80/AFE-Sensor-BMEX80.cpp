@@ -6,15 +6,35 @@
 AFESensorBMEX80::AFESensorBMEX80(){};
 
 #ifdef AFE_ESP32
+#ifdef DEBUG
 void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0,
-                            TwoWire *WirePort1) {
+                            TwoWire *WirePort1, AFEDebugger *Debugger)
+{
+  _Debugger = Debugger;
+  begin(id, WirePort0, WirePort1);
+}
+#endif
+
+void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0,
+                            TwoWire *WirePort1)
+{
   AFEDataAccess Data;
   Data.getConfiguration(id, configuration);
   begin(id, configuration->wirePortId == 0 ? WirePort0 : WirePort1);
 }
+
 #endif // AFE_ESP32
 
-void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
+#ifdef DEBUG
+void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort, AFEDebugger *_Debugger)
+{
+  Debugger = _Debugger;
+  begin(id, WirePort);
+}
+#endif
+
+void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort)
+{
 #ifndef AFE_ESP32
   AFEDataAccess Data;
   Data.getConfiguration(id, configuration);
@@ -23,23 +43,44 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
   _WirePort = WirePort;
 
 #if defined(DEBUG)
-  Serial << endl << endl << F("-------- BMEX80: Initializing --------");
+  Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
+  Debugger->printBulletPoint(F("BMEX80: Initializing"));
 #endif
 
 #ifdef AFE_ESP32
-  if (configuration->wirePortId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+  if (configuration->wirePortId != AFE_HARDWARE_ITEM_NOT_EXIST)
+  {
 #endif
 
-    if (configuration->type == AFE_BME680_SENSOR) {
-      _initialized = s6->begin(configuration, _WirePort, data);
-    } else if (configuration->type == AFE_BME280_SENSOR ||
-               configuration->type == AFE_BMP280_SENSOR) {
-      _initialized = s2->begin(configuration, _WirePort, data);
+    if (configuration->type == AFE_BME680_SENSOR)
+    {
+#ifdef DEBUG
+      _initialized = s6->begin(configuration, _WirePort, Debugger, data);
+#else
+    _initialized = s6->begin(configuration, _WirePort, data);
+#endif
+    }
+    else if (configuration->type == AFE_BME280_SENSOR ||
+             configuration->type == AFE_BMP280_SENSOR)
+    {
+#ifdef DEBUG
+      _initialized = s2->begin(configuration, _WirePort, Debugger, data);
+#else
+    _initialized = s2->begin(configuration, _WirePort, data);
+#endif
 #ifndef AFE_ESP32
-    } else if (configuration->type == AFE_BMP180_SENSOR) {
+    }
+    else if (configuration->type == AFE_BMP180_SENSOR)
+    {
+#ifdef DEBUG
+      _initialized = s1->begin(configuration, _WirePort, Debugger, data);
+#else
       _initialized = s1->begin(configuration, _WirePort, data);
+#endif
 #endif // AFE_ESP32
-    } else {
+    }
+    else
+    {
       _initialized = false;
     }
 
@@ -48,48 +89,57 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort) {
 #endif
 
 #ifdef DEBUG
-  Serial << endl
-         << F(" : ")
-         << (_initialized ? F("Found") : F("NOT found: check wiring"));
-  Serial << endl << F("--------------------------------------") << endl;
+  Debugger->printBulletPoint(F("Sensor: "));
+  Debugger->printValue(_initialized ? F("Found") : F("NOT found: check wiring"));
+  Debugger->printHeader(1, 2, 30, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
 
-boolean AFESensorBMEX80::isReady() {
-  if (ready) {
+boolean AFESensorBMEX80::isReady()
+{
+  if (ready)
+  {
     ready = false;
     return true;
-  } else {
+  }
+  else
+  {
     return false;
   }
 }
 
-void AFESensorBMEX80::listener() {
-  if (_initialized) {
+void AFESensorBMEX80::listener()
+{
+  if (_initialized)
+  {
     unsigned long time = millis();
     boolean readStatus = false;
 
-    if (startTime == 0) { // starting timer. used for switch sensitiveness
+    if (startTime == 0)
+    { // starting timer. used for switch sensitiveness
       startTime = time;
     }
-    if (time - startTime >= configuration->interval * 1000) {
+    if (time - startTime >= configuration->interval * 1000)
+    {
 
 #if defined(DEBUG)
-      Serial << endl
-             << endl
-             << F("--------") << F(" Reading sensor data ") << F("--------");
+      Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
+      Debugger->printBulletPoint(F("BMEX80: Reading"));
 #endif
-      if (configuration->type == AFE_BME680_SENSOR) {
+      if (configuration->type == AFE_BME680_SENSOR)
+      {
         /**
          * @brief Reading Bosch BME680 Sensor
          *
          */
         readStatus = s6->read();
-      } else if (configuration->type != AFE_BME680_SENSOR) {
-/**
- * @brief Reading Bosch BME280/BMP280 or BMP180 (for ESP82xx only) Sensor
- *
- */
+      }
+      else if (configuration->type != AFE_BME680_SENSOR)
+      {
+        /**
+         * @brief Reading Bosch BME280/BMP280 or BMP180 (for ESP82xx only) Sensor
+         *
+         */
 
 #ifdef AFE_ESP32
         readStatus = s2->read();
@@ -100,7 +150,8 @@ void AFESensorBMEX80::listener() {
                 : s1->read();
 #endif // ESP32/ESP8266
       }
-      if (readStatus) {
+      if (readStatus)
+      {
         /*&
                 if (configuration->type == AFE_BME680_SENSOR) {
                   data = s6->data;
@@ -119,46 +170,64 @@ void AFESensorBMEX80::listener() {
         ready = true;
 
 #ifdef DEBUG
-        Serial << endl
-               << F(" - Temperature = ") << data->temperature.value << endl
-               << F(" - Pressure = ") << data->pressure.value
-               << F(", Relative = ") << data->relativePressure.value;
-        if (configuration->type != AFE_BMP180_SENSOR &&
-            configuration->type != AFE_BMP280_SENSOR) {
-          Serial << endl << F(" - Humidity = ") << data->humidity.value;
-          Serial << endl << F(" - Dew Point = ") << data->dewPoint.value;
-        }
-        if (configuration->type == AFE_BME680_SENSOR) {
-          Serial << endl
-                 << F(" - Gas Resistance = ") << data->gasResistance.value;
-          Serial << endl << F(" - IAQ = ") << data->iaq.value;
-          Serial << endl << F(" - IAQ Accuracy = ") << data->iaq.accuracy;
-          Serial << endl << F(" - Static IAQ = ") << data->staticIaq.value;
-          Serial << endl
-                 << F(" - Static IAQ Accuracy = ") << data->staticIaq.accuracy;
-          Serial << endl
-                 << F(" - Breath VOC = ") << data->breathVocEquivalent.value;
-          Serial << endl
-                 << F(" - Breath VOC Accuracy = ")
-                 << data->breathVocEquivalent.accuracy;
-          Serial << endl << F(" - CO2 = ") << data->co2Equivalent.value;
-          Serial << endl
-                 << F(" - CO2 Accuracy = ") << data->co2Equivalent.accuracy;
-        }
+        Debugger->printBulletPoint(F("Temperature: "));
+        Debugger->printValue(data->temperature.value);
+        Debugger->printBulletPoint(F("Pressure (abs): "));
+        Debugger->printValue(data->pressure.value);
+        Debugger->printBulletPoint(F("Pressure (rel): "));
+        Debugger->printValue(data->relativePressure.value);
 
-      } else {
-        Serial << endl << F("WARN: No data found");
+        if (configuration->type != AFE_BMP180_SENSOR &&
+            configuration->type != AFE_BMP280_SENSOR)
+        {
+          Debugger->printBulletPoint(F("Humidity: "));
+          Debugger->printValue(data->humidity.value);
+          Debugger->printBulletPoint(F("Dew Point: "));
+          Debugger->printValue(data->dewPoint.value);
+        }
+        if (configuration->type == AFE_BME680_SENSOR)
+        {
+
+          Debugger->printBulletPoint(F("Gas Resistance: "));
+          Debugger->printValue(data->gasResistance.value);
+
+          Debugger->printBulletPoint(F("IAQ: "));
+          Debugger->printValue(data->iaq.value);
+          Debugger->printBulletPoint(F("IAQ Accuracy: "));
+          Debugger->printValue(data->iaq.accuracy);
+
+          Debugger->printBulletPoint(F("Static IAQ: "));
+          Debugger->printValue(data->staticIaq.value);
+          Debugger->printBulletPoint(F("Static IAQ Accuracy: "));
+          Debugger->printValue(data->staticIaq.accuracy);
+
+          Debugger->printBulletPoint(F("BVOC: "));
+          Debugger->printValue(data->breathVocEquivalent.value);
+          Debugger->printBulletPoint(F("BVOC Accuracy: "));
+          Debugger->printValue(data->breathVocEquivalent.accuracy);
+
+          Debugger->printBulletPoint(F("CO2: "));
+          Debugger->printValue(data->co2Equivalent.value);
+          Debugger->printBulletPoint(F("CO2 Accuracy: "));
+          Debugger->printValue(data->co2Equivalent.accuracy);
+        }
+      }
+      else
+      {
+        Debugger->printBulletPoint(F("Warning: No data"));
+
 #endif // DEBUG
       }
       startTime = 0;
 #ifdef DEBUG
-      Serial << endl << F("------------------------------------") << endl;
+      Debugger->printHeader(1, 2, 30, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
     }
   }
 }
 
-void AFESensorBMEX80::getJSON(char *json) {
+void AFESensorBMEX80::getJSON(char *json)
+{
 
   StaticJsonBuffer<AFE_CONFIG_API_JSON_BMEX80_DATA_REAL_LENGTH> jsonBuffer;
   JsonObject &root = jsonBuffer.createObject();
@@ -187,7 +256,8 @@ void AFESensorBMEX80::getJSON(char *json) {
    *
    */
   if (configuration->type != AFE_BMP180_SENSOR &&
-      configuration->type != AFE_BMP280_SENSOR) {
+      configuration->type != AFE_BMP280_SENSOR)
+  {
     char _perception[90]; // Max size of dewPointPerception from lang.pack
     strcpy_P(_perception,
              (char *)pgm_read_dword(&(dewPointPerception[perception(
@@ -238,7 +308,8 @@ void AFESensorBMEX80::getJSON(char *json) {
   }
 
   /* Only for BME680 Sensor */
-  if (configuration->type == AFE_BME680_SENSOR) {
+  if (configuration->type == AFE_BME680_SENSOR)
+  {
     JsonObject &iaq = root.createNestedObject("iaq");
     JsonObject &staticIaq = root.createNestedObject("staticIaq");
     JsonObject &co2Equivalent = root.createNestedObject("co2Equivalent");
@@ -267,8 +338,8 @@ void AFESensorBMEX80::getJSON(char *json) {
     co2Equivalent["accuracy"] = data->co2Equivalent.accuracy;
 
     //{"temperature":{"value":20.76112,"unit":"C","correction":0},"pressure":{"value":1004.08,"unit":"hPa","correction":0},"relativePressure":{"value":1012.219,"unit":"hPa"},"dewPoint":{"value":12.63424,"unit":"C"},"humidity":{"value":59.61296,"unit":"%H","correction":0,"rating":1},"absoluteHumidity":{"value":10.76806,"unit":"%H"},"heatIndex":{"value":20.44935,"unit":"C"},"perception":{"value":1,"description":"Bardzo
-    //komfortowo"},"comfort":{"value":2,"ratio":99.31985,"unit":"%","description":"Za
-    //zimno"},"iaq":{"value":25,"rating":1,"accuracy":0},"staticIaq":{},"co2Equivalent":{},"breathVocEquivalent":{"value":0.5,"unit":"?","accuracy":0},"gasResistance":{"value":42.212,"unit":"kOm"}}
+    // komfortowo"},"comfort":{"value":2,"ratio":99.31985,"unit":"%","description":"Za
+    // zimno"},"iaq":{"value":25,"rating":1,"accuracy":0},"staticIaq":{},"co2Equivalent":{},"breathVocEquivalent":{"value":0.5,"unit":"?","accuracy":0},"gasResistance":{"value":42.212,"unit":"kOm"}}
   }
   /**
    * @brief There is a conversion to the real JSON string size. Workaround as
@@ -280,23 +351,28 @@ void AFESensorBMEX80::getJSON(char *json) {
   root.printTo(json, AFE_CONFIG_API_JSON_BMEX80_DATA_REAL_LENGTH);
 }
 
-void AFESensorBMEX80::applyCorrections() {
+void AFESensorBMEX80::applyCorrections()
+{
 #ifdef DEBUG
-  Serial << endl << F("INFO: Applying correction to values");
+  Debugger->printBulletPoint(F("Applying correction to values"));
 #endif
 
-  if (configuration->temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT) {
+  if (configuration->temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT)
+  {
     data->temperature.value = celsiusToFerenheit(data->temperature.value);
   }
 
-  if (configuration->temperature.correction != 0) {
+  if (configuration->temperature.correction != 0)
+  {
     data->temperature.value += configuration->temperature.correction;
   }
 
   if (configuration->type != AFE_BMP180_SENSOR &&
-      configuration->type != AFE_BMP280_SENSOR) {
+      configuration->type != AFE_BMP280_SENSOR)
+  {
 
-    if (configuration->humidity.correction != 0) {
+    if (configuration->humidity.correction != 0)
+    {
       data->humidity.value += configuration->humidity.correction;
     }
 
@@ -319,14 +395,16 @@ void AFESensorBMEX80::applyCorrections() {
 #endif
   }
 
-  if (configuration->pressure.correction != 0) {
+  if (configuration->pressure.correction != 0)
+  {
     data->pressure.value += configuration->pressure.correction;
   }
   data->relativePressure.value = relativePressure(
       data->pressure.value, configuration->altitude, data->temperature.value);
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-  if (configuration->type == AFE_BME680_SENSOR) {
+  if (configuration->type == AFE_BME680_SENSOR)
+  {
     data->iaq.rating = iaqRating(data->iaq.value);
     data->staticIaq.rating = iaqRating(data->staticIaq.value);
     data->co2Equivalent.rating = co2Rating(data->co2Equivalent.value);

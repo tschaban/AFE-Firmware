@@ -14,10 +14,11 @@
 #include <Wire.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFESensorBH1750 {
+class AFESensorBH1750
+{
 
 private:
   BH1750 *bh1750 = new BH1750();
@@ -28,9 +29,24 @@ private:
   unsigned long startTime = 0;
 
   TwoWire *_WirePort0;
+
 #ifdef AFE_ESP32
   TwoWire *_WirePort1;
   void begin(uint8_t id, TwoWire *WirePort0);
+#endif
+
+#ifdef DEBUG
+#ifdef AFE_ESP32
+  void begin(uint8_t _id, TwoWire *WirePort0, TwoWire *WirePort1);
+#else
+  void begin(uint8_t _id, TwoWire *WirePort0);
+#endif
+#endif
+
+
+
+#ifdef DEBUG
+  AFEDebugger *_Debugger;
 #endif
 
 public:
@@ -40,11 +56,20 @@ public:
   /* Constructor */
   AFESensorBH1750();
 
+
 /* Turns On sensor */
+#ifdef DEBUG
+#ifdef AFE_ESP32
+  void begin(uint8_t _id, TwoWire *WirePort0, TwoWire *WirePort1, AFEDebugger *Debugger);
+#else
+  void begin(uint8_t _id, TwoWire *WirePort0, AFEDebugger *Debugger);
+#endif
+#else
 #ifdef AFE_ESP32
   void begin(uint8_t _id, TwoWire *WirePort0, TwoWire *WirePort1);
 #else
   void begin(uint8_t _id, TwoWire *WirePort0);
+#endif
 #endif
 
   /* Is true when data has been read from the sensor */

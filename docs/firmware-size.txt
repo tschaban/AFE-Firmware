@@ -7,87 +7,48 @@ RAM:   [=====     ]  49.1% (used 40232 bytes from 81920 bytes)
 Flash: [=====     ]  52.3% (used 546372 bytes from 1044464 bytes)
  
 
-T0 - ESP8266, 4MB, Dev
-RAM:   [====      ]  42.1% (used 34492 bytes from 81920 bytes)
-Flash: [====      ]  43.2% (used 451396 bytes from 1044464 bytes)
+T6 ESP8266, Bez TLS i Hone
 
-RAM:   [====      ]  42.1% (used 34492 bytes from 81920 bytes)
-Flash: [====      ]  43.2% (used 451432 bytes from 1044464 bytes)
+T6 Full
+RAM:   [======    ]  55.7% (used 45624 bytes from 81920 bytes)
+Flash: [======    ]  59.4% (used 620369 bytes from 1044464 bytes)
 
-RAM:   [====      ]  42.1% (used 34492 bytes from 81920 bytes)
-Flash: [====      ]  43.2% (used 451448 bytes from 1044464 bytes)
+added DS18B20
+RAM:   [======    ]  55.7% (used 45624 bytes from 81920 bytes)
+Flash: [======    ]  59.4% (used 620337 bytes from 1044464 bytes)
 
-RAM:   [====      ]  41.8% (used 34244 bytes from 81920 bytes)
-Flash: [====      ]  43.2% (used 450800 bytes from 1044464 bytes)
+added DHT
+RAM:   [======    ]  55.7% (used 45624 bytes from 81920 bytes)
+Flash: [======    ]  59.4% (used 620277 bytes from 1044464 bytes)
 
-T0 Prod
+added all Bosch sensors
+RAM:   [=====     ]  55.0% (used 45036 bytes from 81920 bytes)
+Flash: [======    ]  58.2% (used 608101 bytes from 1044464 bytes)
 
-RAM:   [====      ]  41.8% (used 34236 bytes from 81920 bytes)    
-Flash: [====      ]  39.4% (used 411480 bytes from 1044464 bytes) 
+added Rainmeter
+RAM:   [======    ]  55.2% (used 45212 bytes from 81920 bytes)
+Flash: [======    ]  58.2% (used 608217 bytes from 1044464 bytes)
 
-TEMP
-RAM:   [=====     ]  52.8% (used 43268 bytes from 81920 bytes)
-Flash: [======    ]  55.6% (used 580661 bytes from 1044464 bytes)
+added Anemometer
+RAM:   [======    ]  55.3% (used 45304 bytes from 81920 bytes)
+Flash: [======    ]  58.2% (used 608201 bytes from 1044464 bytes)
 
-RAM:   [=====     ]  52.8% (used 43268 bytes from 81920 bytes)
-Flash: [======    ]  55.6% (used 580897 bytes from 1044464 bytes)
+added full TLS
+RAM:   [======    ]  55.7% (used 45608 bytes from 81920 bytes)
+Flash: [======    ]  58.9% (used 614809 bytes from 1044464 bytes)
 
-RAM:   [=====     ]  52.8% (used 43280 bytes from 81920 bytes)
-Flash: [======    ]  55.6% (used 580981 bytes from 1044464 bytes)
+RAM:   [======    ]  56.1% (used 45944 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614577 bytes from 1044464 bytes)
 
-RAM:   [=====     ]  52.8% (used 43268 bytes from 81920 bytes)
-Flash: [======    ]  55.6% (used 580985 bytes from 1044464 bytes)
+RAM:   [======    ]  55.3% (used 45340 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614453 bytes from 1044464 bytes)
 
-Po zrobieniu AFEDataAccess
-RAM:   [=====     ]  52.8% (used 43236 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578501 bytes from 1044464 bytes)
+RAM:   [======    ]  55.2% (used 45244 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614457 bytes from 1044464 bytes)
 
-Po dodaniu funkcji do Debug i refaktorinug main.cpp
-RAM:   [=====     ]  52.8% (used 43236 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578581 bytes from 1044464 bytes)
+RAM:   [=====     ]  54.9% (used 45004 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614457 bytes from 1044464 bytes)
 
-Po dodanie Debugger do WebServer
-RAM:   [=====     ]  52.8% (used 43264 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578397 bytes from 1044464 bytes)
-
-Po dodaniu Debugger do I2C class
-RAM:   [=====     ]  52.8% (used 43252 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578293 bytes from 1044464 bytes)
-
-Po dodaniu Debugger do Event
-RAM:   [=====     ]  52.8% (used 43252 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578229 bytes from 1044464 bytes)
-
-Po dodaniu Site i linku to panelu
-RAM:   [=====     ]  52.8% (used 43252 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578385 bytes from 1044464 bytes)
-
-Debugger dodany do ASYNC-MQTT
-RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578369 bytes from 1044464 bytes)
-
-Debugger dodany do Standard-MQTT
-RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578289 bytes from 1044464 bytes)
-
-Debugger dodany do Standard-HTTP-API
-RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578273 bytes from 1044464 bytes)
-
-Debugger dodany do HA-API
-RAM:   [=====     ]  52.8% (used 43232 bytes from 81920 bytes)
-Flash: [======    ]  55.4% (used 578197 bytes from 1044464 bytes)
-
-After adding NETWORK saving from template as char
-RAM:   [=====     ]  53.3% (used 43688 bytes from 81920 bytes)
-Flash: [======    ]  55.2% (used 576972 bytes from 1044464 bytes)
-
-After adding NETWORK saving from template as char
-RAM:   [=====     ]  52.8% (used 43288 bytes from 81920 bytes)
-Flash: [======    ]  55.2% (used 576980 bytes from 1044464 bytes)
-
-RAM:   [=====     ]  52.6% (used 43080 bytes from 81920 bytes)
-Flash: [======    ]  55.2% (used 576912 bytes from 1044464 bytes)
-
-RAM:   [=====     ]  52.5% (used 43016 bytes from 81920 bytes)
-Flash: [======    ]  55.3% (used 577112 bytes from 1044464 bytes)
+added FS3000
+RAM:   [=====     ]  54.8% (used 44876 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614345 bytes from 1044464 bytes)

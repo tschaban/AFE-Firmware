@@ -5,20 +5,26 @@
 
 AFESensorBME680::AFESensorBME680(){};
 
+#ifdef DEBUG
+boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, AFEDebugger *_Debugger, BMEX80_DATA *_data)
+{
+  Debugger = _Debugger;
+  return begin(_configuration, WirePort, Debugger, _data);
+}
+#endif
+
 boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, BMEX80_DATA *_data)
 {
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Initializing: Sensor type: BME680");
+  Debugger->printBulletPoint(F("Type: BME680"));
 #endif
 
   data = _data;
 
   EEPROM.begin(BSEC_MAX_STATE_BLOB_SIZE + 1); // 1st address for the length
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: EEPROM initialized: Size reserved: ")
-         << BSEC_MAX_STATE_BLOB_SIZE + 1;
+  Debugger->printBulletPoint(F("EEPROM initialized: Size reserved: "));
+  Debugger->printValue((uint8_t)(BSEC_MAX_STATE_BLOB_SIZE + 1));
 #endif
 
   configuration = _configuration;
@@ -26,21 +32,19 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, BMEX80
   {
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Sensor address: 0x") << _HEX(configuration->i2cAddress);
+    Debugger->printValue((uint8_t)(BSEC_MAX_STATE_BLOB_SIZE + 1));
+    Serial << _HEX(configuration->i2cAddress);
 #endif
     Bme->begin(configuration->i2cAddress, *WirePort);
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Bosch BSEC library version ") << Bme->version.major
+    Debugger->printBulletPoint(F("Bosch BSEC library version: "));
+    Serial << Bme->version.major
            << F(".") << Bme->version.minor << F(".")
            << Bme->version.major_bugfix << F(".") << Bme->version.minor_bugfix;
 
     checkBmeStatus();
-    Serial << endl
-           << F("INFO: Bosch: Setting config");
-
+    Debugger->printBulletPoint(F("Sensor: configuring"));
 #endif
 
     Bme->setConfig(bsec_config_iaq);
@@ -50,9 +54,8 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, BMEX80
 
     loadState();
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Bosch: Stated loaded from the EEPROM") << endl
-           << F("INFO: Bosch: Updating subscription");
+    Debugger->printBulletPoint(F("Stated loaded from the EEPROM"));
+    Debugger->printBulletPoint(F("SUpdating subscription"));
 #endif
 
     bsec_virtual_sensor_t sensorList[10] = {
@@ -80,37 +83,38 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, BMEX80
 boolean AFESensorBME680::read()
 {
   boolean _ret = false;
+
+#ifdef DEBUG
+      Debugger->printBulletPoint(F("Sensor: BME680"));
+#endif
+
+
   if (Bme->run())
   {
     sensorOutputs = Bme->getOutputs();
 
     if (sensorOutputs != nullptr)
     {
+
       for (uint8_t i = 0; i < sensorOutputs->nOutputs; i++)
       {
         const bsecData output = sensorOutputs->output[i];
         switch (output.sensor_id)
         {
         case BSEC_OUTPUT_IAQ:
-          Serial.println("\tiaq = " + String(output.signal));
-          Serial.println("\tiaq accuracy = " + String((int)output.accuracy));
           data->iaq.value = output.signal;
           data->iaq.accuracy = output.accuracy;
           break;
         case BSEC_OUTPUT_RAW_TEMPERATURE:
-          Serial.println("\ttemperature = " + String(output.signal));
           data->temperature.value = output.signal;
           break;
         case BSEC_OUTPUT_RAW_PRESSURE:
-          Serial.println("\tpressure = " + String(output.signal));
           data->pressure.value = output.signal;
           break;
         case BSEC_OUTPUT_RAW_HUMIDITY:
-          Serial.println("\thumidity = " + String(output.signal));
           data->humidity.value = output.signal;
           break;
         case BSEC_OUTPUT_RAW_GAS:
-          Serial.println("\tgas resistance = " + String(output.signal));
           data->gasResistance.value = output.signal;
           break;
         case BSEC_OUTPUT_STATIC_IAQ:
@@ -127,10 +131,10 @@ boolean AFESensorBME680::read()
           break;
 
         case BSEC_OUTPUT_STABILIZATION_STATUS:
-          Serial.println("\tstabilization status = " + String(output.signal));
+          // Serial.println("\tstabilization status = " + String(output.signal));
           break;
         case BSEC_OUTPUT_RUN_IN_STATUS:
-          Serial.println("\trun in status = " + String(output.signal));
+          // Serial.println("\trun in status = " + String(output.signal));
           break;
         default:
           break;
@@ -171,19 +175,19 @@ void AFESensorBME680::checkBmeStatus()
   {
     if (Bme->status < BSEC_OK)
     {
-      Serial << endl
-             << F("ERROR: Bosch: BSEC error code : ") << Bme->status;
+
+      Debugger->printBulletPoint(F("ERROR: BSEC error code: "));
+      Serial << Bme->status;
     }
     else
     {
-      Serial << endl
-             << F("WARN: Bosch: BSEC warning code : ") << Bme->status;
+      Debugger->printBulletPoint(F("WARN: BSEC warning code: "));
+      Serial << Bme->status;
     }
   }
   else
   {
-    Serial << endl
-           << F("INFO: Bosch: Health: OK");
+    Debugger->printBulletPoint(F("Sensor status: OK"));
   }
 
   /* @TODO T6
@@ -208,8 +212,7 @@ void AFESensorBME680::loadState(void)
   if (EEPROM.read(0) == BSEC_MAX_STATE_BLOB_SIZE)
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Bosch: Reading state from EEPROM: ");
+    Debugger->printBulletPoint(F("Reading state from EEPROM: "));
 #endif
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++)
     {
@@ -226,8 +229,7 @@ void AFESensorBME680::loadState(void)
   else
   {
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Bosch: Erasing EEPROM");
+    Debugger->printBulletPoint(F("Erasing EEPROM"));
 #endif
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE + 1; i++)
       EEPROM.write(i, 0);
@@ -266,8 +268,7 @@ void AFESensorBME680::updateState(void)
     Bme->getState(bsecState);
 #ifdef DEBUG
     checkBmeStatus();
-    Serial << endl
-           << F("INFO: Bosch: Writing state to EEPROM: ");
+    Debugger->printBulletPoint(F("Writing state to EEPROM: "));
 #endif
 
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++)

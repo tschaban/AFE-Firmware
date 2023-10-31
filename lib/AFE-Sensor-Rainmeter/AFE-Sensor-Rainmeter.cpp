@@ -6,7 +6,16 @@
 
 AFERainmeter::AFERainmeter(){};
 
-boolean AFERainmeter::begin(AFEDataAccess *Data, AFEImpulseCatcher *Sensor) {
+#ifdef DEBUG
+boolean AFERainmeter::begin(AFEDataAccess *Data, AFEImpulseCatcher *Sensor, AFEDebugger *_Debugger)
+{
+  Debugger = _Debugger;
+  return begin(Data, Sensor);
+}
+#endif
+
+boolean AFERainmeter::begin(AFEDataAccess *Data, AFEImpulseCatcher *Sensor)
+{
   _Data = Data;
   _Sensor = Sensor;
   Data->getConfiguration(configuration);
@@ -15,11 +24,15 @@ boolean AFERainmeter::begin(AFEDataAccess *Data, AFEImpulseCatcher *Sensor) {
 
   _Sensor->begin(configuration->sensitiveness);
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Rain sensor initialized and working") << endl
-         << F(" - GPIO: ") << configuration->gpio << endl
-         << F(" - Interval: ") << configuration->interval << endl
-         << F(" - Boucing: ") << configuration->sensitiveness;
+  Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
+  Debugger->printBulletPoint(F("Initializing Rain Sensor"));
+  Debugger->printBulletPoint(F("GPIO: "));
+  Debugger->printValue(configuration->gpio);
+  Debugger->printBulletPoint(F("Interval: "));
+  Serial << configuration->interval;
+  Debugger->printBulletPoint(F("Boucing: "));
+  Debugger->printValue(configuration->sensitiveness);
+  Debugger->printHeader(1, 2, 30, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 
   RAINMETER_DATA *_previous = new RAINMETER_DATA;
@@ -31,7 +44,8 @@ boolean AFERainmeter::begin(AFEDataAccess *Data, AFEImpulseCatcher *Sensor) {
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   current->counter = _previous->counter;
 #else
-  for (uint8_t i = 0; i < 12; i++) {
+  for (uint8_t i = 0; i < 12; i++)
+  {
     current->last12h[i] = _previous->last12h[i];
   }
   current->last24h[0] = _previous->last24h[0];
@@ -46,12 +60,15 @@ boolean AFERainmeter::begin(AFEDataAccess *Data, AFEImpulseCatcher *Sensor) {
   return _initialized;
 }
 
-boolean AFERainmeter::listener(void) {
+boolean AFERainmeter::listener(void)
+{
   boolean _ret = false;
-  if (_initialized) {
+  if (_initialized)
+  {
 
     // Calculate every 60sec
-    if ((millis() - start60Sec >= 60000)) {
+    if ((millis() - start60Sec >= 60000))
+    {
 
       uint32_t noOfImpulses;
       uint32_t duration;
@@ -67,7 +84,8 @@ boolean AFERainmeter::listener(void) {
 
       /* Recalculating the water level during the last hour */
       rainLevelLastHour = 0;
-      for (uint8_t i = 0; i <= current->index1h; i++) {
+      for (uint8_t i = 0; i <= current->index1h; i++)
+      {
         rainLevelLastHour = rainLevelLastHour + current->last1h[i];
       }
 
@@ -78,7 +96,8 @@ boolean AFERainmeter::listener(void) {
       /* Recalculating the water level during the last 12 hours */
       rainLevelLast12Hours = 0;
 
-      for (uint8_t i = 0; i <= current->index12h; i++) {
+      for (uint8_t i = 0; i <= current->index12h; i++)
+      {
         rainLevelLast12Hours = rainLevelLast12Hours + current->last12h[i];
       }
 
@@ -86,9 +105,11 @@ boolean AFERainmeter::listener(void) {
 
       rainLevelLast24Hours = current->last24h[0] + current->last24h[1];
 
-      if (current->index1h >= 59) {
+      if (current->index1h >= 59)
+      {
 
-        if (current->index12h >= 11) {
+        if (current->index12h >= 11)
+        {
           current->index24h = current->index24h == 0 ? 1 : 0;
         }
 
@@ -101,25 +122,33 @@ boolean AFERainmeter::listener(void) {
       current->index1h = current->index1h >= 59 ? 0 : current->index1h + 1;
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: Reading rain sensor data:") << endl
-             << F(" - last 1min: ") << rainLevelLast1Minute << F(" mm/min")
-             << endl
-             << F(" - last hour: ") << rainLevelLastHour << F(" mm/hour")
-             << endl
+
+      Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
+      Debugger->printBulletPoint(F("Reading rain sensor data"));
+      Debugger->printBulletPoint(F("Last 1 min: "));
+      Debugger->printValue(rainLevelLast1Minute, F("mm/min"));
+      Debugger->printBulletPoint(F("Last hour: "));
+      Debugger->printValue(rainLevelLastHour, F("mm/hour"));
+
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
-             << F(" - last 12 hours: ") << rainLevelLast12Hours
-             << F(" mm/12-hours") << endl
-             << F(" - last 24 hours: ") << rainLevelLast24Hours
-             << F(" mm/24-hours") << endl
+      Debugger->printBulletPoint(F("Last 12 hrs: "));
+      Debugger->printValue(rainLevelLast12Hours, F("mm/12hrs"));
+      Debugger->printBulletPoint(F("Last 24 hrs: "));
+      Debugger->printValue(rainLevelLast24Hours, F("mm/24hrs"));
 #endif
-             << F(" - INDEX: ") << endl
-             << F("  : Hour Index= ") << current->index1h << endl
+      Debugger->printBulletPoint(F("Last 12 hrs: "));
+      Debugger->printValue(rainLevelLast12Hours, F("mm/12hrs"));
+      Debugger->printBulletPoint(F("Last 24 hrs: "));
+      Debugger->printValue(rainLevelLast24Hours, F("mm/24hrs"));
+      Debugger->printBulletPoint(F("Index: Hour: "));
+      Debugger->printValue(current->index1h);
 #if AFE_FIRMWARE_API != AFE_FIRMWARE_API_DOMOTICZ
-             << F("  : 12 Hours Index = ") << current->index12h << endl
-             << F("  : 24 Hours index = ") << current->index24h
+      Debugger->printBulletPoint(F("Index: 12 hrs: "));
+      Debugger->printValue(current->index12h);
+      Debugger->printBulletPoint(F("Index: 24 hrs: "));
+      Debugger->printValue(current->index24h);
 #endif
-             << endl;
+      Debugger->printHeader(1, 2, 30, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 
       start60Sec = millis();
@@ -127,7 +156,8 @@ boolean AFERainmeter::listener(void) {
   }
 
   /* Counter for calculating the data */
-  if ((millis() - startTime >= configuration->interval * 1000)) {
+  if ((millis() - startTime >= configuration->interval * 1000))
+  {
     startTime = millis();
     _Data->save(current);
     _ret = true;
@@ -136,16 +166,17 @@ boolean AFERainmeter::listener(void) {
   return _ret;
 }
 
-void AFERainmeter::getJSON(char *json) {
+void AFERainmeter::getJSON(char *json)
+{
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
+  sprintf(json, (const char *)F("{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"mm/"
                 "min\"},{\"value\":%.3f,\"unit\":\"mm/"
-                "h\"}]}",
+                "h\"}]}"),
           rainLevelLast1Minute, rainLevelLastHour);
 #else
-  sprintf(json, "{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"%s\"},{\"value\":%."
+  sprintf(json, (const char *)F("{\"rainmeter\":[{\"value\":%.3f,\"unit\":\"%s\"},{\"value\":%."
                 "3f,\"unit\":\"%s\"},{\"value\":%.3f,\"unit\":\"%s\"},{"
-                "\"value\":%.3f,\"unit\":\"%s\"}]}",
+                "\"value\":%.3f,\"unit\":\"%s\"}]}"),
           rainLevelLast1Minute, AFE_UNIT_MMM, rainLevelLastHour, AFE_UNIT_MMH,
           rainLevelLast12Hours, AFE_UNIT_MM12H, rainLevelLast24Hours,
           AFE_UNIT_MM24H);

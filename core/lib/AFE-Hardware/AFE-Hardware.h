@@ -62,7 +62,7 @@
 #include <AFE-Sensor-HPMA115S0.h>
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) ||                                 \
+#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) || \
     defined(AFE_CONFIG_HARDWARE_RAINMETER)
 #include <AFE-Impulse-Catcher.h>
 #endif
@@ -83,7 +83,8 @@
 #include <Streaming.h>
 #endif
 
-class AFEHardware {
+class AFEHardware
+{
 
 private:
   AFEFirmware *_Firmware;
@@ -204,11 +205,13 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   AFEImpulseCatcher *WindImpulse = new AFEImpulseCatcher();
   AFEAnemometer *AnemometerSensor = new AFEAnemometer();
+  boolean initAnemometer(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   AFEImpulseCatcher *RainImpulse = new AFEImpulseCatcher();
   AFERainmeter *RainmeterSensor = new AFERainmeter();
+  boolean initRainmeter(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_FS3000

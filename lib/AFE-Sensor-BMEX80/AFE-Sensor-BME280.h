@@ -13,24 +13,33 @@
 #include <Wire.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFESensorBME280 {
+class AFESensorBME280
+{
 
 private:
   Adafruit_BME280 *bme = new Adafruit_BME280();
   BMEX80_DATA *data = new BMEX80_DATA;
-  
+
+#ifdef DEBUG
+  AFEDebugger *Debugger;
+  boolean begin(BMEX80 *_configuration, TwoWire *_wirePort, BMEX80_DATA *_data);
+#endif
+
 public:
   BMEX80 *configuration = new BMEX80;
-  
-  
+
   /* Constructor: entry parameter is GPIO number where Sensor is connected to */
   AFESensorBME280();
-  boolean begin(BMEX80 *_configuration, TwoWire *_wirePort, BMEX80_DATA *_data);
-  boolean read();
 
+#ifdef DEBUG
+  boolean begin(BMEX80 *_configuration, TwoWire *_wirePort, AFEDebugger *_Debugger, BMEX80_DATA *_data);
+#else
+  boolean begin(BMEX80 *_configuration, TwoWire *_wirePort, BMEX80_DATA *_data);
+  #endif
+  boolean read();
 };
 
 #endif // AFE_CONFIG_HARDWARE_BMEX80

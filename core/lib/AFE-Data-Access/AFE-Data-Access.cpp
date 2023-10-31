@@ -6525,7 +6525,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
   sprintf(fileName, (const char*)F(AFE_FILE_TSL2561_CONFIGURATION), id);
   
 #ifdef DEBUG
-  printFileOpeningInformation(F(), id);
+  printFileOpeningInformation(F(AFE_FILE_TSL2561_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6590,7 +6590,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
   } else {
     _ret = false;
 #ifdef DEBUG
-    printFileOpeningError(F(AFE_CONFIG_FILE_BUFFER_TSL2561), id);
+    printFileOpeningError(F(AFE_FILE_TSL2561_CONFIGURATION), id);
 #endif
   }
 
@@ -6603,7 +6603,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
   
 
 #ifdef DEBUG
-  printFileOpeningInformation(F(AFE_CONFIG_FILE_BUFFER_TSL2561), id);
+  printFileOpeningInformation(F(AFE_FILE_TSL2561_CONFIGURATION), id);
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6654,7 +6654,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
   }
 #ifdef DEBUG
   else {
-    printFileOpeningError(F(AFE_CONFIG_FILE_BUFFER_TSL2561), id);
+    printFileOpeningError(F(AFE_FILE_TSL2561_CONFIGURATION), id);
   }
 #endif
 }
@@ -6681,7 +6681,7 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561; i++) {
 #ifdef DEBUG
-    printFileCreatingInformation(F(AFE_CONFIG_FILE_BUFFER_TSL2561), i);
+    printFileCreatingInformation(F(AFE_FILE_TSL2561_CONFIGURATION), i);
 #endif
 
     sprintf(configuration.name, "TSL2561-%d", (i + 1));

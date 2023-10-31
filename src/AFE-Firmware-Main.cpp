@@ -111,12 +111,15 @@ void setup() {
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-    initializeAnemometer();
+    attacheInteruptToAnenoMeter();
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
+
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-    initializeRainmeter();
+    attacheInteruptToRainMeter();
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
+
+
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     initializePN532Sensor();

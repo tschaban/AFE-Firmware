@@ -5,19 +5,32 @@
 
 AFESensorBME280::AFESensorBME280(){};
 
-boolean AFESensorBME280::begin(BMEX80 *_configuration, TwoWire *_wirePort, BMEX80_DATA *_data) {
+#ifdef DEBUG
+boolean AFESensorBME280::begin(BMEX80 *_configuration, TwoWire *_wirePort, AFEDebugger *_Debugger, BMEX80_DATA *_data)
+{
+  Debugger = _Debugger;
+  return begin(_configuration, _wirePort, _data);
+}
+#endif
+
+boolean AFESensorBME280::begin(BMEX80 *_configuration, TwoWire *_wirePort, BMEX80_DATA *_data)
+{
   configuration = _configuration;
   data = _data;
 
-
-  if (configuration->i2cAddress != 0) {
+  if (configuration->i2cAddress != 0)
+  {
 
 #ifdef DEBUG
-    Serial << endl << F(" : Address: 0x") << _HEX(configuration->i2cAddress);
+    Debugger->printBulletPoint(F(" : Address: 0x"));
+    Serial << _HEX(configuration->i2cAddress);
 #endif
-    if (!bme->begin(configuration->i2cAddress, _wirePort)) {
+    if (!bme->begin(configuration->i2cAddress, _wirePort))
+    {
       return false;
-    } else {
+    }
+    else
+    {
       bme->setSampling(
           Adafruit_BME280::MODE_FORCED, Adafruit_BME280::SAMPLING_X1,
           Adafruit_BME280::SAMPLING_X1, Adafruit_BME280::SAMPLING_X1,
@@ -26,37 +39,40 @@ boolean AFESensorBME280::begin(BMEX80 *_configuration, TwoWire *_wirePort, BMEX8
       if ((bme->sensorID() == BME280_SENSOR &&
            _configuration->type != AFE_BME280_SENSOR) ||
           (bme->sensorID() == BMP280_SENSOR &&
-           _configuration->type != AFE_BMP280_SENSOR)) {
-        Serial << endl << F(" : ERROR: Wrong sensor type in configuration");
+           _configuration->type != AFE_BMP280_SENSOR))
+      {
+        Debugger->printBulletPoint(F("ERROR: Wrong sensor type in configuration"));
       }
-      Serial << endl
-             << F(" : Type: ")
-             << (bme->sensorID() == BME280_SENSOR ? F("BME280") : F("BMP280"));
+      Debugger->printBulletPoint(F("Type: "));
+      Debugger->printValue(bme->sensorID() == BME280_SENSOR ? F("BME280") : F("BMP280"));
 #endif
 
       return true;
     }
-  } else {
+  }
+  else
+  {
 #ifdef DEBUG
-    Serial << endl << F(" : ERROR: Address not set");
+    Debugger->printBulletPoint(F("ERROR: Address not set"));
 #endif
     return false;
   }
 }
 
-boolean AFESensorBME280::read() {
+boolean AFESensorBME280::read()
+{
 
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO :Sensor: ")
-         << (bme->sensorID() == AFE_BME280_SENSOR ? F("BME280") : F("BMP280"));
+  Debugger->printBulletPoint(F("Sensor: "));
+  Debugger->printValue(bme->sensorID() == BME280_SENSOR ? F("BME280") : F("BMP280"));
 #endif
 
   bme->takeForcedMeasurement();
 
   data->temperature.value = bme->readTemperature();
   data->pressure.value = bme->readPressure() / 100.0;
-  if (configuration->type == AFE_BME280_SENSOR) {
+  if (configuration->type == AFE_BME280_SENSOR)
+  {
     data->humidity.value = bme->readHumidity();
   }
 

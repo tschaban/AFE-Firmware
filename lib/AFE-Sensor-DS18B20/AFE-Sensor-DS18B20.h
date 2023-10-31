@@ -12,13 +12,15 @@
 #include <OneWire.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFESensorDS18B20 {
+class AFESensorDS18B20
+{
 
 private:
   AFEDataAccess *Data;
+  AFEDebugger *Debugger;
   OneWire *WireBUS = new OneWire();
   DallasTemperature *Sensor = new DallasTemperature();
   boolean _initialized = false;
@@ -26,12 +28,20 @@ private:
   unsigned long readTimeOut = 0;
   float currentTemperature = DEVICE_DISCONNECTED_C;
 
+#ifdef DEBUG
+  void begin(AFEDataAccess *, uint8_t id);
+#endif
+
 public:
   DS18B20 *configuration = new DS18B20;
 
   AFESensorDS18B20();
 
+#ifdef DEBUG
+  void begin(AFEDataAccess *, AFEDebugger *, uint8_t id);
+#else
   void begin(AFEDataAccess *, uint8_t id);
+#endif
 
   /* Read and returns current temperature from the sensor */
   float getCurrentTemperature();

@@ -12,13 +12,14 @@
 #include <AFE-Impulse-Catcher.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFEAnemometer {
+class AFEAnemometer
+{
 
 public:
-  ANEMOMETER *configuration = new ANEMOMETER; 
+  ANEMOMETER *configuration = new ANEMOMETER;
   float lastSpeedMS =
       0; // used by HTTPs API - stores and gets the lastest value by HTTP API
   float lastSpeedKMH =
@@ -27,8 +28,13 @@ public:
   /* Constructors */
   AFEAnemometer();
 
+#ifdef DEBUG
+  /* Init switch */
+  boolean begin(AFEDataAccess *, AFEImpulseCatcher *, AFEDebugger *);
+#else
   /* Init switch */
   boolean begin(AFEDataAccess *, AFEImpulseCatcher *);
+#endif
 
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
@@ -42,16 +48,19 @@ private:
   uint32_t startTime = 0;
   float oneImpulseDistanceCM = 0;
 
-
-  boolean  active = false;
+  boolean active = false;
   uint32_t impulseCounter = 0;
   uint32_t counterStarted = 0;
   uint32_t _previousDuration = 0; // Used in case of time rollout
 
+  AFEDebugger *Debugger;
+
+#ifdef DEBUG
+  boolean begin(AFEDataAccess *, AFEImpulseCatcher *);
+#endif
+
   void newImpulse(void);
   void get(uint32_t &noOfImpulses, uint32_t &duration);
-
-
 };
 
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER

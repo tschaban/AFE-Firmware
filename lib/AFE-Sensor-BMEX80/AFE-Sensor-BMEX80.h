@@ -23,7 +23,12 @@
 #include <en_EN.h>
 #endif
 
-class AFESensorBMEX80 : public AFESensorsCommon {
+#ifdef DEBUG
+#include <AFE-Debugger.h>
+#endif
+
+class AFESensorBMEX80 : public AFESensorsCommon
+{
 
 private:
   boolean ready = false;
@@ -38,10 +43,19 @@ private:
   void applyCorrections();
 
   TwoWire *_WirePort;
-  
+
+#ifdef DEBUG
+  AFEDebugger *Debugger;
+  void begin(uint8_t id, TwoWire *WirePort);
+#ifdef AFE_ESP32
+  void begin(uint8_t id, TwoWire *WirePort0, TwoWire *WirePort1);
+#endif
+#else
 #ifdef AFE_ESP32
   void begin(uint8_t id, TwoWire *WirePort);
 #endif
+#endif
+
 
 public:
   BMEX80 *configuration = new BMEX80;
@@ -51,10 +65,20 @@ public:
   AFESensorBMEX80();
 
 /* Initialization of the sensor */
+#ifdef DEBUG
+
+#ifdef AFE_ESP32
+  void begin(uint8_t id, TwoWire *WirePort0, TwoWire *WirePort1, AFEDebugger *);
+#else
+  void begin(uint8_t id, TwoWire *WirePort, AFEDebugger *);
+#endif
+
+#else
 #ifdef AFE_ESP32
   void begin(uint8_t id, TwoWire *WirePort0, TwoWire *WirePort1);
 #else
   void begin(uint8_t id, TwoWire *WirePort);
+#endif
 #endif
 
   /* Returns sensor data in JSON format */
