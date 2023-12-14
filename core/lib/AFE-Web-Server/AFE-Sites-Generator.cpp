@@ -52,7 +52,7 @@ void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
 }
 
 void AFESitesGenerator::generateMenu(String &page, uint16_t redirect) {
-  Firmware->Device->begin();
+  Firmware->Device->refreshConfiguration();
   generateMenuHeader(page, redirect);
   page.concat(F("<ul class=\"lst\">"));
 

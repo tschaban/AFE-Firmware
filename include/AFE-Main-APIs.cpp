@@ -29,28 +29,32 @@ AFEAPIMQTTStandard *MqttAPI = new AFEAPIMQTTStandard();
 #endif
 
 /* Initializing MQTT API */
-void initializeMQTTAPI(void) {
+void initializeMQTTAPI(void)
+{
   if (Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT &&
-      Firmware->Device->configuration.api.mqtt) {
+      Firmware->Device->configuration.api.mqtt)
+  {
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: BOOT: API: Initializing MQTT");
+    Firmware->Debugger->printInformation(F("Initializing MQTT"), F("BOOT: API"));
 #endif
 
     MqttAPI->begin(Firmware, Hardware);
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: BOOT: API: MQTT init completed");
+    Firmware->Debugger->printInformation(F("MQTT init completed"), F("BOOT: API"));
 #endif
   }
 }
 
 /* Initializing HTTP API */
-void initializeHTTPAPI(void) {
-  if (Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT) {
+void initializeHTTPAPI(void)
+{
+  if (Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT)
+  {
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: BOOT: API: Initializing MQTT");
+    Firmware->Debugger->printInformation(F("Initializing HTTP"), F("BOOT: API"));
 #endif
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -60,7 +64,7 @@ void initializeHTTPAPI(void) {
 #endif
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: BOOT: API: HTTP init completed");
+    Firmware->Debugger->printInformation(F("HTTP init completed"), F("BOOT: API"));
 #endif
   }
 }
@@ -68,14 +72,16 @@ void initializeHTTPAPI(void) {
 /* Initializing Domoticz HTTP API */
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
-void initializeHTTPDomoticzAPI(void) {
+void initializeHTTPDomoticzAPI(void)
+{
   if (Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT &&
-      Firmware->Device->configuration.api.domoticz) {
+      Firmware->Device->configuration.api.domoticz)
+  {
 
     HttpDomoticzAPI->begin(Firmware, Hardware);
 
 #ifdef DEBUG
-    Serial << endl << F("INFO: BOOT: API: MQTT init completed");
+    Firmware->Debugger->printInformation(F("Domoticz HTTP init completed"), F("BOOT: API"));
 #endif
   }
 }

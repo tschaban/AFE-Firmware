@@ -8,11 +8,11 @@ void initializeMCP23017(void);
 
 void initializeMCP23017(void) {
 
-  for (uint8_t i = 0; i < Device->configuration.noOfMCP23xxx; i++) {
+  for (uint8_t i = 0; i < Firmware->Device->configuration.noOfMCP23xxx; i++) {
 #ifdef AFE_ESP32
-    MCP23017Broker->begin(Data, Device, &WirePort0, &WirePort1);
+    MCP23017Broker->begin(Firmware->API->Flash, Firmware->Device, &WirePort0, &WirePort1);
 #else
-    MCP23017Broker->begin(Data, Device, &WirePort0);
+    MCP23017Broker->begin(Firmware->API->Flash, Firmware->Device, &WirePort0);
 #endif
   }
 };

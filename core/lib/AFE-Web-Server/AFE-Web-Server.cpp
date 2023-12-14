@@ -305,7 +305,7 @@ boolean AFEWebServer::generate(boolean upload)
     if (_refreshConfiguration)
     {
       _refreshConfiguration = false;
-      Firmware->Device->begin();
+      Firmware->Device->refreshConfiguration();
     }
 
     /* Requested: site paramters */

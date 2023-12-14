@@ -16,7 +16,11 @@ void AFEFirmware::begin()
 #endif
   API->Flash->initializeFileSystem();
 
-  Device->begin();
+#ifdef DEBUG
+  Device->begin(API->Flash, Debugger);
+#else
+  Device->begin(API->Flash);
+#endif
 
   firstBooting();
 
@@ -297,7 +301,7 @@ void AFEFirmware::firstBooting(void)
 #endif
     if (API->Flash->setDefaultConfiguration())
     {
-      Device->begin();
+      Device->refreshConfiguration();
     }
     else
     {

@@ -5,12 +5,7 @@
 #ifndef _AFE_Humidistat_h
 #define _AFE_Humidistat_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
+#include <Arduino.h>
 #include <AFE-Data-Access.h>
 
 class AFEHumidistat {
@@ -19,18 +14,19 @@ class AFEHumidistat {
    * functionality */
 
 private:
+  AFEDataAccess *Data;
   boolean ready = false;
-  REGULATOR configuration;
+  REGULATOR *configuration = new REGULATOR;
   byte relayState;
   /* Method enables / disables thermostat */
   void enable(boolean state);
 
 public:
   /* Constructors */
-  AFEHumidistat();
+  AFEHumidistat(AFEDataAccess *);
 
   /* Method initialize humidistat */
-  void begin(REGULATOR config);
+  void begin(REGULATOR *config);
 
   /* Method returns true if humidistat is enabled */
   boolean enabled();

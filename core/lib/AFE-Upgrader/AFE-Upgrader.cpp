@@ -4,25 +4,28 @@
 
 AFEUpgrader::AFEUpgrader(AFEFirmware *_Firmware) { Firmware = _Firmware; }
 
-void AFEUpgrader::upgraded() {
+void AFEUpgrader::upgraded()
+{
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: UPGRADE: Current firmware version: T")
-         << Firmware->Configuration->Version->type << F("-")
+
+  Firmware->Debugger->printInformation(F("Current firmware version: T"), F("UPGRADE"));
+  Serial << Firmware->Configuration->Version->type << F("-")
          << Firmware->Configuration->Version->installed_version << F("-");
 
-  switch (Firmware->Configuration->Version->api) {
+  switch (Firmware->Configuration->Version->api)
+  {
   case AFE_FIRMWARE_API_STANDARD:
-    Serial << F("Standard");
+
+    Firmware->Debugger->printValue(F("Standard"));
     break;
   case AFE_FIRMWARE_API_DOMOTICZ:
-    Serial << F("Domoticz");
+    Firmware->Debugger->printValue(F("Domoticz"));
     break;
   case AFE_FIRMWARE_API_HOME_ASSISTANT:
-    Serial << F("HomeAssistant");
+    Firmware->Debugger->printValue(F("HomeAssistant"));
     break;
   default:
-    Serial << F("Unknwon");
+    Firmware->Debugger->printValue(F("Unknwon"));
     break;
   }
 
@@ -39,28 +42,35 @@ void AFEUpgrader::upgraded() {
 #else
           AFE_FIRMWARE_API_STANDARD
 #endif
-      ) {
+  )
+  {
 #ifdef DEBUG
-    Serial << endl << F("INFO: UPGRADE: up2date");
+    Firmware->Debugger->printInformation(F("up2date"), F("UPGRADE"));
 #endif
-  } else {
+  }
+  else
+  {
 #ifdef DEBUG
-    Serial << endl << F("WARN: UPGRADE: Up2date. Upgrading...");
+    Firmware->Debugger->printInformation(F("Upgrading..."), F("UPGRADE"));
 #endif
 
     /* Upgraded version from one T to other T */
-    if (Firmware->Configuration->Version->type != AFE_FIRMWARE_TYPE) {
+    if (Firmware->Configuration->Version->type != AFE_FIRMWARE_TYPE)
+    {
 #ifdef DEBUG
-      Serial << endl << F("INFO: UPGRADE: Upgrading Firmware type");
+      Firmware->Debugger->printInformation(F("Upgrading Firmware type"), F("UPGRADE"));
+
 #endif
       upgradeFirmwarType();
 
       /* Upgrade from one version to other within the same T */
-    } else if (strcmp(Firmware->Configuration->Version->installed_version,
-                      AFE_FIRMWARE_VERSION) != 0) {
+    }
+    else if (strcmp(Firmware->Configuration->Version->installed_version,
+                    AFE_FIRMWARE_VERSION) != 0)
+    {
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: UPGRADE: Upgrading Firmware T") << AFE_FIRMWARE_TYPE
+      Firmware->Debugger->printInformation(F("Upgrading Firmware T"), F("UPGRADE"));
+      Serial << AFE_FIRMWARE_TYPE
              << F(" from version: ")
              << Firmware->Configuration->Version->installed_version << F(" to ")
              << AFE_FIRMWARE_VERSION;
@@ -69,25 +79,26 @@ void AFEUpgrader::upgraded() {
     }
 
     /* Checking if in addition there has been API version change */
-    if (Firmware->Configuration->Version->api != AFE_FIRMWARE_API) {
+    if (Firmware->Configuration->Version->api != AFE_FIRMWARE_API)
+    {
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: UPGRADE: Firmware API version upgraded")
-             << F(" from version: ") << Firmware->Configuration->Version->api
+      Firmware->Debugger->printInformation(F("Firmware API version upgraded"), F("UPGRADE"));
+      Serial << F(" from version: ") << Firmware->Configuration->Version->api
              << F(" to ") << AFE_FIRMWARE_API;
 #endif
       updateFirmwareAPIVersion();
     }
 
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO UPGRADE: Upgrade to version ") << AFE_FIRMWARE_VERSION
+    Firmware->Debugger->printInformation(F("Upgrade to version "), F("UPGRADE"));
+    Serial << AFE_FIRMWARE_VERSION
            << F(" completed");
 #endif
   }
 }
 
-void AFEUpgrader::upgradeFirmwarType() {
+void AFEUpgrader::upgradeFirmwarType()
+{
   NETWORK networkConfiguration;
   MQTT mqttConfiguration;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -98,9 +109,8 @@ void AFEUpgrader::upgradeFirmwarType() {
   uint8_t deviceState;
 
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: UPGRADE: Upgrading firmware type.") << endl
-         << F("INFO: UPGRADE: Reading core configuration");
+  Firmware->Debugger->printInformation(F("Upgrading firmware type"), F("UPGRADE"));
+  Firmware->Debugger->printInformation(F("Reading core configuration"), F("UPGRADE"));
 #endif
 
   /* Reading current data */
@@ -115,14 +125,14 @@ void AFEUpgrader::upgradeFirmwarType() {
   deviceState = Firmware->API->Flash->getDeviceMode();
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: UPGRADE: Creating default configuration");
+  Firmware->Debugger->printInformation(F("Creating default configuration"), F("UPGRADE"));
 #endif
 
   /* Setting the device from scratch */
   Firmware->API->Flash->setDefaultConfiguration();
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: UPGRADE: Restoring core configuration");
+  Firmware->Debugger->printInformation(F("Restoring core configuration"), F("UPGRADE"));
 #endif
 
   /* Restoring core configuration */
@@ -140,7 +150,8 @@ void AFEUpgrader::upgradeFirmwarType() {
   Firmware->API->Flash->getConfiguration(Firmware->Configuration->Version);
 }
 
-void AFEUpgrader::updateFirmwareVersion() {
+void AFEUpgrader::updateFirmwareVersion()
+{
 
 #ifndef AFE_ESP32
 
@@ -151,7 +162,8 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") ==
           0 ||
       strcmp(Firmware->Configuration->Version->installed_version, "2.0.2") ==
-          0) {
+          0)
+  {
     upgradeToT0V210();
   }
 #endif // T0_CONFIG
@@ -162,7 +174,8 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") ==
           0 ||
       strcmp(Firmware->Configuration->Version->installed_version, "2.2.0.B1") ==
-          0) {
+          0)
+  {
     upgradeToT5V220();
   }
 #endif // T5_CONFIG
@@ -177,7 +190,8 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(Firmware->Configuration->Version->installed_version, "2.2.1") ==
           0 ||
       strcmp(Firmware->Configuration->Version->installed_version, "2.2.2") ==
-          0) {
+          0)
+  {
     upgradeToT6V230();
   }
 
@@ -186,7 +200,8 @@ void AFEUpgrader::updateFirmwareVersion() {
       strcmp(Firmware->Configuration->Version->installed_version, "2.3.1") ==
           0 ||
       strcmp(Firmware->Configuration->Version->installed_version, "2.3.1.E1") ==
-          0) {
+          0)
+  {
     upgradeToT6V250();
   }
 
@@ -199,11 +214,13 @@ void AFEUpgrader::updateFirmwareVersion() {
   Firmware->API->Flash->getConfiguration(Firmware->Configuration->Version);
 }
 
-void AFEUpgrader::updateFirmwareAPIVersion() {
+void AFEUpgrader::updateFirmwareAPIVersion()
+{
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   /* Checking if there is Domoticz server configuration file */
-  if (!Firmware->API->Flash->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION)) {
+  if (!Firmware->API->Flash->fileExist(AFE_FILE_DOMOTICZ_CONFIGURATION))
+  {
     Firmware->API->Flash->createDomoticzConfigurationFile();
   }
 #endif
@@ -218,7 +235,8 @@ void AFEUpgrader::updateFirmwareAPIVersion() {
 /* Specyfic upgrade to version T0 2.1 from version 2.0 */
 
 #ifdef T0_CONFIG
-void AFEUpgrader::upgradeToT0V210() {
+void AFEUpgrader::upgradeToT0V210()
+{
 
   DEVICE newDevice;
   DEVICE_T0_200 oldDevice =
@@ -238,14 +256,16 @@ void AFEUpgrader::upgradeToT0V210() {
   newDevice.isAnalogInput = oldDevice.isAnalogInput;
 #endif
 
-  for (uint8_t i = 0; i < sizeof(oldDevice.isSwitch); i++) {
+  for (uint8_t i = 0; i < sizeof(oldDevice.isSwitch); i++)
+  {
     counter += oldDevice.isSwitch[i] ? 1 : 0;
   }
 
   newDevice.noOfSwitches = counter;
 
   counter = 0;
-  for (uint8_t i = 0; i < sizeof(oldDevice.isRelay); i++) {
+  for (uint8_t i = 0; i < sizeof(oldDevice.isRelay); i++)
+  {
     counter += oldDevice.isRelay[i] ? 1 : 0;
   }
 
@@ -253,7 +273,8 @@ void AFEUpgrader::upgradeToT0V210() {
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   counter = 0;
-  for (uint8_t i = 0; i < sizeof(oldDevice.isLED); i++) {
+  for (uint8_t i = 0; i < sizeof(oldDevice.isLED); i++)
+  {
     counter += oldDevice.isLED[i] ? 1 : 0;
   }
   newDevice.noOfLEDs = counter;
@@ -266,7 +287,8 @@ void AFEUpgrader::upgradeToT0V210() {
 #endif // T0_CONFIG
 
 #ifdef T5_CONFIG
-void AFEUpgrader::upgradeToT5V220() {
+void AFEUpgrader::upgradeToT5V220()
+{
 
 // It will do nothing for ESP8266 1MB - sensors are e
 #if defined(AFE_CONFIG_HARDWARE_BMEX80) || defined(AFE_CONFIG_HARDWARE_BH1750)
@@ -285,7 +307,8 @@ void AFEUpgrader::upgradeToT5V220() {
 #endif // T0_CONFIG
 
 #ifdef T6_CONFIG
-void AFEUpgrader::upgradeToT6V230() {
+void AFEUpgrader::upgradeToT6V230()
+{
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   Firmware->API->Flash->createAnemometerSensorConfigurationFile();
 #endif
@@ -298,7 +321,8 @@ void AFEUpgrader::upgradeToT6V230() {
 #endif
 }
 
-void AFEUpgrader::upgradeToT6V250() {
+void AFEUpgrader::upgradeToT6V250()
+{
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   Firmware->API->Flash->createDS18B20SensorConfigurationFile();
 #endif

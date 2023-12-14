@@ -15,9 +15,6 @@
 #include <AFE-API-MQTT-Standard.h>
 #endif
 
-#ifdef DEBUG
-#include <Streaming.h>
-#endif
 
 class AFEEvent {
 

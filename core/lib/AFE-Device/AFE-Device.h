@@ -3,18 +3,25 @@
 #ifndef _AFE_Device_h
 #define _AFE_Device_h
 
-//#include <AFE-Defaults.h>
+// #include <AFE-Defaults.h>
 #include <AFE-Data-Access.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFEDevice {
+class AFEDevice
+{
 
 private:
-  AFEDataAccess Data;
+  AFEDataAccess *Data;
+  AFEDebugger *Debugger;
   uint8_t deviceMode;
+
+/* Method reads device configuration data. It used in config panel */
+#ifdef DEBUG
+  void begin(AFEDataAccess *);
+#endif
 
 public:
   DEVICE configuration;
@@ -25,8 +32,15 @@ public:
 
   AFEDevice();
 
-  /* Method reads device configuration data. It used in config panel */
-  void begin();
+/* Method reads device configuration data. It used in config panel */
+#ifdef DEBUG
+  void begin(AFEDataAccess *, AFEDebugger *);
+#else
+  void begin(AFEDataAccess *);
+#endif
+
+  /* Method refreshes configuration */
+  void refreshConfiguration();
 
   /* Method reboots device to specyfic mode  define by MODE_.. */
   void reboot(uint8_t mode = AFE_MODE_NORMAL);
@@ -36,8 +50,6 @@ public:
 
   /* Method saves current device mode to EEPROM */
   void saveMode(uint8_t mode);
-
-
 };
 
 #endif

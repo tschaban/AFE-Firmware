@@ -37,9 +37,6 @@
 #include <AFE-Sensor-PN532.h>
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-#ifdef DEBUG
-#include <Streaming.h>
-#endif
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>

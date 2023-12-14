@@ -35,6 +35,7 @@ void initializeHTTPServer(void) {
   HTTPServer->begin(Firmware);
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: BOOT: HTTP Server initialized");
+  Firmware->Debugger->printInformation(F("HTTP Server initialized"),F("BOOT"));
+
 #endif
 }

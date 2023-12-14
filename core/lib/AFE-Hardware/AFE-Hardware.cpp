@@ -163,7 +163,12 @@ void AFEHardware::initADC(void)
 #else
     if (_Firmware->Device->configuration.isAnalogInput)
     {
-      AnalogInput = new AFEAnalogInput();
+#ifdef DEBUG
+      AnalogInput = new AFEAnalogInput(_Firmware->API->Flash, _Firmware->Debugger);
+#else
+      AnalogInput = new AFEAnalogInput(_Firmware->API->Flash);
+#endif
+
       AnalogInput->begin();
     }
 #endif
@@ -397,11 +402,11 @@ void AFEHardware::initFS3000(void)
     for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfFS3000s; i++)
     {
       FS3000Sensor[i] = new AFESensorFS3000();
-      #ifdef DEBUG
-       FS3000Sensor[i]->begin(i, _Firmware->API->Flash, _Firmware->Debugger);
-      #else
+#ifdef DEBUG
+      FS3000Sensor[i]->begin(i, _Firmware->API->Flash, _Firmware->Debugger);
+#else
       FS3000Sensor[i]->begin(i, _Firmware->API->Flash);
-      #endif
+#endif
     }
   }
 }

@@ -10,32 +10,43 @@
 #include <AFE-Data-Access.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFEAnalogInput {
+class AFEAnalogInput
+{
 
 private:
+  AFEDebugger *Debugger;
+  AFEDataAccess *Data;
   boolean ready = false;
   unsigned long startTime = 0;
   boolean _initialized = false;
   uint8_t counterOfSamplings = 0;
   uint16_t temporaryAnalogData = 0;
 
+#ifdef AFE_ESP32
+  void begin();
+#endif
+
 public:
   ADCINPUT *configuration = new ADCINPUT;
   ADCINPUT_DATA *data = new ADCINPUT_DATA;
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER void begin(AFEDataAccess *);
   float batteryPercentage = 0;
 #endif
 
-  /* Constructor */
-  AFEAnalogInput();
+/* Constructor */
+#ifdef DEBUG
+  AFEAnalogInput(AFEDataAccess *, AFEDebugger *);
+#else
+  AFEAnalogInput(AFEDataAccess *);
+#endif
 
 /* Initialized analog input using configuration parameters */
 #ifdef AFE_ESP32
-  void begin(uint8_t id);
+  void begin(uint8_t *);
 #else  // ESP8266
   void begin();
 #endif // AFE_ESP32

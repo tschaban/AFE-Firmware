@@ -5,9 +5,6 @@
 
 #include <AFE-Firmware.h>
 
-#ifdef DEBUG
-#include <Streaming.h>
-#endif
 
 class AFEUpgrader {
 

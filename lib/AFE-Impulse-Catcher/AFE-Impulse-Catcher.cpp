@@ -4,30 +4,42 @@
 
 #if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) || defined(AFE_CONFIG_HARDWARE_RAINMETER)
 
-AFEImpulseCatcher::AFEImpulseCatcher(){};
+#ifdef DEBUG
 
-void AFEImpulseCatcher::begin(uint16_t _bouncing) {
+AFEImpulseCatcher::AFEImpulseCatcher(AFEDebugger *_Debugger){Debugger = _Debugger;};
+#else
+AFEImpulseCatcher::AFEImpulseCatcher(){};
+#endif
+
+void AFEImpulseCatcher::begin(uint16_t _bouncing)
+{
   active = true;
   bouncing = _bouncing;
 #ifdef DEBUG
-  Serial << endl << F("INFO: IMPULSE CATCHER: initialized and working");
+  Debugger->printInformation(F("Initialized"), F("IMPULSE CATCHER"));
 #endif
 }
 
-void AFEImpulseCatcher::newImpulse(void) {
-  if (active) {
+void AFEImpulseCatcher::newImpulse(void)
+{
+  if (active)
+  {
     impulseCounter++;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: IMPULSE CATCHER: New impulse. Total: ") << impulseCounter
-           << F(", during: ") << ((millis() - counterStarted) / 1000) << F("sec.");
+  Debugger->printInformation(F("New impulse"), F("IMPULSE CATCHER"));
+  Debugger->printBulletPoint(F("Total: "));
+  Serial << impulseCounter;
+  Debugger->printBulletPoint(F("During: "));
+  Serial << ((millis() - counterStarted) / 1000) << F("sec.");
 #endif
   }
 }
 
-void AFEImpulseCatcher::get(uint32_t &noOfImpulses, uint32_t &duration) {
+void AFEImpulseCatcher::get(uint32_t &noOfImpulses, uint32_t &duration)
+{
   duration = millis() - counterStarted;
-  if (duration < 0) { // used previous duration if timer rollouts
+  if (duration < 0)
+  { // used previous duration if timer rollouts
     duration = _previousDuration;
   }
   noOfImpulses = impulseCounter;
@@ -35,9 +47,12 @@ void AFEImpulseCatcher::get(uint32_t &noOfImpulses, uint32_t &duration) {
   impulseCounter = 0;
   counterStarted = millis();
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: IMPULSE CATCHER: Reading data from Binary sensor: Impulses: ") << noOfImpulses
-         << F(", during: ") << (duration / 1000) << F("sec.");
+
+  Debugger->printInformation(F("Reading data from Binary sensor: Impulses: "), F("IMPULSE CATCHER"));
+  Debugger->printBulletPoint(F("Impulses: "));
+  Serial << impulseCounter;
+  Debugger->printBulletPoint(F("During: "));
+  Serial << ((millis() - counterStarted) / 1000) << F("sec.");
 #endif
 }
 

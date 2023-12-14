@@ -203,13 +203,21 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
+#ifdef DEBUG
+  AFEImpulseCatcher *WindImpulse = new AFEImpulseCatcher(_Firmware->Debugger);
+#else
   AFEImpulseCatcher *WindImpulse = new AFEImpulseCatcher();
+#endif
   AFEAnemometer *AnemometerSensor = new AFEAnemometer();
   boolean initAnemometer(void);
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
+#ifdef DEBUG
+  AFEImpulseCatcher *RainImpulse = new AFEImpulseCatcher(_Firmware->Debugger);
+#else
   AFEImpulseCatcher *RainImpulse = new AFEImpulseCatcher();
+#endif
   AFERainmeter *RainmeterSensor = new AFERainmeter();
   boolean initRainmeter(void);
 #endif

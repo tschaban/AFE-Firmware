@@ -1,4 +1,4 @@
- /* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
+/* AFE Firmware for smarthome devices, More info: https://afe.smartnydom.pl/ */
 
 #ifndef _AFE_Impulse_Cahtcher_h
 #define _AFE_Impulse_Cahtcher_h
@@ -12,16 +12,21 @@
 #include <AFE-Device.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
-class AFEImpulseCatcher {
+class AFEImpulseCatcher
+{
 
 public:
   uint16_t bouncing = AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING;
 
-  /* Constructors */
+/* Constructors */
+#ifdef DEBUG
+  AFEImpulseCatcher(AFEDebugger *_Debugger);
+#else
   AFEImpulseCatcher();
+#endif
 
   /* Init switch */
   void begin(uint16_t _bouncing = AFE_HARDWARE_ANEMOMETER_DEFAULT_BOUNCING);
@@ -30,11 +35,11 @@ public:
   void get(uint32_t &noOfImpulses, uint32_t &duration);
 
 private:
-  boolean  active = false;
+  boolean active = false;
   uint32_t impulseCounter = 0;
   uint32_t counterStarted = 0;
-
   uint32_t _previousDuration = 0; // Used in case of time rollout
+  AFEDebugger *Debugger;
 };
 
 #endif // #if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) || defined(AFE_CONFIG_HARDWARE_RAINMETER)

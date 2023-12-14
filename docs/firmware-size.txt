@@ -52,3 +52,25 @@ Flash: [======    ]  58.8% (used 614457 bytes from 1044464 bytes)
 added FS3000
 RAM:   [=====     ]  54.8% (used 44876 bytes from 81920 bytes)
 Flash: [======    ]  58.8% (used 614345 bytes from 1044464 bytes)
+
+added Device
+RAM:   [=====     ]  54.8% (used 44876 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614269 bytes from 1044464 bytes)
+
+Added U[grade class]
+RAM:   [=====     ]  54.8% (used 44876 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614205 bytes from 1044464 bytes)
+
+added all from mains
+RAM:   [=====     ]  54.8% (used 44876 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614197 bytes from 1044464 bytes)
+
+added ADC
+RAM:   [=====     ]  54.6% (used 44748 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614057 bytes from 1044464 bytes)
+
+
+Impulse chatcher
+RAM:   [=====     ]  54.6% (used 44748 bytes from 81920 bytes)
+Flash: [======    ]  58.8% (used 614037 bytes from 1044464 bytes)
+Building .pio/build/AFE_T6_8266_4m-ha-development/firmware.bin
