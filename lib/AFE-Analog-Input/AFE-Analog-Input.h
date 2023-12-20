@@ -13,11 +13,12 @@
 #include <AFE-Debugger.h>
 #endif
 
-class AFEAnalogInput
-{
+class AFEAnalogInput {
 
 private:
+#ifdef DEBUG
   AFEDebugger *Debugger;
+#endif
   AFEDataAccess *Data;
   boolean ready = false;
   unsigned long startTime = 0;
@@ -33,7 +34,8 @@ public:
   ADCINPUT *configuration = new ADCINPUT;
   ADCINPUT_DATA *data = new ADCINPUT_DATA;
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER void begin(AFEDataAccess *);
+#ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
+  void begin(AFEDataAccess *);
   float batteryPercentage = 0;
 #endif
 

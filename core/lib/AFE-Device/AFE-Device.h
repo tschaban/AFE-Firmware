@@ -15,7 +15,9 @@ class AFEDevice
 
 private:
   AFEDataAccess *Data;
+  #ifdef DEBUG
   AFEDebugger *Debugger;
+  #endif
   uint8_t deviceMode;
 
 /* Method reads device configuration data. It used in config panel */

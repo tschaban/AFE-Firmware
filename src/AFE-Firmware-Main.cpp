@@ -40,14 +40,6 @@ void setup() {
   Firmware->begin();
 
 /**
- * @brief Initializing MCP23017 expanders
- *
- */
-#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-  initializeMCP23017();
-#endif // AFE_CONFIG_HARDWARE_MCP23XXX
-
-/**
  * @brief Initializing system LED (if exists) and turning it on
  *
  */
@@ -179,7 +171,7 @@ void setup() {
 
 #ifdef DEBUG
   Firmware->Debugger->getFreeMemorySize();
-  Firmware->Debugger->printHeader(2, 1, 74, AFE_DEBUG_HEADER_TYPE_HASH);
+  Firmware->Debugger->printHeader(2, 1, 72, AFE_DEBUG_HEADER_TYPE_HASH);
   Firmware->Debugger->printValue(F("BOOTING COMPLETED"));
   Firmware->Debugger->printValue(F("Starting ..."), 1);
   if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {

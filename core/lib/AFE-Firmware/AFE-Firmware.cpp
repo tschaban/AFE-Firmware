@@ -49,9 +49,7 @@ void AFEFirmware::begin()
 
   API->Flash->getConfiguration(Configuration->Pro);
   API->Flash->getConfiguration(Configuration->Version);
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  initializeIIC();
-#endif
+
 }
 
 void AFEFirmware::initializeNetwork(void)
@@ -81,7 +79,7 @@ void AFEFirmware::initializeSystemLED(void)
     if (Device->configuration.noOfLEDs - 1 >= id)
     {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-      Led->addMCP23017Reference(MCP23017Broker);
+     // @TODO T4 Led->addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
       if (Hardware->SystemLed->begin(API->Flash, id))
       {
@@ -105,102 +103,6 @@ void AFEFirmware::initializeSystemLED(void)
 }
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_I2C
-void AFEFirmware::initializeIIC(void)
-{
-  I2CPORT I2CBUSConfiguration;
-  AFEI2CScanner *I2CBus = new AFEI2CScanner();
-  boolean success = false;
-
-#ifdef AFE_ESP32
-  if (Device->configuration.noOfI2Cs > 0)
-  {
-    API->Flash->getConfiguration(0, &I2CBUSConfiguration);
-
-#ifdef DEBUG
-    Debugger->printInformation(F("Initialization"), F("I2C[0]"));
-    Debugger->printBulletPoint(F("SDA: "));
-    Debugger->printValue(I2CBUSConfiguration.SDA);
-    Debugger->printBulletPoint(F("SCL: "));
-    Debugger->printValue(I2CBUSConfiguration.SCL);
-    Debugger->printBulletPoint(F("Frequency: "));
-    Serial << (I2CBUSConfiguration.frequency / 1000) << F("Hz");
-#endif
-
-    success = Hardware->WirePort0->begin(I2CBUSConfiguration.SDA,
-                                         I2CBUSConfiguration.SCL,
-                                         I2CBUSConfiguration.frequency);
-#else /* ESP8266 */
-  API->Flash->getConfiguration(&I2CBUSConfiguration);
-
-#ifdef DEBUG
-
-  Debugger->printInformation(F("Initialization"), F("I2C"));
-  Debugger->printBulletPoint(F("SDA: "));
-  Debugger->printValue(I2CBUSConfiguration.SDA);
-  Debugger->printBulletPoint(F("SCL: "));
-  Debugger->printValue(I2CBUSConfiguration.SCL);
-
-#endif
-
-  Hardware->WirePort0->begin(I2CBUSConfiguration.SDA, I2CBUSConfiguration.SCL);
-  success = true;
-#endif // AFE_ESP32
-
-#ifdef DEBUG
-    // @TODO there was delay(100) here, testing without it
-    if (!success)
-    {
-      Debugger->printError(F("Doesn't work"), F("I2C[0]"));
-    }
-    else
-    {
-      I2CBus->begin(Hardware->WirePort0, Debugger);
-      I2CBus->scanAll();
-    }
-#endif // DEBUG
-
-#ifdef AFE_ESP32
-  }
-
-  if (Device->configuration.noOfI2Cs > 1)
-  {
-    API->Flash->getConfiguration(1, &I2CBUSConfiguration);
-
-#ifdef DEBUG
-    Debugger->printInformation(F("Initialization"), F("I2C[2]"));
-    Debugger->printBulletPoint(F("SDA: "));
-    Debugger->printValue(I2CBUSConfiguration.SDA);
-    Debugger->printBulletPoint(F("SCL: "));
-    Debugger->printValue(I2CBUSConfiguration.SCL);
-    Debugger->printBulletPoint(F("Frequency: "));
-    Serial << (I2CBUSConfiguration.frequency / 1000) << F("Hz");
-#endif // DEBUG
-
-    success = Hardware->WirePort1->begin(I2CBUSConfiguration.SDA,
-                                         I2CBUSConfiguration.SCL,
-                                         I2CBUSConfiguration.frequency);
-
-#ifdef DEBUG
-
-    if (!success)
-    {
-
-      Debugger->printError(F("Bus doesn't work"), F("I2C[1]"));
-    }
-    else
-    {
-      I2CBus->begin(Hardware->WirePort1);
-      I2CBus->scanAll();
-    }
-#endif // DEBUG
-  }
-#endif // AFE_ESP32
-
-  delete I2CBus;
-  I2CBus = NULL;
-}
-#endif
 
 void AFEFirmware::validateProVersion(void)
 {

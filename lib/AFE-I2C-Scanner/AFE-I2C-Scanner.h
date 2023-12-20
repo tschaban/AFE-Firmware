@@ -7,39 +7,31 @@
 #ifdef AFE_CONFIG_HARDWARE_I2C
 
 #include <Arduino.h>
-
-#include <AFE-Data-Access.h>
 #include <Wire.h>
 
 #ifdef DEBUG
 #include <AFE-Debugger.h>
 #endif
 
-class AFEI2CScanner
-{
+class AFEI2CScanner {
 
 private:
+  boolean portSet = false;
   TwoWire *WirePort;
 
 #ifdef DEBUG
   AFEDebugger *Debugger;
-  void begin(TwoWire *_WirePort);
 #endif
 
 public:
-  AFEI2CScanner();
-
-  /**
-   * @brief  Initialization of I2C Scanner
-   *
-   * @param  _WirePort        reference to TwoWire
-   */
-
 #ifdef DEBUG
-  void begin(TwoWire *_WirePort, AFEDebugger *_Debugger);
+  AFEI2CScanner(AFEDebugger *);
+
 #else
-  void begin(TwoWire *_WirePort);
+  AFEI2CScanner();
 #endif
+
+void setWire(TwoWire *_Wire);
 
 #ifdef DEBUG
   /**
@@ -48,6 +40,7 @@ public:
    */
 
   void scanAll();
+  void scanAll(TwoWire *_Wire);
 #endif
 
   /**
@@ -56,10 +49,13 @@ public:
    * @param  address          address to scan
    * @return Return true if a device is foun
    */
+  
   boolean scan(byte address);
+  boolean scan(TwoWire *_Wire, byte address);
 
   /**
-   * @brief Method returns potential name of the device based. Based on default known
+   * @brief Method returns potential name of the device based. Based on default
+   * known
    * devices address
    *
    * @param  deviceAddress    device address

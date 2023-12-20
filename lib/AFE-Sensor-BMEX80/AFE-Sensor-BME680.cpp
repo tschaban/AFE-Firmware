@@ -3,23 +3,26 @@
 #include "AFE-Sensor-BME680.h"
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
-AFESensorBME680::AFESensorBME680(){};
-
 #ifdef DEBUG
-boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, AFEDebugger *_Debugger, BMEX80_DATA *_data)
-{
+AFESensorBME680::AFESensorBME680(BMEX80 *_configuration, BMEX80_DATA *_data,
+                                 AFEDebugger *_Debugger) {
   Debugger = _Debugger;
-  return begin(_configuration, WirePort, Debugger, _data);
-}
+  data = _data;
+  configuration = _configuration;
+};
+#else
+AFESensorBME680::AFESensorBME680(BMEX80 *_configuration, BMEX80_DATA *_data) {
+  data = _data;
+  configuration = _configuration;
+};
 #endif
 
-boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, BMEX80_DATA *_data)
-{
+boolean AFESensorBME680::begin(TwoWire *_WirePort) {
 #ifdef DEBUG
   Debugger->printBulletPoint(F("Type: BME680"));
 #endif
 
-  data = _data;
+  Wire = _WirePort;
 
   EEPROM.begin(BSEC_MAX_STATE_BLOB_SIZE + 1); // 1st address for the length
 #ifdef DEBUG
@@ -27,20 +30,17 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, BMEX80
   Debugger->printValue((uint8_t)(BSEC_MAX_STATE_BLOB_SIZE + 1));
 #endif
 
-  configuration = _configuration;
-  if (configuration->i2cAddress != 0)
-  {
+  if (configuration->i2cAddress != 0) {
 
 #ifdef DEBUG
     Debugger->printValue((uint8_t)(BSEC_MAX_STATE_BLOB_SIZE + 1));
     Serial << _HEX(configuration->i2cAddress);
 #endif
-    Bme->begin(configuration->i2cAddress, *WirePort);
+    Bme->begin(configuration->i2cAddress, *Wire);
 
 #ifdef DEBUG
     Debugger->printBulletPoint(F("Bosch BSEC library version: "));
-    Serial << Bme->version.major
-           << F(".") << Bme->version.minor << F(".")
+    Serial << Bme->version.major << F(".") << Bme->version.minor << F(".")
            << Bme->version.major_bugfix << F(".") << Bme->version.minor_bugfix;
 
     checkBmeStatus();
@@ -80,27 +80,21 @@ boolean AFESensorBME680::begin(BMEX80 *_configuration, TwoWire *WirePort, BMEX80
   return true;
 }
 
-boolean AFESensorBME680::read()
-{
+boolean AFESensorBME680::read() {
   boolean _ret = false;
 
 #ifdef DEBUG
-      Debugger->printBulletPoint(F("Sensor: BME680"));
+  Debugger->printBulletPoint(F("Sensor: BME680"));
 #endif
 
-
-  if (Bme->run())
-  {
+  if (Bme->run()) {
     sensorOutputs = Bme->getOutputs();
 
-    if (sensorOutputs != nullptr)
-    {
+    if (sensorOutputs != nullptr) {
 
-      for (uint8_t i = 0; i < sensorOutputs->nOutputs; i++)
-      {
+      for (uint8_t i = 0; i < sensorOutputs->nOutputs; i++) {
         const bsecData output = sensorOutputs->output[i];
-        switch (output.sensor_id)
-        {
+        switch (output.sensor_id) {
         case BSEC_OUTPUT_IAQ:
           data->iaq.value = output.signal;
           data->iaq.accuracy = output.accuracy;
@@ -131,7 +125,8 @@ boolean AFESensorBME680::read()
           break;
 
         case BSEC_OUTPUT_STABILIZATION_STATUS:
-          // Serial.println("\tstabilization status = " + String(output.signal));
+          // Serial.println("\tstabilization status = " +
+          // String(output.signal));
           break;
         case BSEC_OUTPUT_RUN_IN_STATUS:
           // Serial.println("\trun in status = " + String(output.signal));
@@ -168,25 +163,18 @@ boolean AFESensorBME680::read()
 }
 
 #ifdef DEBUG
-void AFESensorBME680::checkBmeStatus()
-{
+void AFESensorBME680::checkBmeStatus() {
 
-  if (Bme->status != BSEC_OK)
-  {
-    if (Bme->status < BSEC_OK)
-    {
+  if (Bme->status != BSEC_OK) {
+    if (Bme->status < BSEC_OK) {
 
       Debugger->printBulletPoint(F("ERROR: BSEC error code: "));
       Serial << Bme->status;
-    }
-    else
-    {
+    } else {
       Debugger->printBulletPoint(F("WARN: BSEC warning code: "));
       Serial << Bme->status;
     }
-  }
-  else
-  {
+  } else {
     Debugger->printBulletPoint(F("Sensor status: OK"));
   }
 
@@ -194,9 +182,11 @@ void AFESensorBME680::checkBmeStatus()
 
     if (Bme->bme68xStatus != BME68X_OK) {
       if (Bme->bme68xStatus < BME68X_OK) {
-      // @TODO  Serial << endl             << F("ERROR: Bosch: BME680 error code : ") << Bme->bme68xStatus;
+      // @TODO  Serial << endl             << F("ERROR: Bosch: BME680 error code
+    : ") << Bme->bme68xStatus;
       } else {
-     // @TODO   Serial << endl             << F("WARN: Bosch: BME680 warning code : ") << Bme->bme68xStatus;
+     // @TODO   Serial << endl             << F("WARN: Bosch: BME680 warning
+    code : ") << Bme->bme68xStatus;
       }
     } else {
       //  Serial << endl << F("INFO: Bosch: Health: OK");
@@ -206,16 +196,13 @@ void AFESensorBME680::checkBmeStatus()
 }
 #endif
 
-void AFESensorBME680::loadState(void)
-{
+void AFESensorBME680::loadState(void) {
 
-  if (EEPROM.read(0) == BSEC_MAX_STATE_BLOB_SIZE)
-  {
+  if (EEPROM.read(0) == BSEC_MAX_STATE_BLOB_SIZE) {
 #ifdef DEBUG
     Debugger->printBulletPoint(F("Reading state from EEPROM: "));
 #endif
-    for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++)
-    {
+    for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++) {
       bsecState[i] = EEPROM.read(i + 1);
 #ifdef DEBUG
       Serial << _HEX(bsecState[i]);
@@ -225,9 +212,7 @@ void AFESensorBME680::loadState(void)
 #ifdef DEBUG
     checkBmeStatus();
 #endif
-  }
-  else
-  {
+  } else {
 #ifdef DEBUG
     Debugger->printBulletPoint(F("Erasing EEPROM"));
 #endif
@@ -238,41 +223,34 @@ void AFESensorBME680::loadState(void)
   }
 }
 
-void AFESensorBME680::updateState(void)
-{
+void AFESensorBME680::updateState(void) {
   bool update = false;
   /* Set a trigger to save the state. Here, the state is saved every
    * STATE_SAVE_PERIOD with the first state being saved once the algorithm
    * achieves full calibration, i.e. iaqAccuracy = 3 */
-  if (stateUpdateCounter == 0)
-  {
+  if (stateUpdateCounter == 0) {
     /* @TODO T6
      if (Bme->iaqAccuracy >= 3) {
        update = true;
        stateUpdateCounter++;
      }
      */
-  }
-  else
-  {
+  } else {
     /* Update every STATE_SAVE_PERIOD milliseconds */
-    if ((stateUpdateCounter * STATE_SAVE_PERIOD) < millis())
-    {
+    if ((stateUpdateCounter * STATE_SAVE_PERIOD) < millis()) {
       update = true;
       stateUpdateCounter++;
     }
   }
 
-  if (update)
-  {
+  if (update) {
     Bme->getState(bsecState);
 #ifdef DEBUG
     checkBmeStatus();
     Debugger->printBulletPoint(F("Writing state to EEPROM: "));
 #endif
 
-    for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++)
-    {
+    for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++) {
       EEPROM.write(i + 1, bsecState[i]);
 #ifdef DEBUG
       Serial << _HEX(bsecState[i]);

@@ -30,9 +30,8 @@
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-#include <Wire.h>
+#include <AFE-Wire-Container.h>
 #endif // AFE_CONFIG_HARDWARE_I2C
-
 
 struct AFE_SITE_PARAMETERS {
   uint8_t ID;
@@ -52,10 +51,7 @@ private:
   AFEFirmware *Firmware;
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-  TwoWire *WirePort0;
-#ifdef AFE_ESP32
-  TwoWire *WirePort1;
-#endif // AFE_ESP32
+  AFEWireContainer *WirePort;
 #endif // AFE_CONFIG_HARDWARE_I2C
 
   /**
@@ -279,14 +275,8 @@ public:
  * @brief Method initialize WebServer and Updater server
  *
  */
-#if defined(AFE_CONFIG_HARDWARE_I2C)
-
-#ifdef AFE_ESP32
-  void begin(AFEFirmware *, TwoWire *, TwoWire *);
-#else
-  void begin(AFEFirmware *, TwoWire *);
-#endif // AFE_ESP32
-
+#ifdef AFE_CONFIG_HARDWARE_I2C
+  void begin(AFEFirmware *, AFEWireContainer *);
 #endif
 
   void begin(AFEFirmware *);

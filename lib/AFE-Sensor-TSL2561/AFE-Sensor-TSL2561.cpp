@@ -4,45 +4,26 @@
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
 
-AFESensorTSL2561::AFESensorTSL2561(){};
-
 #ifdef DEBUG
-#ifdef AFE_ESP32
-void AFESensorTSL2561::begin(uint8_t _id, TwoWire *_WirePort0,
-                             TwoWire *_WirePort1, AFEDebugger *_Debugger)
-{
+AFESensorTSL2561::AFESensorTSL2561(AFEDataAccess *_Data,
+                                   AFEWireContainer *_WirePort,
+                                   AFEDebugger *_Debugger) {
+  Data = _Data;
+  WirePort = _WirePort;
   Debugger = _Debugger;
-  begin(_id, _WirePort0, _WirePort1);
-}
-#endif
-void AFESensorTSL2561::begin(uint8_t _id, TwoWire *_WirePort0, AFEDebugger *_Debugger)
-{
-  Debugger = _Debugger;
-  begin(_id, _WirePort0);
-}
-
-#endif
-
-#ifdef AFE_ESP32
-void AFESensorTSL2561::begin(uint8_t _id, TwoWire *_WirePort0,
-                             TwoWire *_WirePort1)
-{
-  WirePort1 = _WirePort1;
-  begin(_id, _WirePort0);
-}
-#endif
-
-void AFESensorTSL2561::begin(uint8_t _id, TwoWire *_WirePort0)
-{
-  AFEDataAccess Data;
-  Data.getConfiguration(_id, configuration);
-
-#ifdef AFE_ESP32
-  /* Setting the WirePort used by the sensor to _WirePort0 */
-  WirePort0 = configuration->wirePortId == 0 ? _WirePort0 : WirePort1;
+};
 #else
-  WirePort0 = _WirePort0;
+AFESensorTSL2561::AFESensorTSL2561(AFEDataAccess *_Data,
+                                   AFEWireContainer *_WirePort) {
+  Data = _Data;
+  WirePort = _WirePort;
+};
 #endif
+
+void AFESensorTSL2561::begin(uint8_t _id) {
+  Data->getConfiguration(_id, configuration);
+  delete Data;
+  Data = NULL;
 
 #ifdef DEBUG
   Debugger->printHeader(2, 1, 50, AFE_DEBUG_HEADER_TYPE_DASH);
@@ -62,27 +43,31 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *_WirePort0)
 #ifdef AFE_ESP32
       configuration->wirePortId != AFE_HARDWARE_ITEM_NOT_EXIST &&
 #endif
-      configuration->i2cAddress != 0)
-  {
+      configuration->i2cAddress != 0) {
 
 #ifdef DEBUG
     Debugger->printBulletPoint(F("Checking if the sensor is connected"));
 #endif
-    AFEI2CScanner I2CScanner;
-#ifdef DEBUG
-    I2CScanner.begin(WirePort0, Debugger);
+
+#ifdef AFE_ESP32
+    WirePort->Scanner->setWire(
+        (configuration->wirePortId == 0 ? WirePort->Port0 : WirePort->Port1));
 #else
-    I2CScanner.begin(WirePort0);
+    WirePort->Scanner->setWire(WirePort->Port0);
 #endif
 
-    if (I2CScanner.scan(configuration->i2cAddress))
-    {
+    if (WirePort->Scanner->scan(configuration->i2cAddress)) {
 
-      _initialized = tls2561->begin(configuration->i2cAddress, WirePort0);
+#ifdef AFE_ESP32
+      _initialized = tls2561->begin(
+          configuration->i2cAddress,
+          (configuration->wirePortId == 0 ? WirePort->Port0 : WirePort->Port1));
+#else
+      _initialized = tls2561->begin(configuration->i2cAddress, WirePort->Port0);
+#endif
 
       /* Configuring the sensor: setting gain */
-      switch (configuration->gain)
-      {
+      switch (configuration->gain) {
       case TSL2561_GAIN_1X:
         tls2561->setGain(TSL2561_GAIN_1X); /* No gain ... use in bright light to
                                              avoid sensor saturation */
@@ -97,8 +82,7 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *_WirePort0)
       }
 
       /* Configuring the sensor: sensitiveness */
-      switch (configuration->sensitiveness)
-      {
+      switch (configuration->sensitiveness) {
       case TSL2561_INTEGRATIONTIME_101MS:
         tls2561->setIntegrationTime(
             TSL2561_INTEGRATIONTIME_101MS); /* medium resolution and speed   */
@@ -114,25 +98,21 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *_WirePort0)
       }
 
 #ifdef DEBUG
-    }
-    else
-    {
-      Debugger->printBulletPoint(F("Error: Device not found under I2C Address: 0x: "));
+    } else {
+      Debugger->printBulletPoint(
+          F("Error: Device not found under I2C Address: 0x: "));
       Serial << _HEX(configuration->i2cAddress);
 #endif
     }
 
 #ifdef DEBUG
-  }
-  else
-  {
+  } else {
     Debugger->printBulletPoint(F("Error: Address not set"));
 #endif
   }
 
 #ifdef DEBUG
-  if (_initialized)
-  {
+  if (_initialized) {
 
     sensor_t sensor;
     tls2561->getSensor(&sensor);
@@ -150,19 +130,17 @@ void AFESensorTSL2561::begin(uint8_t _id, TwoWire *_WirePort0)
     Debugger->printBulletPoint(F("Resolution: "));
     Debugger->printValue(sensor.resolution);
     Debugger->printBulletPoint(F("Device: "));
-    Debugger->printValue(_initialized ? F("Found") : F("Not found: check wiring"));
+    Debugger->printValue(_initialized ? F("Found")
+                                      : F("Not found: check wiring"));
     Debugger->printHeader(1, 2, 50, AFE_DEBUG_HEADER_TYPE_DASH);
   }
 #endif
 }
 
-boolean AFESensorTSL2561::listener()
-{
+boolean AFESensorTSL2561::listener() {
   ready = false;
-  if (_initialized)
-  {
-    if (millis() - startTime >= configuration->interval * 1000)
-    {
+  if (_initialized) {
+    if (millis() - startTime >= configuration->interval * 1000) {
 
 #ifdef DEBUG
       Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
@@ -171,8 +149,7 @@ boolean AFESensorTSL2561::listener()
       Serial << (millis() - startTime) / 1000 << F("s");
 #endif
 
-      if (tls2561->init())
-      {
+      if (tls2561->init()) {
         tls2561->getLuminosity(&broadband, &ir);
         illuminance = tls2561->calculateLux(broadband, ir);
 #ifdef DEBUG
@@ -185,10 +162,9 @@ boolean AFESensorTSL2561::listener()
 #endif
         ready = true;
 #ifdef DEBUG
-      }
-      else
-      {
-        Debugger->printBulletPoint(F("ERROR: TSL2561: Sensor not found and initialized"));
+      } else {
+        Debugger->printBulletPoint(
+            F("ERROR: TSL2561: Sensor not found and initialized"));
 #endif
       }
 
@@ -202,11 +178,12 @@ boolean AFESensorTSL2561::listener()
   return ready;
 }
 
-void AFESensorTSL2561::getJSON(char *json)
-{
-  sprintf(json, (const char *)F("{\"illuminance\":{\"value\":%d,\"unit\":\"%s\"},"
-                "\"broadband\":{\"value\":%d,\"unit\":\"?\"},\"IR\":{\"value\":"
-                "%d,\"unit\":\"?\"}}"),
+void AFESensorTSL2561::getJSON(char *json) {
+  sprintf(json,
+          (const char *)F(
+              "{\"illuminance\":{\"value\":%d,\"unit\":\"%s\"},"
+              "\"broadband\":{\"value\":%d,\"unit\":\"?\"},\"IR\":{\"value\":"
+              "%d,\"unit\":\"?\"}}"),
           illuminance, AFE_UNIT_LUX, broadband, ir);
 }
 

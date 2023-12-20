@@ -3,71 +3,86 @@
 #include "AFE-MCP23017-Broker.h"
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-
-AFEMCP23017Broker::AFEMCP23017Broker(){};
-
-#ifdef AFE_ESP32
-void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device,
-                              TwoWire *WirePort0, TwoWire *WirePort1) {
+#ifdef DEBUG
+AFEMCP23017Broker::AFEMCP23017Broker(AFEDataAccess *_Data, AFEDevice *_Device,
+                                     AFEWireContainer *_Wire,
+                                     AFEDebugger *_Debugger) {
+  Data = _Data;
+  Device = _Device;
+  WirePort = _Wire;
+  Debugger = _Debugger;
+};
 #else
-void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device,
-                              TwoWire *WirePort0) {
+AFEMCP23017Broker::AFEMCP23017Broker(AFEDataAccess *_Data, AFEDevice *_Device,
+                                     AFEWireContainer *_Wire) {
+  Data = _Data;
+  Device = _Device;
+  WirePort = _Wire;
+};
 #endif
+
+void AFEMCP23017Broker::begin() {
 
 #ifdef DEBUG
-  Serial << endl << F("INFO: MCP23017 Broker: initializing");
+  Debugger->printInformation(F("initializing"), F("MCP23xxx"));
 #endif
-
-  AFEI2CScanner I2CScanner;
-  _WirePort0 = WirePort0;
 
   for (uint8_t i = 0; i < Device->configuration.noOfMCP23xxx; i++) {
 
 #ifdef AFE_ESP32
     if (configuration[i].wirePortId == AFE_CONFIG_HARDWARE_I2C_0) {
-      I2CScanner.begin(_WirePort0);
+      WirePort->Scanner->setWire(WirePort->Port0);
     } else {
-      I2CScanner.begin(_WirePort1);
+      WirePort->Scanner->setWire(WirePort->Port1);
     }
 #else // ESP8266
-    I2CScanner.begin(_WirePort0);
+    WirePort->Scanner->setWire(WirePort->Port0);
 #endif
 
     Data->getConfiguration(i, &configuration[i]);
 
-    if (I2CScanner.scan(configuration[i].address)) {
+    if (WirePort->Scanner->scan(configuration[i].address)) {
 
 #ifdef DEBUG
-      Serial << endl
-             << F(": MCP23XXX expander address: 0x")
-             << _HEX(configuration[i].address);
+      Debugger->printInformation(F("expander address: 0x"), F("MCP23xxx"));
+      Serial << _HEX(configuration[i].address);
 #endif
 
 #ifdef AFE_ESP32
       if (MCP[i].begin_I2C(configuration[i].address,
-                    configuration[i].wirePortId == AFE_CONFIG_HARDWARE_I2C_0
-                        ? _WirePort0
-                        : _WirePort1))
+                           configuration[i].wirePortId ==
+                                   AFE_CONFIG_HARDWARE_I2C_0
+                               ? WirePort->Port0
+                               : WirePort->Port1))
 #else // ESP8266
-      if (MCP[i].begin_I2C(configuration[i].address, _WirePort0))
+      if (MCP[i].begin_I2C(configuration[i].address, WirePort->Port0))
 #endif
       {
 #ifdef DEBUG
-        Serial << endl << F("INFO: MCP23XXX: Initialized");
+        Debugger->printInformation(F("Initialized"), F("MCP23xxx"));
       } else {
-        Serial << endl << F("ERROR: MCP23XXX: Initialization failure");
+        Debugger->printError(F("Initialization failure"), F("MCP23xxx"));
 #endif
-    }
+      }
 
 #ifdef DEBUG
-  }
-  else {
-    Serial << endl
-           << F(": Error: Device not found under I2C Address: 0x")
-           << _HEX(configuration[i].address);
+    } else {
+      Debugger->printError(F("Device not found under I2C Address: 0x"),
+                           F("MCP23xxx"));
+      Serial << _HEX(configuration[i].address);
 #endif
+    }
   }
-}
+
+  delete Data;
+  Data = NULL;
+  delete Device;
+  Device = NULL;
+
+#ifdef DEBUG
+  delete Debugger;
+  Debugger = NULL;
+#endif
 }
 
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX

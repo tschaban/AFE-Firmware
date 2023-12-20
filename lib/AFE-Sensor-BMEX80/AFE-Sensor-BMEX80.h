@@ -13,9 +13,9 @@
 #include <AFE-Sensor-BMP180.h>
 #endif // AFE_ESP32
 #include <AFE-Sensors-Common.h>
-#include <ArduinoJson.h>
-#include <Wire.h>
+#include <AFE-Wire-Container.h>
 #include <Arduino.h>
+#include <ArduinoJson.h>
 
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
@@ -27,59 +27,55 @@
 #include <AFE-Debugger.h>
 #endif
 
-class AFESensorBMEX80 : public AFESensorsCommon
-{
+class AFESensorBMEX80 : public AFESensorsCommon {
 
 private:
   boolean ready = false;
   unsigned long startTime = 0;
   boolean _initialized = false;
+
 #ifndef AFE_ESP32 // Sensor doesn't work with current libraries
-  AFESensorBMP180 *s1 = new AFESensorBMP180();
+#ifdef DEBUG
+  AFESensorBMP180 *s1 = new AFESensorBMP180(configuration, data, Debugger);
+#else
+  AFESensorBMP180 *s1 = new AFESensorBMP180(configuration, data);
+#endif
 #endif // ESP32
-  AFESensorBME280 *s2 = new AFESensorBME280();
-  AFESensorBME680 *s6 = new AFESensorBME680();
+
+#ifdef DEBUG
+  AFESensorBME280 *s2 = new AFESensorBME280(configuration, data, Debugger);
+#else
+  AFESensorBME280 *s2 = new AFESensorBME280(configuration, data);
+#endif
+
+#ifdef DEBUG
+  AFESensorBME680 *s6 = new AFESensorBME680(configuration, data, Debugger);
+#else
+  AFESensorBME680 *s6 = new AFESensorBME680(configuration, data);
+#endif
 
   void applyCorrections();
 
-  TwoWire *_WirePort;
+  AFEWireContainer *WirePort;
+  AFEDataAccess *Data;
 
 #ifdef DEBUG
   AFEDebugger *Debugger;
-  void begin(uint8_t id, TwoWire *WirePort);
-#ifdef AFE_ESP32
-  void begin(uint8_t id, TwoWire *WirePort0, TwoWire *WirePort1);
 #endif
-#else
-#ifdef AFE_ESP32
-  void begin(uint8_t id, TwoWire *WirePort);
-#endif
-#endif
-
 
 public:
   BMEX80 *configuration = new BMEX80;
   BMEX80_DATA *data = new BMEX80_DATA;
 
-  /* Constructor: entry parameter is GPIO number where Sensor is connected to */
-  AFESensorBMEX80();
-
-/* Initialization of the sensor */
+/* Constructor: entry parameter is GPIO number where Sensor is connected to */
 #ifdef DEBUG
-
-#ifdef AFE_ESP32
-  void begin(uint8_t id, TwoWire *WirePort0, TwoWire *WirePort1, AFEDebugger *);
+  AFESensorBMEX80(AFEDataAccess *, AFEWireContainer *, AFEDebugger *);
 #else
-  void begin(uint8_t id, TwoWire *WirePort, AFEDebugger *);
+  AFESensorBMEX80(AFEDataAccess *, AFEWireContainer *);
 #endif
 
-#else
-#ifdef AFE_ESP32
-  void begin(uint8_t id, TwoWire *WirePort0, TwoWire *WirePort1);
-#else
-  void begin(uint8_t id, TwoWire *WirePort);
-#endif
-#endif
+  /* Initialization of the sensor */
+  void begin(uint8_t id);
 
   /* Returns sensor data in JSON format */
   void getJSON(char *);

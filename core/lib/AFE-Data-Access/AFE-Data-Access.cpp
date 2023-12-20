@@ -1076,6 +1076,11 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
                            : AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
 #endif
 
+      exists = root["m"]; // mDNSActive
+      configuration->mDNSActive =
+          exists.success() ? root["m"] : AFE_CONFIG_NETWORK_DEFAULT_MDNS;
+
+
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
 #endif
@@ -1113,15 +1118,6 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
 #endif
 
     char fileContent[AFE_CONFIG_FILE_BUFFER_NETWORK];
-    Serial << endl << 1;
-    
-//   strcpy_P(fileContent, JSON_CONFIG_NETWORK);
-
-   //strcpy_P(fileContent,JSON_CONFIG_NETWORK);
-   //sprintf(fileContent, "%S", F(JSON_CONFIG_NETWORK));
-   Serial << endl << 2;
-    
-    //Serial << endl << a;
 
     sprintf(fileContent, (const char*)FPSTR(JSON_CONFIG_NETWORK), configuration->outputPower,
             configuration->radioMode, configuration->noConnectionAttempts,
@@ -1134,8 +1130,8 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
             configuration->secondary.ssid, configuration->secondary.password,
             configuration->secondary.isDHCP, configuration->secondary.ip,
             configuration->secondary.gateway, configuration->secondary.subnet,
-            configuration->secondary.dns1, configuration->secondary.dns2);
-Serial << endl << 3;
+            configuration->secondary.dns1, configuration->secondary.dns2, configuration->mDNSActive);
+
     /*
         StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_NETWORK> jsonBuffer;
         JsonObject &root = jsonBuffer.createObject();
@@ -1172,12 +1168,14 @@ Serial << endl << 3;
 
         root.printTo(configFile);
 
-    #ifdef DEBUG
-        root.printTo(Serial);
-    #endif
-       */
-    configFile.print(fileContent);
 
+       */
+
+    #ifdef DEBUG
+    Serial << fileContent;
+    //    root.printTo(Serial);
+    #endif
+    configFile.print(fileContent);
     configFile.close();
 
 #ifdef DEBUG
@@ -1226,6 +1224,9 @@ void AFEDataAccess::createNetworkConfigurationFile() {
   configuration->outputPower = AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
   configuration->radioMode = AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
 #endif
+
+  configuration->mDNSActive = AFE_CONFIG_NETWORK_DEFAULT_MDNS;
+
   saveConfiguration(configuration);
 }
 
@@ -7222,10 +7223,9 @@ boolean AFEDataAccess::setDefaultConfiguration() {
     /* Setting device mode to Access Point */
     saveDeviceMode(AFE_MODE_NETWORK_NOT_SET);
 
-    Serial << endl << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
     NETWORK *t = new NETWORK;
     getConfiguration(t);
-    Serial << endl << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
     createDomoticzConfigurationFile();

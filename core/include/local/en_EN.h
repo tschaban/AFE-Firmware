@@ -119,6 +119,10 @@
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">More</a> information about the device"
 #define L_INDEX_DONATION "Donation"
 
+#define L_INDEX_MULITICAST_TURNED_ON "Multicast DNS is active"
+#define L_INDEX_FIRMWARE_AVAILABLE_UNDER_ADDRESS "If mDNS is supported by the LAN, the device will be available by this <a target=\"_blank\" href=\"http://%s.local\">url</a>"
+
+
 /* Form: device coniguration */
 #define L_DEVICE_NAME "Device name"
 #define L_DEVICE_SECTION_INFO "Name is used for device identification within your LAN and a device's hotspot name used for configuration mode"

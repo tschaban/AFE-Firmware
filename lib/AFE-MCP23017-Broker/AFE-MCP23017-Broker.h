@@ -6,58 +6,42 @@
 #include <AFE-Configuration.h>
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
-#include <AFE-I2C-Scanner.h>
+#include <AFE-Wire-Container.h>
 #include <Adafruit_MCP23X17.h>
 
+
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
 class AFEMCP23017Broker {
 
 private:
-  TwoWire *_WirePort0;
-#ifdef AFE_ESP32
-  TwoWire *_WirePort1;
-#endif
+  AFEDataAccess *Data;
+  AFEDebugger *Debugger;
+  AFEDevice *Device;
+  AFEWireContainer *WirePort;
 
   MCP23XXX configuration[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];
 
 public:
   Adafruit_MCP23X17 MCP[AFE_CONFIG_HARDWARE_NUMBER_OF_MCP23XXX];
 
-  /**
-   * @brief Construct a new AFEMCP23017Broker object
-   * 
-   */
-  AFEMCP23017Broker();
-
-#ifdef AFE_ESP32
-  /**
-   * @brief Initialize MCP + adds to the cache all items Relays, LEDs, etc. IDs
-   * connected to MCP
-   *
-   * @param  Data             reference to database
-   * @param  WirePort0        reference to WirePort0
-   * @param  WirePort1        reference to WirePort1
-   */
-  void begin(AFEDataAccess *Data, AFEDevice *Device, TwoWire *WirePort0,
-             TwoWire *WirePort1);
+/**
+ * @brief Construct a new AFEMCP23017Broker object
+ *
+ */
+#ifdef DEBUG
+  AFEMCP23017Broker(AFEDataAccess *_Data, AFEDevice *_Device,
+                    AFEWireContainer *_Wire, AFEDebugger *_Debugger);
 #else
-  /**
-   * @brief Initialize MCP + adds to the cache all items Relays, LEDs, etc. IDs
-   * connected to MCP
-   *
-   * @param  Data             reference to database
-   * @param  WirePort0        reference to WirePort0
-   */
-  void begin(AFEDataAccess *Data, AFEDevice *Device, TwoWire *WirePort0);
+  AFEMCP23017Broker(AFEDataAccess *_Data, AFEDevice *_Device,
+                    AFEWireContainer *_Wire);
 #endif
 
-
+  void begin();
 };
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #endif // _AFE_MCP23107_Broker_h

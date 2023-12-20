@@ -3,44 +3,25 @@
 #include "AFE-Sensor-BMEX80.h"
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
 
-AFESensorBMEX80::AFESensorBMEX80(){};
-
-#ifdef AFE_ESP32
 #ifdef DEBUG
-void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0,
-                            TwoWire *WirePort1, AFEDebugger *Debugger)
-{
-  _Debugger = Debugger;
-  begin(id, WirePort0, WirePort1);
-}
-#endif
-
-void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort0,
-                            TwoWire *WirePort1)
-{
-  AFEDataAccess Data;
-  Data.getConfiguration(id, configuration);
-  begin(id, configuration->wirePortId == 0 ? WirePort0 : WirePort1);
-}
-
-#endif // AFE_ESP32
-
-#ifdef DEBUG
-void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort, AFEDebugger *_Debugger)
-{
+AFESensorBMEX80::AFESensorBMEX80(AFEDataAccess *_Data, AFEWireContainer *_WirePort, AFEDebugger *_Debugger){
+  Data = _Data;
+  WirePort = _WirePort;
   Debugger = _Debugger;
-  begin(id, WirePort);
-}
+};
+#else
+AFESensorBMEX80::AFESensorBMEX80(AFEDataAccess *_Data, AFEWireContainer *_WirePort){
+  Data = _Data;
+  WirePort = _WirePort;
+};
+
 #endif
 
-void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort)
-{
-#ifndef AFE_ESP32
-  AFEDataAccess Data;
-  Data.getConfiguration(id, configuration);
-#endif // AFE_ESP32
 
-  _WirePort = WirePort;
+void AFESensorBMEX80::begin(uint8_t id)
+{
+
+  Data->getConfiguration(id, configuration);
 
 #if defined(DEBUG)
   Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
@@ -54,33 +35,25 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort)
 
     if (configuration->type == AFE_BME680_SENSOR)
     {
-#ifdef DEBUG
-      _initialized = s6->begin(configuration, _WirePort, Debugger, data);
+#ifdef AFE_ESP32
+      _initialized = s6->begin();
 #else
-    _initialized = s6->begin(configuration, _WirePort, data);
+    _initialized = s6->begin(WirePort->Port0);
 #endif
-    }
-    else if (configuration->type == AFE_BME280_SENSOR ||
-             configuration->type == AFE_BMP280_SENSOR)
-    {
-#ifdef DEBUG
+
+    } else if (configuration->type == AFE_BME280_SENSOR ||
+               configuration->type == AFE_BMP280_SENSOR) {
+#ifdef AFE_ESP32
       _initialized = s2->begin(configuration, _WirePort, Debugger, data);
 #else
-    _initialized = s2->begin(configuration, _WirePort, data);
+      _initialized = s2->begin(WirePort->Port0);
 #endif
+
 #ifndef AFE_ESP32
-    }
-    else if (configuration->type == AFE_BMP180_SENSOR)
-    {
-#ifdef DEBUG
-      _initialized = s1->begin(configuration, _WirePort, Debugger, data);
-#else
-      _initialized = s1->begin(configuration, _WirePort, data);
-#endif
+    } else if (configuration->type == AFE_BMP180_SENSOR) {
+      _initialized = s1->begin(WirePort->Port0);
 #endif // AFE_ESP32
-    }
-    else
-    {
+    } else {
       _initialized = false;
     }
 
@@ -90,56 +63,46 @@ void AFESensorBMEX80::begin(uint8_t id, TwoWire *WirePort)
 
 #ifdef DEBUG
   Debugger->printBulletPoint(F("Sensor: "));
-  Debugger->printValue(_initialized ? F("Found") : F("NOT found: check wiring"));
+  Debugger->printValue(_initialized ? F("Found")
+                                    : F("NOT found: check wiring"));
   Debugger->printHeader(1, 2, 30, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
 
-boolean AFESensorBMEX80::isReady()
-{
-  if (ready)
-  {
+boolean AFESensorBMEX80::isReady() {
+  if (ready) {
     ready = false;
     return true;
-  }
-  else
-  {
+  } else {
     return false;
   }
 }
 
-void AFESensorBMEX80::listener()
-{
-  if (_initialized)
-  {
+void AFESensorBMEX80::listener() {
+  if (_initialized) {
     unsigned long time = millis();
     boolean readStatus = false;
 
-    if (startTime == 0)
-    { // starting timer. used for switch sensitiveness
+    if (startTime == 0) { // starting timer. used for switch sensitiveness
       startTime = time;
     }
-    if (time - startTime >= configuration->interval * 1000)
-    {
+    if (time - startTime >= configuration->interval * 1000) {
 
 #if defined(DEBUG)
       Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
       Debugger->printBulletPoint(F("BMEX80: Reading"));
 #endif
-      if (configuration->type == AFE_BME680_SENSOR)
-      {
+      if (configuration->type == AFE_BME680_SENSOR) {
         /**
          * @brief Reading Bosch BME680 Sensor
          *
          */
         readStatus = s6->read();
-      }
-      else if (configuration->type != AFE_BME680_SENSOR)
-      {
-        /**
-         * @brief Reading Bosch BME280/BMP280 or BMP180 (for ESP82xx only) Sensor
-         *
-         */
+      } else if (configuration->type != AFE_BME680_SENSOR) {
+/**
+ * @brief Reading Bosch BME280/BMP280 or BMP180 (for ESP82xx only) Sensor
+ *
+ */
 
 #ifdef AFE_ESP32
         readStatus = s2->read();
@@ -150,8 +113,7 @@ void AFESensorBMEX80::listener()
                 : s1->read();
 #endif // ESP32/ESP8266
       }
-      if (readStatus)
-      {
+      if (readStatus) {
         /*&
                 if (configuration->type == AFE_BME680_SENSOR) {
                   data = s6->data;
@@ -178,15 +140,13 @@ void AFESensorBMEX80::listener()
         Debugger->printValue(data->relativePressure.value);
 
         if (configuration->type != AFE_BMP180_SENSOR &&
-            configuration->type != AFE_BMP280_SENSOR)
-        {
+            configuration->type != AFE_BMP280_SENSOR) {
           Debugger->printBulletPoint(F("Humidity: "));
           Debugger->printValue(data->humidity.value);
           Debugger->printBulletPoint(F("Dew Point: "));
           Debugger->printValue(data->dewPoint.value);
         }
-        if (configuration->type == AFE_BME680_SENSOR)
-        {
+        if (configuration->type == AFE_BME680_SENSOR) {
 
           Debugger->printBulletPoint(F("Gas Resistance: "));
           Debugger->printValue(data->gasResistance.value);

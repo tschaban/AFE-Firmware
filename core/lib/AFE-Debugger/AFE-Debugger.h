@@ -3,6 +3,8 @@
 #ifndef _AFE_Debugger_h
 #define _AFE_Debugger_h
 
+
+#include <AFE-Configuration.h>
 #ifdef DEBUG
 
 extern "C"
@@ -10,7 +12,7 @@ extern "C"
 #include "user_interface.h"
 }
 
-#include <AFE-Configuration.h>
+
 #include <Streaming.h>
 
 #include <FS.h>

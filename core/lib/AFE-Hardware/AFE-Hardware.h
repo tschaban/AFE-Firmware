@@ -6,6 +6,14 @@
 #include <AFE-Configuration.h>
 #include <AFE-Firmware.h>
 
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#include <AFE-Wire-Container.h>
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+#include <AFE-MCP23017-Broker.h>
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 #include <AFE-Relay.h>
 #endif
@@ -62,7 +70,7 @@
 #include <AFE-Sensor-HPMA115S0.h>
 #endif
 
-#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) || \
+#if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) ||                                 \
     defined(AFE_CONFIG_HARDWARE_RAINMETER)
 #include <AFE-Impulse-Catcher.h>
 #endif
@@ -83,11 +91,10 @@
 #include <Streaming.h>
 #endif
 
-class AFEHardware
-{
+class AFEHardware {
 
 private:
-  AFEFirmware *_Firmware;
+  AFEFirmware *Firmware;
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   void initSwitch(void);
@@ -143,7 +150,21 @@ private:
   void initFS3000(void);
 #endif
 
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+  void initMCP23XXX(void);
+#endif
+
 public:
+#ifdef AFE_CONFIG_HARDWARE_I2C
+#ifdef DEBUG
+  AFEWireContainer *WirePort = new AFEWireContainer(
+      Firmware->Device, Firmware->API->Flash, Firmware->Debugger);
+#else
+  AFEWireContainer *WirePort =
+      new AFEWireContainer(Firmware->Device, Firmware->API->Flash);
+#endif
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   AFERelay *Relay[AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS];
 #endif
@@ -204,7 +225,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
 #ifdef DEBUG
-  AFEImpulseCatcher *WindImpulse = new AFEImpulseCatcher(_Firmware->Debugger);
+  AFEImpulseCatcher *WindImpulse = new AFEImpulseCatcher(Firmware->Debugger);
 #else
   AFEImpulseCatcher *WindImpulse = new AFEImpulseCatcher();
 #endif
@@ -214,7 +235,7 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
 #ifdef DEBUG
-  AFEImpulseCatcher *RainImpulse = new AFEImpulseCatcher(_Firmware->Debugger);
+  AFEImpulseCatcher *RainImpulse = new AFEImpulseCatcher(Firmware->Debugger);
 #else
   AFEImpulseCatcher *RainImpulse = new AFEImpulseCatcher();
 #endif
@@ -224,10 +245,23 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_FS3000
   AFESensorFS3000 *FS3000Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_FS3000];
-#endif
+#endif /*                                                                      \ \
+   AFEMCP23017Broker(AFEDataAccess *_Data, AFEDevice *_Device, TwoWire \                                                                               \
+   *_WirePort0, \                                                                               \
+                     TwoWire *_WirePort1, AFEDebugger *_Debugger); \                                                                               \
+ */
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
+#ifdef DEBUG
+  AFEMCP23017Broker *MCP23017Broker = new AFEMCP23017Broker(
+      Firmware->API->Flash, Firmware->Device, WirePort, Firmware->Debugger);
+#else
+  AFEMCP23017Broker *MCP23017Broker =
+      new AFEMCP23017Broker(Firmware->API->Flash, Firmware->Device, WirePort);
+#endif
+#endif
   /* Constructor */
-  AFEHardware(AFEFirmware *Firmware);
+  AFEHardware(AFEFirmware *);
 
   void initPriorityHardwareItems(void);
   void initHardwareItems(void);

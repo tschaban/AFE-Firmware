@@ -448,7 +448,7 @@ void AFEWiFi::listener() {
 
         Debugger->printHeader(2, 1, 40, AFE_DEBUG_HEADER_TYPE_DASH);
         Debugger->printValue(F("Connection established"));
-            Debugger->printBulletPoint(F("MAC: "));
+        Debugger->printBulletPoint(F("MAC: "));
         Serial << WirelessNetwork.macAddress();
         Debugger->printBulletPoint(F("IP: "));
         Serial << WirelessNetwork.localIP();
@@ -485,7 +485,7 @@ void AFEWiFi::listener() {
         Serial << WirelessNetwork.hostname();
 #endif
 
-        Debugger->printBulletPoint(F("LAN HTTP: http:////"));
+        Debugger->printBulletPoint(F("LAN HTTP: http://"));
         char deviceIdExtended[AFE_CONFIG_DEVICE_ID_SIZE];
         Data->getDeviceID(deviceIdExtended, true);
         Serial << deviceIdExtended << F(".local");
@@ -498,13 +498,37 @@ void AFEWiFi::listener() {
 }
 
 boolean AFEWiFi::connected() {
-  MDNS.update();
+  if (configuration->mDNSActive == AFE_CONFIG_NETWORK_MDNS_ACTIVE) {
+    MDNS.update();
+  }
   return AFEWiFi::isConnected;
 }
 
 boolean AFEWiFi::eventConnected() {
   boolean returnValue = AFEWiFi::eventConnectionEstablished;
-  AFEWiFi::eventConnectionEstablished = false;
+
+  if (AFEWiFi::eventConnectionEstablished == true) {
+    if (configuration->mDNSActive == AFE_CONFIG_NETWORK_MDNS_ACTIVE) {
+      char _mDNSDeviceID[AFE_CONFIG_DEVICE_ID_SIZE +
+                         4]; // extended deviceId "afe-1234-5678"
+      Data->getDeviceID(_mDNSDeviceID, true);
+
+      if (MDNS.begin(_mDNSDeviceID)) {
+#ifdef DEBUG
+        Serial << endl << F("INFO: mDNS: Responder started: ") << _mDNSDeviceID;
+#endif
+
+        MDNS.addService("http", "tcp", 80);
+#ifdef DEBUG
+        Serial << endl << F("INFO: mDNS: HTTP service added");
+      } else {
+        Serial << endl << F("ERROR: mDNS: Responder not set");
+#endif
+      }
+    }
+    AFEWiFi::eventConnectionEstablished = false;
+  }
+
   return returnValue;
 }
 
@@ -536,31 +560,8 @@ void AFEWiFi::onWiFiEvent(WiFiEvent_t event) {
 
 #else // ESP8266
 void AFEWiFi::onWifiConnect(const WiFiEventStationModeGotIP &event) {
-#ifdef DEBUG
-// AFEDebugger::printInformation(F("Connected to Wi-Fi"), F("WIFI"));
-#endif
   AFEWiFi::eventConnectionEstablished = true;
   AFEWiFi::isConnected = true;
-
-  AFEDataAccess *Data = new AFEDataAccess();
-  char _mDNSDeviceID[AFE_CONFIG_DEVICE_ID_SIZE +
-                     4]; // extended deviceId "afe-1234-5678"
-  Data->getDeviceID(_mDNSDeviceID, true);
-  if (MDNS.begin(_mDNSDeviceID)) {
-#ifdef DEBUG
-    Serial << endl << F("INFO: mDNS: Responder started: ") << _mDNSDeviceID;
-#endif
-
-    MDNS.addService("http", "tcp", 80);
-#ifdef DEBUG
-    Serial << endl << F("INFO: mDNS: HTTP service added");
-  } else {
-    Serial << endl << F("ERROR: mDNS: Responder not set");
-#endif
-  }
-
-  delete Data;
-  Data = NULL;
 }
 
 void AFEWiFi::onWifiDisconnect(const WiFiEventStationModeDisconnected &event) {

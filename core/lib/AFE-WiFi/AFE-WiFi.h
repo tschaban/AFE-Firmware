@@ -27,7 +27,6 @@ class AFEWiFi {
 private:
   AFEDevice *Device;
   AFEDataAccess *Data;
-  NETWORK *configuration = new NETWORK;
   unsigned long delayStartTime = 0;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -114,6 +113,7 @@ public:
 
   /* Constructor: no actions */
   AFEWiFi();
+  NETWORK *configuration = new NETWORK;
 
 #ifdef AFE_ESP32
   WiFiClass WirelessNetwork;

@@ -8,19 +8,11 @@ void AFESitesGenerator::begin(AFEFirmware *_Firmware) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-#ifdef AFE_ESP32
-void AFESitesGenerator::begin(AFEFirmware *_Firmware, TwoWire *_WirePort0,
-                              TwoWire *_WirePort1) {
-  WirePort0 = _WirePort0;
-  WirePort1 = _WirePort1;
+void AFESitesGenerator::begin(AFEFirmware *_Firmware,
+                              AFEWireContainer *_WirePort) {
+  WirePort = _WirePort;
   begin(_Firmware);
 }
-#else
-void AFESitesGenerator::begin(AFEFirmware *_Firmware, TwoWire *_WirePort0) {
-  WirePort0 = _WirePort0;
-  begin(_Firmware);
-}
-#endif // AFE_ESP32
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 void AFESitesGenerator::generateHeader(String &page, uint16_t redirect) {
@@ -712,7 +704,7 @@ void AFESitesGenerator::siteNetwork(String &page) {
 #endif // AFE_ESP32
 
 #ifdef DEBUG
-Firmware->Debugger->printInformation(F("Searching for WiFis: "),F("WIFI"));
+    Firmware->Debugger->printInformation(F("Searching for WiFis: "), F("WIFI"));
 #endif
     numberOfNetworks = WiFi.scanNetworks();
 #ifdef DEBUG
@@ -849,6 +841,11 @@ Firmware->Debugger->printInformation(F("Searching for WiFis: "),F("WIFI"));
 
   /* Section: Advanced settings */
   openSection(page, F(L_NETWORK_ADVANCED), F(""));
+
+  addCheckboxFormItem(
+      page, "md", (const char *)F("Multicast DNS"), "1",
+      (configuration.mDNSActive == AFE_CONFIG_NETWORK_MDNS_ACTIVE ? true
+                                                                  : false));
 
 #if !defined(ESP32)
 
@@ -2168,7 +2165,8 @@ void AFESitesGenerator::siteGate(String &page, uint8_t id) {
     }
 
 #ifdef DEBUG
-    Firmware->Debugger->printInformation(F("Number of contactros set for the gate: "),F("SITE"));
+    Firmware->Debugger->printInformation(
+        F("Number of contactros set for the gate: "), F("SITE"));
     Firmware->Debugger->printValue(numberOfContractons);
 #endif
 
@@ -3297,7 +3295,7 @@ void AFESitesGenerator::siteConnecting(String &page) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_NETWORK_CONNECT_TO_PANEL));
   char _deviceLocalLANAddress[AFE_CONFIG_DEVICE_ID_SIZE];
-  Firmware->API->Flash->getDeviceID(_deviceLocalLANAddress,true);
+  Firmware->API->Flash->getDeviceID(_deviceLocalLANAddress, true);
   page.replace(F("{{A}}"), _deviceLocalLANAddress);
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_NETWORK_SEARCH_FOR_IP_ADDRESS));
@@ -3307,9 +3305,25 @@ void AFESitesGenerator::siteConnecting(String &page) {
 
 void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
 
-  char _text[42];
-  sprintf(_text, "%s: %s", L_DEVICE, Firmware->Device->configuration.name);
-  openMessageSection(page, _text, F(""));
+  openMessageSection(page, Firmware->Device->configuration.name, F(""));
+
+  if (Firmware->API->Network->configuration->mDNSActive ==
+      AFE_CONFIG_NETWORK_MDNS_ACTIVE) {
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), (const char *)F(L_INDEX_MULITICAST_TURNED_ON));
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    char _mDNSDeviceID[AFE_CONFIG_DEVICE_ID_SIZE +
+                       4]; // extended deviceId "afe-1234-5678"
+    char _text[sizeof(L_INDEX_FIRMWARE_AVAILABLE_UNDER_ADDRESS) +
+               sizeof(_mDNSDeviceID) + 10]; // 10 buffer for PL chars
+
+    Firmware->API->Flash->getDeviceID(_mDNSDeviceID, true);
+    sprintf(_text, (const char *)F(L_INDEX_FIRMWARE_AVAILABLE_UNDER_ADDRESS),
+            _mDNSDeviceID);
+    page.replace(F("{{I}}"), _text);
+  }
 
   if (Firmware->API->REST->accessToWAN()) {
 
@@ -3364,13 +3378,26 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   page.concat(F("\" /></div></form>"));
   closeSection(page);
 
+  openSection(page, F(L_ADDITIONAL_INFORMATION), F(""));
+
   if (Firmware->API->REST->accessToWAN()) {
+
+    Firmware->API->REST->sent(
+        _HtmlResponse,
+        (const char *)F(
+            AFE_CONFIG_JSONRPC_REST_METHOD_FIRMWARE_COMPATIBLE_WITH));
+    if (_HtmlResponse.length() > 0) {
+      page.concat(_HtmlResponse);
+    }
+
     Firmware->API->REST->sent(_HtmlResponse,
                               AFE_CONFIG_JSONRPC_REST_METHOD_BOTTOM_TEXT);
     if (_HtmlResponse.length() > 0) {
       page.concat(_HtmlResponse);
     }
   }
+
+  closeSection(page);
 }
 
 void AFESitesGenerator::siteProKey(String &page) {
@@ -4320,15 +4347,15 @@ void AFESitesGenerator::setAttributes(String *page) {
   page->replace(F("{{s.lang}}"), F(L_LANGUAGE_SHORT));
 
   char _ramText[7];
-  #ifndef AFE_ESP32
+#ifndef AFE_ESP32
   sprintf(_ramText, "%-.1f",
           100 -
               (float)((float)system_get_free_heap_size() / (float)AFE_MAX_RAM) *
                   100);
-  #else
+#else
   sprintf(_ramText, "?");
-  #endif
-  
+#endif
+
   page->replace(F("{{f.r}}"), _ramText);
 }
 
@@ -4735,19 +4762,11 @@ void AFESitesGenerator::addDeviceI2CAddressSelectionItem(String &item,
 
 #endif
 
-  AFEI2CScanner I2CScanner;
 #ifdef AFE_ESP32
-#ifdef DEBUG
-I2CScanner.begin(wirePortId == 0 ? WirePort0 : WirePort1,Firmware->Debugger));
-else
-  I2CScanner.begin(wirePortId == 0 ? WirePort0 : WirePort1);
-  #endif
+  WirePort->Scanner->setWire(wirePortId == 0 ? WirePort->Port0
+                                             : WirePort->Port0);
 #else
-  #ifdef DEBUG
-  I2CScanner.begin(WirePort0,Firmware->Debugger);
-  #else
-  I2CScanner.begin(WirePort0);
-  #endif
+  WirePort->Scanner->setWire(WirePort->Port0);
 #endif
 
   addSelectFormItemOpen(item, F("a"), F("I2C " L_ADDRESS));
@@ -4755,9 +4774,9 @@ else
 
   char _i2cItemName[90];
   for (uint8_t addressToScan = 1; addressToScan < 127; addressToScan++) {
-    if (I2CScanner.scan(addressToScan)) {
+    if (WirePort->Scanner->scan(addressToScan)) {
       sprintf(_i2cItemName, "[0x%X] : %s", addressToScan,
-              I2CScanner.getName(addressToScan));
+              WirePort->Scanner->getName(addressToScan));
       sprintf(_number, "%d", addressToScan);
       addSelectOptionFormItem(item, _i2cItemName, _number,
                               address == addressToScan);
@@ -4895,13 +4914,11 @@ void AFESitesGenerator::siteFS3000(String &page, uint8_t id) {
   addSelectFormItemClose(page);
 
   addInformationItem(page, F(L_FS3000_R_HINT));
-  
+
   sprintf(_number, "%d", configuration.r);
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "re", L_FS3000_R,
-                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "100000", "1",
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "re", L_FS3000_R, _number,
+                   AFE_FORM_ITEM_SKIP_PROPERTY, "0", "100000", "1",
                    L_MILIMETERS);
-
-
 
   closeSection(page);
 

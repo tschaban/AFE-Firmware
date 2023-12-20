@@ -1,5 +1,7 @@
 #include "AFE-Debugger.h"
 
+#ifdef DEBUG
+
 AFEDebugger::AFEDebugger(){};
 
 void AFEDebugger::print(const char *text,
@@ -314,3 +316,5 @@ void AFEDebugger::printProcessingRequest(const __FlashStringHelper *deviceItemNa
     Serial << F(", Id: ") << deviceId;
   }
 }
+
+#endif

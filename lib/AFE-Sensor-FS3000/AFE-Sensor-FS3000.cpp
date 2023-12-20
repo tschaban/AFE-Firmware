@@ -3,31 +3,41 @@
 #include "AFE-Sensor-FS3000.h"
 
 #ifdef AFE_CONFIG_HARDWARE_FS3000
-
-AFESensorFS3000::AFESensorFS3000(){};
-
 #ifdef DEBUG
-boolean AFESensorFS3000::begin(uint8_t id, AFEDataAccess *_Data, AFEDebugger *_Debugger)
-{
+AFESensorFS3000::AFESensorFS3000(AFEDataAccess *_Data,
+                                 AFEWireContainer *_WirePort,
+                                 AFEDebugger *_Debugger) {
+  Data = _Data;
+  WirePort = _WirePort;
   Debugger = _Debugger;
-  return begin(id, _Data);
-}
+};
+#else
+AFESensorFS3000::AFESensorFS3000(AFEDataAccess *_Data,
+                                 AFEWireContainer *_WirePort) {
+  Data = _Data;
+  WirePort = _WirePort;
+};
 #endif
 
-boolean AFESensorFS3000::begin(uint8_t id, AFEDataAccess *_Data)
-{
-  _Data->getConfiguration(id, configuration);
+boolean AFESensorFS3000::begin(uint8_t id) {
+  Data->getConfiguration(id, configuration);
+  delete Data;
+  Data = NULL;
 
-  if (_fs3000->begin())
-  {
+#ifdef AFE_ESP32
+  bool _success = _fs3000->begin(configuration->wirePortId =
+                                     0 ? *WirePort->Port0 : *WirePort->Port1);
+#else
+  bool _success = _fs3000->begin(*WirePort->Port0);
+#endif
+
+  if (_success) {
     _fs3000->setRange(configuration->range);
     _initialized = true;
     _startTime = millis();
 #ifdef DEBUG
     Debugger->printInformation(F("Intialized"), F("FS3000"));
-  }
-  else
-  {
+  } else {
     Debugger->printError(F("Not Intialized"), F("FS3000"));
 #endif
   }
@@ -37,13 +47,10 @@ boolean AFESensorFS3000::begin(uint8_t id, AFEDataAccess *_Data)
 
 // wzor PI * R(mm/1000)2 * 3600 * Predkosc meter per second
 
-boolean AFESensorFS3000::listener(void)
-{
+boolean AFESensorFS3000::listener(void) {
   boolean _ret = false;
-  if (_initialized)
-  {
-    if (millis() - _startTime >= configuration->interval * 1000)
-    {
+  if (_initialized) {
+    if (millis() - _startTime >= configuration->interval * 1000) {
 
 #ifdef DEBUG
       Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
@@ -86,11 +93,11 @@ boolean AFESensorFS3000::listener(void)
   return _ret;
 }
 
-void AFESensorFS3000::getJSON(char *json)
-{
-  sprintf(json, (const char *)F("{\"fs3000\":[{\"value\":%d,\"unit\":\"raw\"},{\"value\":%."
-                                "3f,\"unit\":\"%s\"},{\"value\":%.3f,\"unit\":\"%s\"},{"
-                                "\"value\":%.3f,\"unit\":\"%s\"}]}"),
+void AFESensorFS3000::getJSON(char *json) {
+  sprintf(json, (const char *)F(
+                    "{\"fs3000\":[{\"value\":%d,\"unit\":\"raw\"},{\"value\":%."
+                    "3f,\"unit\":\"%s\"},{\"value\":%.3f,\"unit\":\"%s\"},{"
+                    "\"value\":%.3f,\"unit\":\"%s\"}]}"),
           data->raw, data->metersPerSecond, F(AFE_UNIT_MS), data->milesPerHour,
           F(AFE_UNIT_MILH), data->meters3PerHour, F(AFE_UNIT_M3H));
 }

@@ -4,11 +4,13 @@
 
 AFEDevice::AFEDevice() {}
 
+#ifdef DEBUG
 void AFEDevice::begin(AFEDataAccess *_data, AFEDebugger *_debugger)
 {
   Debugger = _debugger;
   begin(_data);
 }
+#endif 
 
 void AFEDevice::begin(AFEDataAccess *_data)
 {

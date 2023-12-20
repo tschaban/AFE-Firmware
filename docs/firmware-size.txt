@@ -73,4 +73,14 @@ Flash: [======    ]  58.8% (used 614057 bytes from 1044464 bytes)
 Impulse chatcher
 RAM:   [=====     ]  54.6% (used 44748 bytes from 81920 bytes)
 Flash: [======    ]  58.8% (used 614037 bytes from 1044464 bytes)
-Building .pio/build/AFE_T6_8266_4m-ha-development/firmware.bin
+
+
+FIRMWARE T0 HA Debug +++++++++++++
+RAM:   [====      ]  41.9% (used 34360 bytes from 81920 bytes)
+Flash: [=====     ]  46.7% (used 487280 bytes from 1044464 bytes)
+
+RAM:   [====      ]  42.1% (used 34476 bytes from 81920 bytes)
+Flash: [=====     ]  46.7% (used 487652 bytes from 1044464 bytes)
+
+RAM:   [====      ]  41.9% (used 34344 bytes from 81920 bytes)
+Flash: [=====     ]  46.7% (used 487656 bytes from 1044464 bytes)

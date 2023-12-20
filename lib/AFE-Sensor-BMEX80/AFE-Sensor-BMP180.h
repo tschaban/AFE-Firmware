@@ -19,30 +19,28 @@
 #include <AFE-Debugger.h>
 #endif
 
-class AFESensorBMP180
-{
+class AFESensorBMP180 {
 
 private:
   Adafruit_BMP085 *bme = new Adafruit_BMP085();
   BMEX80_DATA *data = new BMEX80_DATA;
+  TwoWire *Wire;
 
 #ifdef DEBUG
   AFEDebugger *Debugger;
-  boolean begin(BMEX80 *, TwoWire *, BMEX80_DATA *);
 #endif
+
 public:
   BMEX80 *configuration = new BMEX80;
 
-  /* Constructor: entry parameter is GPIO number where Sensor is connected to */
-  AFESensorBMP180();
+/* Constructor: entry parameter is GPIO number where Sensor is connected to */
 #ifdef DEBUG
-  boolean begin(BMEX80 *, TwoWire *, AFEDebugger *, BMEX80_DATA *);
+  AFESensorBMP180(BMEX80 *, BMEX80_DATA *, AFEDebugger *);
 #else
-  boolean begin(BMEX80 *, TwoWire *, BMEX80_DATA *);
+  AFESensorBMP180(BMEX80 *, BMEX80_DATA *);
 #endif
-
+  boolean begin(TwoWire *);
   boolean read();
-
 };
 
 #endif // AFE_CONFIG_HARDWARE_BMEX80

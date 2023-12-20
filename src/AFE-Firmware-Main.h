@@ -41,10 +41,7 @@ AFEFirmware *Firmware = new AFEFirmware();
 AFEWebServer *HTTPServer = new AFEWebServer();
 AFEHardware *Hardware = new AFEHardware(Firmware);
 
-#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-#include <AFE-MCP23017-Broker.h>
-AFEMCP23017Broker *MCP23017Broker = new AFEMCP23017Broker();
-#endif
+
 
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -69,10 +66,11 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 
 #include <AFE-Main-APIs.cpp>
 
-
+/*
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 #include <AFE-Main-MCP23017.cpp>
 #endif
+*/
 
 
 #ifdef AFE_CONFIG_HARDWARE_CLED

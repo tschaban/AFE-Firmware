@@ -3,81 +3,87 @@
 #include "AFE-I2C-Scanner.h"
 #ifdef AFE_CONFIG_HARDWARE_I2C
 
+#ifdef DEBUG
+AFEI2CScanner::AFEI2CScanner(AFEDebugger *_Debugger) { Debugger = _Debugger; };
+#else
 AFEI2CScanner::AFEI2CScanner(){};
-
-#ifdef DEBUG
-void AFEI2CScanner::begin(TwoWire *_WirePort, AFEDebugger *_Debugger)
-{
-  Debugger = _Debugger;
-  begin(_WirePort);
-}
 #endif
 
-void AFEI2CScanner::begin(TwoWire *_WirePort)
-{
-  AFEDataAccess Data;
-  WirePort = _WirePort;
+void AFEI2CScanner::setWire(TwoWire *_Wire) {
+  portSet = true;
+  WirePort = _Wire;
 }
 
 #ifdef DEBUG
-void AFEI2CScanner::scanAll()
-{
-
-  uint8_t numberOfDeficesFound = 0;
-  boolean searchStatus;
-  Debugger->printHeader(2, 0, 49, AFE_DEBUG_HEADER_TYPE_DASH);
-
-  for (uint8_t address = 1; address < 127; address++)
-  {
-
-    searchStatus = scan(address);
-
-    if (searchStatus)
-      numberOfDeficesFound++;
-  }
-
-  if (numberOfDeficesFound == 0)
-  {
-    Serial << endl
-           << F("No I2C devices found");
-  }
-  else
-  {
-    Serial << endl
-           << F("Scanning completed");
-  }
-
-  Debugger->printHeader(1, 1, 49, AFE_DEBUG_HEADER_TYPE_DASH);
+void AFEI2CScanner::scanAll(TwoWire *_Wire) {
+  portSet = true;
+  WirePort = _Wire;
+  scanAll();
 }
-#endif
 
-boolean AFEI2CScanner::scan(byte address)
-{
-  byte status;
-  WirePort->beginTransmission(address);
-  status = WirePort->endTransmission();
-  if (status == 0)
-  {
-#ifdef DEBUG
-    Serial << endl
-           << F(" - Sensor Found [0x");
-    if (address < 16)
-    {
-      Serial << F("0");
+void AFEI2CScanner::scanAll() {
+  if (portSet) {
+    uint8_t numberOfDeficesFound = 0;
+    boolean searchStatus;
+    Debugger->printHeader(2, 0, 49, AFE_DEBUG_HEADER_TYPE_DASH);
+
+    for (uint8_t address = 1; address < 127; address++) {
+
+      searchStatus = scan(address);
+      if (searchStatus)
+        numberOfDeficesFound++;
     }
-    Serial << _HEX(address) << F("] : ") << getName(address);
-#endif
-    return true;
-  }
-  else
-  {
-    return false;
+
+    if (numberOfDeficesFound == 0) {
+      Debugger->printValue(F("No I2C devices found"));
+    } else {
+      Debugger->printValue(F("Scanning completed"));
+    }
+
+    Debugger->printHeader(1, 1, 49, AFE_DEBUG_HEADER_TYPE_DASH);
+  } else {
+    Debugger->printError(F("Wire port has not been set"), F("I2C Scanner"));
   }
 }
+#endif
 
-const __FlashStringHelper *AFEI2CScanner::getName(byte deviceAddress)
-{
-  /* WARN: Description can't be longer than 70chars, used by addDeviceI2CAddressSelectionItem in AFE-Site-Gnerator.h */
+boolean AFEI2CScanner::scan(TwoWire *_Wire, byte address) {
+  portSet = true;
+  WirePort = _Wire;
+  return scan(address);
+}
+
+boolean AFEI2CScanner::scan(byte address) {
+  boolean _ret = false;
+  if (portSet) {
+    byte status;
+    WirePort->beginTransmission(address);
+    status = WirePort->endTransmission();
+    if (status == 0) {
+#ifdef DEBUG
+      Serial << endl << F(" - Sensor Found [0x");
+      if (address < 16) {
+        Serial << F("0");
+      }
+      Serial << _HEX(address) << F("] : ") << getName(address);
+#endif
+      _ret = true;
+    } else {
+      _ret = false;
+    }
+  }
+#ifdef DEBUG
+  else {
+    Debugger->printError(F("Wire port has not been set"), F("I2C Scanner"));
+  }
+#endif
+
+  return _ret;
+}
+
+const __FlashStringHelper *AFEI2CScanner::getName(byte deviceAddress) {
+  /* WARN: Description can't be longer than 70chars, used by
+   * addDeviceI2CAddressSelectionItem in AFE-Site-Gnerator.h */
   if (deviceAddress == 0x00)
     return F("AS3935");
   else if (deviceAddress == 0x01)

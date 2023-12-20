@@ -5,9 +5,10 @@
 
 #include <AFE-Configuration.h>
 #include <AFE-Data-Structures.h>
+#include <Arduino.h>
 #include <ArduinoJson.h>
 #include <IPAddress.h>
-#include <Arduino.h>
+
 
 #include <AFE-Data-JSON-templates.h>
 
@@ -28,24 +29,28 @@
 
 class AFEDataAccess {
 private:
+#ifdef DEBUG
   AFEDebugger *Debugger;
+#endif
   IPAddress IPfromString(const char *address);
 
 #ifdef DEBUG
-  void printFileOpeningInformation(const __FlashStringHelper *fileName, uint8_t id = AFE_NONE);
-  void printFileCreatingInformation(const __FlashStringHelper *fileName, uint8_t id = AFE_NONE);
-  void printFileOpeningError(const __FlashStringHelper *fileName, uint8_t id = AFE_NONE);
+  void printFileOpeningInformation(const __FlashStringHelper *fileName,
+                                   uint8_t id = AFE_NONE);
+  void printFileCreatingInformation(const __FlashStringHelper *fileName,
+                                    uint8_t id = AFE_NONE);
+  void printFileOpeningError(const __FlashStringHelper *fileName,
+                             uint8_t id = AFE_NONE);
   void printFileWritingInformation();
-  void printFileContentInformation();  
+  void printFileContentInformation();
 #endif
-
 
 public:
   AFEDataAccess();
 
-  #ifdef DEBUG
+#ifdef DEBUG
   void printBufforSizeInfo(uint16_t bufferSize, uint16_t jsonSize);
-void printJSONNotPharsed();  
+  void printJSONNotPharsed();
 #endif
 
   /* It formats SPIFFS */
@@ -284,7 +289,7 @@ void printJSONNotPharsed();
   void saveConfiguration(uint8_t id, CLED_EFFECT_FADE_INOUT *);
   void createCLEDEffectFadeInOutConfigurationFile();
 
-/* @TODO T5 
+/* @TODO T5
 #ifdef AFE_CONFIG_HARDWARE_CLED_LIGHT_CONTROLLED_EFFECT
   boolean getConfiguration(uint8_t id, CLED_BACKLIGHT *);
   void saveConfiguration(uint8_t id, CLED_BACKLIGHT *);
@@ -311,6 +316,5 @@ void printJSONNotPharsed();
   void saveConfiguration(uint8_t id, FS3000_CONFIG *);
   void createFS3000SensorConfigurationFile();
 #endif
-
 };
 #endif // _AFE_Data_Access_h

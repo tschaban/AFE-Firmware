@@ -27,6 +27,7 @@ struct NETWORK {
   uint8_t radioMode;
   float outputPower;
 #endif
+  bool mDNSActive;
 };
 
 #endif

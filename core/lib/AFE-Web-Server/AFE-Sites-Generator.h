@@ -5,7 +5,6 @@
 #include <AFE-Site-components.h>
 #include <Arduino.h>
 
-
 #ifdef AFE_ESP32
 #include <WiFi.h>
 #else /* ESP8266 */
@@ -13,8 +12,7 @@
 #endif // ESP32/ESP8266
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-#include <AFE-I2C-Scanner.h>
-#include <Wire.h>
+#include <AFE-Wire-Container.h>
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
@@ -37,7 +35,6 @@
 #include <AFE-Sensor-PN532.h>
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 
-
 #if AFE_LANGUAGE == 0
 #include <pl_PL.h>
 #else
@@ -51,12 +48,7 @@ private:
   String _HtmlResponse;
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-#ifdef AFE_ESP32
-  TwoWire *WirePort0;
-  TwoWire *WirePort1;
-#else  // ESP8266
-  TwoWire *WirePort0;
-#endif // ESP32/ESP8266
+  AFEWireContainer *WirePort;
   void begin(AFEFirmware *);
 #endif // AFE_CONFIG_HARDWARE_I2C
 
@@ -261,11 +253,7 @@ public:
   AFESitesGenerator();
 
 #ifdef AFE_CONFIG_HARDWARE_I2C
-#ifdef AFE_ESP32
-  void begin(AFEFirmware *, TwoWire *, TwoWire *);
-#else  // ESP8266
-  void begin(AFEFirmware *, TwoWire *);
-#endif // ESP32/ESP8266
+  void begin(AFEFirmware *, AFEWireContainer *);
 #else
   void begin(AFEFirmware *);
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -477,6 +465,5 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_FS3000
   void siteFS3000(String &page, uint8_t id);
 #endif // AFE_CONFIG_HARDWARE_FS3000
-
 };
 #endif // _AFE_Sites_Generator_h

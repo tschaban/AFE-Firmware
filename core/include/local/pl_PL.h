@@ -105,11 +105,14 @@
 #define L_INDEX_WRONG_PASSWORD "Hasło nie jest poprawne"
 #define L_INDEX_NORMAL_MODE "Tryb normalny"
 #define L_INDEX_HOTSPOT_MODE "Tryb HotSpot"
-#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Urządzenie jest w trybie operacyjnym"
+#define L_INDEX_LAUNCH_CONFIGURATION_PANEL "Konfiguracja"
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "Aby uruchomić panel konfiguracyjny użyj jednego z poniższych przycisków"
 #define L_INDEX_OPENING_CONFIG_PANEL "Otwieram panel konfiguracyjny {{n}}"
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">Więcej</a> informacji o urządzeniu"
 #define L_INDEX_DONATION "Wsparcie"
+
+#define L_INDEX_MULITICAST_TURNED_ON "Multicast DNS jest włączony"
+#define L_INDEX_FIRMWARE_AVAILABLE_UNDER_ADDRESS "Jeśli LAN wspiera mDNS urządzenie będzie dostępne pod <a target=\"_blank\" href=\"http://%s.local\">adresem</a>"
 
 /* JSON RPC API */
 #define L_JSON_RPC_API "Niestabilne połączenie z serwerem AFE Firmware. Brak możliwości sprawdzania i aktualizacji firmware przez Internet oraz aktywacji AFE Pro"

@@ -7,18 +7,17 @@
 #ifdef AFE_CONFIG_HARDWARE_FS3000
 
 #include <AFE-Data-Access.h>
+#include <AFE-Wire-Container.h>
 #include <SparkFun_FS3000_Arduino_Library.h>
 
 #ifdef DEBUG
 #include <AFE-Debugger.h>
 #endif
 
-class AFESensorFS3000
-{
+class AFESensorFS3000 {
 
 public:
-  struct FS3000_DATA
-  {
+  struct FS3000_DATA {
     uint16_t raw;
     float metersPerSecond;
     float milesPerHour;
@@ -28,14 +27,14 @@ public:
   FS3000_CONFIG *configuration = new FS3000_CONFIG;
   FS3000_DATA *data = new FS3000_DATA;
 
-  /* Constructors */
-  AFESensorFS3000();
-
+/* Constructors */
 #ifdef DEBUG
-  boolean begin(uint8_t id, AFEDataAccess *_Data, AFEDebugger *_Debugger);
+  AFESensorFS3000(AFEDataAccess *, AFEWireContainer *, AFEDebugger *);
 #else
-  boolean begin(uint8_t id, AFEDataAccess *_Data);
+  AFESensorFS3000(AFEDataAccess *, AFEWireContainer *);
 #endif
+
+  boolean begin(uint8_t id);
 
   /* Returns the sensor data in JSON format */
   void getJSON(char *json);
@@ -47,9 +46,11 @@ private:
   boolean _initialized = false;
   unsigned long _startTime = 0;
 
+  AFEDataAccess *Data;
+  AFEWireContainer *WirePort;
+
 #ifdef DEBUG
   AFEDebugger *Debugger;
-  boolean begin(uint8_t id, AFEDataAccess *_Data);
 #endif
 };
 

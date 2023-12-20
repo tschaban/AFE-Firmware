@@ -47,6 +47,15 @@
 #define AFE_MODE_FIRST_TIME_LAUNCH 5
 
 /**
+ * @brief mDNS states
+ * 
+ */
+
+#define AFE_CONFIG_NETWORK_MDNS_ACTIVE 1
+#define AFE_CONFIG_NETWORK_MDNS_INACTIVE 0
+
+
+/**
  * @brief include configuration related to network configuration
  * 
  */
@@ -62,6 +71,7 @@
 #define AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER_MAX 20.5
 #define AFE_CONFIG_NETWORK_DEFAULT_DNS1 "8.8.8.8"
 #define AFE_CONFIG_NETWORK_DEFAULT_DNS2 "8.8.4.4"
+#define AFE_CONFIG_NETWORK_DEFAULT_MDNS AFE_CONFIG_NETWORK_MDNS_ACTIVE 
 
 
 /**

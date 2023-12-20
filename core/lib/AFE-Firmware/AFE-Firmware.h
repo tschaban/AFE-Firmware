@@ -15,15 +15,13 @@
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #include <AFE-I2C-Scanner.h>
 #include <Wire.h>
-
 #endif
 
 #ifdef DEBUG
-#include <Streaming.h>
 #include <AFE-Debugger.h>
 #endif
 
-class AFEFirmware
+class AFEFirmware //: public AFECoreHardware
 {
 
 private:
@@ -37,21 +35,26 @@ private:
   void firstBooting(void);
 
 public:
-  struct GLOBAL_API_OBJECTS
-  {
+#ifdef DEBUG
+  AFEDebugger *Debugger = new AFEDebugger();
+#endif
+
+  struct GLOBAL_API_OBJECTS {
     AFEWiFi *Network = new AFEWiFi();
     AFEJSONRPC *REST = new AFEJSONRPC();
     AFEDataAccess *Flash = new AFEDataAccess();
+    /*
 #ifdef AFE_CONFIG_HARDWARE_I2C
     AFEI2CScanner *I2CScanner = new AFEI2CScanner();
 #endif
+*/
   };
 
-  struct GLOBAL_HARDWARE_OBJECTS
-  {
+  struct GLOBAL_HARDWARE_OBJECTS {
 #ifdef AFE_CONFIG_HARDWARE_LED
     AFELED *SystemLed = new AFELED();
 #endif
+/*
 #ifdef AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_ESP32
     TwoWire *WirePort0 = new TwoWire(0);
@@ -60,16 +63,15 @@ public:
     TwoWire *WirePort0 = new TwoWire();
 #endif
 #endif
+*/
   };
 
-  struct GLOBAL_CONFIGURATION_OBJECTS
-  {
+  struct GLOBAL_CONFIGURATION_OBJECTS {
     PRO_VERSION *Pro = new PRO_VERSION;
     FIRMWARE *Version = new FIRMWARE;
   };
 
-  struct TIMER_OBJECT
-  {
+  struct TIMER_OBJECT {
     unsigned long miliseconds;
     uint8_t minutes;
     uint8_t hours;
@@ -85,10 +87,6 @@ public:
       new GLOBAL_CONFIGURATION_OBJECTS;
 
   AFEDevice *Device = new AFEDevice();
-
-#ifdef DEBUG
-  AFEDebugger *Debugger = new AFEDebugger();
-#endif
 
   /* Constructor */
   AFEFirmware();
@@ -109,9 +107,6 @@ public:
   void initializeSystemLED(void);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  void initializeIIC(void);
-#endif
 };
 
 #endif

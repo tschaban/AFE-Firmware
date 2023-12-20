@@ -25,7 +25,7 @@ AFEAPIHomeAssistantIntegration::AFEAPIHomeAssistantIntegration(
 #ifdef DEBUG
   else
   {
-    _Firmware->Debugger->printWarning(F("Integration not initialize due to lack of configuration"), F("HA-API"));
+    _Firmware->Debugger->printWarning(F("Integration not initialize. It's not configured"), F("HA-API"));
   }
 #endif
 };
@@ -123,8 +123,11 @@ void AFEAPIHomeAssistantIntegration::publish()
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   publishContactron();
 #endif
+
+#ifdef DEBUG
   _Firmware->Debugger->printHeader();
   _Firmware->Debugger->printValue(F("Auto-Discovery configuration sent to MQTT"));
+  #endif
 }
 
 void AFEAPIHomeAssistantIntegration::publishFirmwareVersion(void)
