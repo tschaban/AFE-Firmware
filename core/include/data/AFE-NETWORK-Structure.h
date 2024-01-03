@@ -23,7 +23,7 @@ struct NETWORK {
   uint8_t waitTimeConnections;
   uint8_t waitTimeSeries;
   uint8_t noFailuresToSwitchNetwork;
-#if !defined(ESP32)
+#ifndef AFE_ESP32
   uint8_t radioMode;
   float outputPower;
 #endif

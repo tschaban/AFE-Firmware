@@ -87,6 +87,14 @@
 #include <AFE-Sensor-FS3000.h>
 #endif
 
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#include <AFE-Regulator.h>
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+#include <AFE-Thermal-Protector.h>
+#endif
+
 #ifdef DEBUG
 #include <Streaming.h>
 #endif
@@ -152,6 +160,14 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   void initMCP23XXX(void);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  void initRegulator(void);
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  void initThermalProtector(void);
 #endif
 
 public:
@@ -246,9 +262,11 @@ public:
 #ifdef AFE_CONFIG_HARDWARE_FS3000
   AFESensorFS3000 *FS3000Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_FS3000];
 #endif /*                                                                      \ \
-   AFEMCP23017Broker(AFEDataAccess *_Data, AFEDevice *_Device, TwoWire \                                                                               \
-   *_WirePort0, \                                                                               \
-                     TwoWire *_WirePort1, AFEDebugger *_Debugger); \                                                                               \
+   \                                                                             \
+   \ \                                                                               \
+   AFEMCP23017Broker(AFEDataAccess *_Data, AFEDevice *_Device, TwoWire \ \ \                                                                               \
+   *_WirePort0, \ \ \                                                                               \
+                     TwoWire *_WirePort1, AFEDebugger *_Debugger); \ \ \                                                                               \
  */
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
@@ -260,6 +278,16 @@ public:
       new AFEMCP23017Broker(Firmware->API->Flash, Firmware->Device, WirePort);
 #endif
 #endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+  AFERegulator *Regulator[AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS];
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+  AFEThermalProtector
+      *ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
+#endif
+
   /* Constructor */
   AFEHardware(AFEFirmware *);
 

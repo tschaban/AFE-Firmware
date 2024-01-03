@@ -12,7 +12,7 @@
 
 #ifdef AFE_ESP32
 #include <WiFi.h>
-
+#include <ESPmDNS.h>
 #else // ESP8266
 #include <ESP8266WiFi.h>
 #include <ESP8266mDNS.h>
@@ -195,11 +195,13 @@ public:
   static void onWifiDisconnect(const WiFiEventStationModeDisconnected &event);
 
 #ifdef DEBUG
-  static void
-  onWiFiAPStationConnected(const WiFiEventSoftAPModeStationConnected &event);
-  void addReference(AFEDebugger *_Debugger);
+  static void onWiFiAPStationConnected(const WiFiEventSoftAPModeStationConnected &event);
 #endif
 
+#endif
+
+#ifdef DEBUG
+  void addReference(AFEDebugger *_Debugger);
 #endif
 };
 

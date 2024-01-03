@@ -54,10 +54,12 @@ void AFEFirmware::begin()
 
 void AFEFirmware::initializeNetwork(void)
 {
+
 #ifdef DEBUG
   Debugger->printInformation(F("Starting network"), F("BOOT"));
   API->Network->addReference(Debugger);
 #endif
+
 #ifdef AFE_CONFIG_HARDWARE_LED
   API->Network->begin(Device, API->Flash, Hardware->SystemLed);
 #else

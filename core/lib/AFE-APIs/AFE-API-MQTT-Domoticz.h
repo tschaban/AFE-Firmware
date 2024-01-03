@@ -76,9 +76,9 @@ private:
 
 #ifdef DEBUG
   void printSameStateWarningMessage();
-  void printFoundDeviceItem(const *__FlashStringHelper deviceName, uint8_t id);
-  void printSynchronzingDeviceItem(const *__FlashStringHelper deviceName, uint8_t id);
-  void printCacheingDeviceItem(const *__FlashStringHelper deviceName, uint8_t id, uint32_t idx);
+  void printFoundDeviceItem(const __FlashStringHelper *deviceName, uint8_t id);
+  void printSynchronzingDeviceItem(const __FlashStringHelper *deviceName, uint8_t id);
+  void printCacheingDeviceItem(const __FlashStringHelper *deviceName, uint8_t id, uint32_t idx);
 #endif
 
 public:

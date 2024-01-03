@@ -42,21 +42,6 @@ AFEWebServer *HTTPServer = new AFEWebServer();
 AFEHardware *Hardware = new AFEHardware(Firmware);
 
 
-
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#include <AFE-Regulator.h>
-AFERegulator Regulator[AFE_CONFIG_HARDWARE_NUMBER_OF_REGULATORS];
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-#include <AFE-Thermal-Protector.h>
-AFEThermalProtector
-    ThermalProtector[AFE_CONFIG_HARDWARE_NUMBER_OF_THERMAL_PROTECTORS];
-#endif
-
-
-
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Sensor-PN532.h>
 AFESensorPN532 PN532Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS];
@@ -65,12 +50,6 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
 #include <AFE-Main-APIs.cpp>
-
-/*
-#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-#include <AFE-Main-MCP23017.cpp>
-#endif
-*/
 
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
@@ -95,14 +74,6 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 #include <AFE-Main-Gate.cpp>
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-#include <AFE-Main-Regulator.cpp>
-#endif
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
-#include <AFE-Main-Thermal-Protector.cpp>
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20

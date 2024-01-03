@@ -12,19 +12,19 @@ void AFEAPIMQTTDomoticz::printSameStateWarningMessage()
   _Firmware->Debugger->printInformation(F("Same state. No change needed"), F("Domoticz"));
 }
 
-void AFEAPIMQTTDomoticz::printFoundDeviceItem(const *__FlashStringHelper deviceName, uint8_t id)
+void AFEAPIMQTTDomoticz::printFoundDeviceItem(const __FlashStringHelper *deviceName, uint8_t id)
 {
   _Firmware->Debugger->printInformation(F("Found "), F("Domoticz"));
   Serial << deviceName << F(", Id: ") << id;
 }
 
-void AFEAPIMQTTDomoticz::printSynchronzingDeviceItem(const *__FlashStringHelper deviceName, uint8_t id)
+void AFEAPIMQTTDomoticz::printSynchronzingDeviceItem(const __FlashStringHelper *deviceName, uint8_t id)
 {
-  Firmware->Debugger->printInformation(F("Synchronizing: "), F("Domoticz"));
+  _Firmware->Debugger->printInformation(F("Synchronizing: "), F("Domoticz"));
   Serial << deviceName << F(", Id: ") << id;
 }
 
-void AFEAPIMQTTDomoticz::printCacheingDeviceItem(const *__FlashStringHelper deviceName, uint8_t id, uint32_t idx)
+void AFEAPIMQTTDomoticz::printCacheingDeviceItem(const __FlashStringHelper *deviceName, uint8_t id, uint32_t idx)
 {
   _Firmware->Debugger->printInformation(F("Caching IDX for "), F("Domoticz"));
   Serial << deviceName << F("[") << id << F("], IDX: ") << idx;
@@ -56,7 +56,7 @@ void AFEAPIMQTTDomoticz::begin(AFEFirmware *Firmware, AFEHardware *Hardware)
     printCacheingDeviceItem(F("Relay"), i, _Hardware->Relay[i]->configuration->domoticz.idx);
 #endif
 
-    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_RELAY, );
+    addIdxToCache(i, AFE_DOMOTICZ_DEVICE_RELAY, _Hardware->Relay[i]->configuration->domoticz.idx);
   }
 #endif
 
@@ -527,8 +527,8 @@ void AFEAPIMQTTDomoticz::processRequest()
 #ifdef DEBUG
   else
   {
-    _Firmware->Debugger->printInformation(F((command.domoticz.idx > 0 ? F("Bypassing")
-                                                                      : F("No"))),
+    _Firmware->Debugger->printInformation((command.domoticz.idx > 0 ? F("Bypassing")
+                                                                      : F("No")),
                                           F("Domoticz"));
     Serial << F(" IDX: ") << command.domoticz.idx;
   }

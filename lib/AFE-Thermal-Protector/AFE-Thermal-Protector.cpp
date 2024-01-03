@@ -4,17 +4,24 @@
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
-AFEThermalProtector::AFEThermalProtector(){};
-
-void AFEThermalProtector::begin(AFEDataAccess *Data, uint8_t id) {
+#ifdef DEBUG
+AFEThermalProtector::AFEThermalProtector(AFEDataAccess *Data,
+                                         AFEDebugger *Debugger) {
   _Data = Data;
+  _Debugger = Debugger;
+};
+#else
+AFEThermalProtector::AFEThermalProtector(AFEDataAccess *Data) { _Data = Data; };
+#endif
+
+void AFEThermalProtector::begin(uint8_t id) {
   _id = id;
   _Data->getConfiguration(id, configuration);
 
 #ifdef DEBUG
-  Serial << endl
-         << F("INFO: Thermal protection initialized. Max temp: ")
-         << configuration->temperature;
+  _Debugger->printInformation(F("Initialized. Max temp set: "),
+                              F("Thermal protection"));
+  _Debugger->printValue(configuration->temperature);
 #endif
 
   if (configuration->enabled &&
@@ -22,8 +29,9 @@ void AFEThermalProtector::begin(AFEDataAccess *Data, uint8_t id) {
        configuration->sensorId == AFE_HARDWARE_ITEM_NOT_EXIST)) {
     configuration->enabled = false;
 #ifdef DEBUG
-    Serial << endl
-           << F("INFO: Thermal protection: has been disabled becuase Relay ID and/or Sensor ID is missing ");
+    _Debugger->printInformation(
+        F("Disabled becuase Relay ID and/or Sensor ID is missing"),
+        F("Thermal protection"));
 #endif
   }
 };
@@ -34,9 +42,9 @@ bool AFEThermalProtector::listener(float currentTemperature) {
       turnOff = true;
 
 #ifdef DEBUG
-      Serial << endl
-             << F("INFO: Thermal protection. Temperature has exceeded the max value: ")
-             << configuration->temperature;
+      _Debugger->printInformation(F("Temperature has exceeded the max value: "),
+                                  F("Thermal protection"));
+      _Debugger->printValue(configuration->temperature);
 #endif
 
     } else if (currentTemperature <= configuration->temperature && turnOff) {
@@ -45,7 +53,7 @@ bool AFEThermalProtector::listener(float currentTemperature) {
     return true;
   } else {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Thermal protection: disabled");
+    _Debugger->printInformation(F("Disabled"), F("Thermal protection"));
 #endif
     return false;
   }
@@ -61,7 +69,7 @@ void AFEThermalProtector::off(void) {
 }
 void AFEThermalProtector::toggle(void) {
   configuration->enabled ? configuration->enabled = false
-                        : configuration->enabled = true;
+                         : configuration->enabled = true;
   enable();
 }
 
@@ -71,7 +79,9 @@ void AFEThermalProtector::enable(void) {
 
 /* Returns Thermal Protector data in JSON format */
 void AFEThermalProtector::getJSON(char *json) {
-  sprintf(json, "{\"enabled\":%s}", configuration->enabled ? "true" : "false");
+  sprintf(json, (const char *)F("{\"enabled\":%s}"),
+          configuration->enabled ? (const char *)F("true")
+                                 : (const char *)F("false"));
 }
 
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR

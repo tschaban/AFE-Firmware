@@ -4,26 +4,30 @@
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
 
-AFERegulator::AFERegulator(){};
-
-void AFERegulator::begin(AFEDataAccess *Data, uint8_t id) {
+#ifdef DEBUG
+AFERegulator::AFERegulator(AFEDataAccess *Data, AFEDebugger *Debugger) {
   _Data = Data;
-  _id = id;
-  _Data->getConfiguration(id, configuration);
-}
+  _Debugger = Debugger;
+};
+#else
+AFERegulator::AFERegulator(AFEDataAccess *Data) { _Data = Data; };
+#endif
 
-void AFERegulator::addRelayReference(AFERelay *Relay) {
+void AFERegulator::begin(uint8_t id, AFERelay *Relay) {
+  _id = id;
   _Relay = Relay;
   initialized = true;
+  _Data->getConfiguration(id, configuration);
 #ifdef DEBUG
-    Serial << endl << F("INFO: Regulator initialized");
-#endif  
+  _Debugger->printInformation(F("initialized"), F("Regulator"));
+#endif
 }
 
 boolean AFERegulator::listener(float value) {
   if (configuration->enabled && initialized) {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Executing regulator check ...");
+    _Debugger->printInformation(F("Executing regulator check ..."),
+                                F("Regulator"));
 #endif
     deviceState = _Relay->get();
     if (configuration->turnOnAbove && value > configuration->turnOn) {
@@ -38,7 +42,7 @@ boolean AFERegulator::listener(float value) {
     return true;
   } else {
 #ifdef DEBUG
-    Serial << endl << F("INFO: Regulator: disabled");
+    _Debugger->printInformation(F("Disabled"), F("Regulator"));
 #endif
     return false;
   }
@@ -54,7 +58,7 @@ void AFERegulator::off(void) {
 }
 void AFERegulator::toggle(void) {
   configuration->enabled ? configuration->enabled = false
-                        : configuration->enabled = true;
+                         : configuration->enabled = true;
   enable();
 }
 
@@ -64,7 +68,9 @@ void AFERegulator::enable(void) {
 
 /* Returns Regulator data in JSON format */
 void AFERegulator::getJSON(char *json) {
-  sprintf(json, "{\"enabled\":%s}", configuration->enabled ? "true" : "false");
+  sprintf(json, (const char *)F("{\"enabled\":%s}"),
+          configuration->enabled ? (const char *)F("true")
+                                 : (const char *)F("false"));
 }
 
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR

@@ -35,7 +35,6 @@ public:
   ADCINPUT_DATA *data = new ADCINPUT_DATA;
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
-  void begin(AFEDataAccess *);
   float batteryPercentage = 0;
 #endif
 
@@ -48,7 +47,7 @@ public:
 
 /* Initialized analog input using configuration parameters */
 #ifdef AFE_ESP32
-  void begin(uint8_t *);
+  void begin(uint8_t id);
 #else  // ESP8266
   void begin();
 #endif // AFE_ESP32

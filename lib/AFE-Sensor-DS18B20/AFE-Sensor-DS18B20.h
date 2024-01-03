@@ -20,7 +20,9 @@ class AFESensorDS18B20
 
 private:
   AFEDataAccess *Data;
+  #ifdef DEBUG
   AFEDebugger *Debugger;
+  #endif
   OneWire *WireBUS = new OneWire();
   DallasTemperature *Sensor = new DallasTemperature();
   boolean _initialized = false;

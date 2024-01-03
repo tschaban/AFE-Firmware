@@ -232,7 +232,7 @@ void AFEAPIMQTTStandard::subscribe() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfRegulators;
        i++) {
-    subscribeToCommand(_Regulator[i]->configuration->mqtt.topic);
+    subscribeToCommand(_Hardware->Regulator[i]->configuration->mqtt.topic);
   }
 #endif
 
@@ -240,7 +240,7 @@ void AFEAPIMQTTStandard::subscribe() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   for (uint8_t i = 0;
        i < _Firmware->Device->configuration.noOfThermalProtectors; i++) {
-    subscribeToCommand(_ThermalProtector[i]->configuration->mqtt.topic);
+    subscribeToCommand(_Hardware->ThermalProtector[i]->configuration->mqtt.topic);
   }
 #endif
 
@@ -579,9 +579,9 @@ void AFEAPIMQTTStandard::listener() {
 #endif
     for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfRegulators;
          i++) {
-      if (strlen(_Regulator[i]->configuration->mqtt.topic) > 0) {
+      if (strlen(_Hardware->Regulator[i]->configuration->mqtt.topic) > 0) {
         sprintf(mqttCommandTopic, "%s/cmd",
-                _Regulator[i]->configuration->mqtt.topic);
+                _Hardware->Regulator[i]->configuration->mqtt.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
 #ifdef DEBUG
           printYesNo(true);
@@ -602,9 +602,9 @@ void AFEAPIMQTTStandard::listener() {
 #endif
     for (uint8_t i = 0;
          i < _Firmware->Device->configuration.noOfThermalProtectors; i++) {
-      if (strlen(_ThermalProtector[i]->configuration->mqtt.topic) > 0) {
+      if (strlen(_Hardware->ThermalProtector[i]->configuration->mqtt.topic) > 0) {
         sprintf(mqttCommandTopic, "%s/cmd",
-                _ThermalProtector[i]->configuration->mqtt.topic);
+                _Hardware->ThermalProtector[i]->configuration->mqtt.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
 #ifdef DEBUG
           printYesNo(true);
@@ -1214,8 +1214,8 @@ boolean AFEAPIMQTTStandard::publishDS18B20SensorData(uint8_t id) {
 boolean AFEAPIMQTTStandard::publishRegulatorState(uint8_t id) {
   return enabled
              ? publishOnOffState(
-                   _Regulator[id]->configuration->mqtt.topic,
-                   _Regulator[id]->configuration->enabled ? AFE_ON : AFE_OFF)
+                   _Hardware->Regulator[id]->configuration->mqtt.topic,
+                   _Hardware->Regulator[id]->configuration->enabled ? AFE_ON : AFE_OFF)
              : false;
 }
 
@@ -1226,12 +1226,12 @@ void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
   _Firmware->Debugger->printProcessingRequest(F("Regulator"), *id, F("MQTT"));
 #endif
   if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_ON) == 0) {
-    _Regulator[*id]->on();
+    _Hardware->Regulator[*id]->on();
   } else if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_OFF) == 0) {
-    _Regulator[*id]->off();
+    _Hardware->Regulator[*id]->off();
   } else if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_TOGGLE) ==
              0) {
-    _Regulator[*id]->toggle();
+    _Hardware->Regulator[*id]->toggle();
   } else if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
   } else {
     publishState = false;
@@ -1248,8 +1248,8 @@ void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 boolean AFEAPIMQTTStandard::publishThermalProtectorState(uint8_t id) {
   return enabled ? publishOnOffState(
-                       _ThermalProtector[id]->configuration->mqtt.topic,
-                       _ThermalProtector[id]->configuration->enabled ? AFE_ON
+                       _Hardware->ThermalProtector[id]->configuration->mqtt.topic,
+                       _Hardware->ThermalProtector[id]->configuration->enabled ? AFE_ON
                                                                      : AFE_OFF)
                  : false;
 }
@@ -1262,12 +1262,12 @@ void AFEAPIMQTTStandard::processThermalProtector(uint8_t *id) {
                                               F("MQTT"));
 #endif
   if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_ON) == 0) {
-    _ThermalProtector[*id]->on();
+    _Hardware->ThermalProtector[*id]->on();
   } else if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_OFF) == 0) {
-    _ThermalProtector[*id]->off();
+    _Hardware->ThermalProtector[*id]->off();
   } else if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_TOGGLE) ==
              0) {
-    _ThermalProtector[*id]->toggle();
+    _Hardware->ThermalProtector[*id]->toggle();
   } else if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
   } else {
     publishState = false;

@@ -9,6 +9,10 @@
 #include <AFE-Data-Access.h>
 #include <AFE-Relay.h>
 
+#ifdef DEBUG
+#include <AFE-Debugger.h>
+#endif
+
 class AFERegulator {
 
 private:
@@ -16,6 +20,10 @@ private:
   AFEDataAccess *_Data;
   AFERelay *_Relay;
   uint8_t _id;
+
+#ifdef DEBUG
+  AFEDebugger *_Debugger;
+#endif
 
   /* Method enables / disables regulator */
   void enable(void);
@@ -27,17 +35,15 @@ public:
   byte deviceState;
   boolean initialized = false;
 
-  /* Constructors */
-  AFERegulator();
+/* Constructors */
+#ifdef DEBUG
+  AFERegulator(AFEDataAccess *, AFEDebugger *);
+#else
+  AFERegulator(AFEDataAccess *);
+#endif
 
   /* Method initialize regulator */
-  void begin(AFEDataAccess *, uint8_t id);
-
-  /* Add reference to the global instance of Relay class. Required for regulator
-   * to work. It's implemented like that to save the device resources. More
-   * clean would be to initialize it directly within this class. For later
-   * consideration */
-  void addRelayReference(AFERelay *);
+  void begin(uint8_t id, AFERelay *Relay);
 
   /* Method rises event if thermostat themperatures have been exceeded */
   boolean listener(float value);

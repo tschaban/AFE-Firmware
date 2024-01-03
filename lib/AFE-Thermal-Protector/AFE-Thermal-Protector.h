@@ -9,13 +9,16 @@
 #include <AFE-Data-Access.h>
 
 #ifdef DEBUG
-#include <Streaming.h>
+#include <AFE-Debugger.h>
 #endif
 
 class AFEThermalProtector {
 
 private:
   AFEDataAccess *_Data;
+#ifdef DEBUG
+  AFEDebugger *_Debugger;
+#endif
   uint8_t _id;
 
   /* Method enables / disables thermal protector */
@@ -25,11 +28,15 @@ public:
   THERMAL_PROTECTOR *configuration = new THERMAL_PROTECTOR;
   boolean turnOff = false;
 
-  /* Constructors */
-  AFEThermalProtector();
+/* Constructors */
+#ifdef DEBUG
+  AFEThermalProtector(AFEDataAccess *, AFEDebugger *);
+#else
+  AFEThermalProtector(AFEDataAccess *);
+#endif
 
   /* Method initialize protection */
-  void begin(AFEDataAccess *, uint8_t id);
+  void begin(uint8_t id);
 
   /* Method monitors current temeprature and allowed one */
   bool listener(float currentTemperature);

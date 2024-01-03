@@ -7,22 +7,20 @@
 AFESensorDS18B20::AFESensorDS18B20(){};
 
 #ifdef DEBUG
-void AFESensorDS18B20::begin(AFEDataAccess *_Data, AFEDebugger *_Debugger, uint8_t id)
-{
+void AFESensorDS18B20::begin(AFEDataAccess *_Data, AFEDebugger *_Debugger,
+                             uint8_t id) {
   Debugger = _Debugger;
   begin(_Data, id);
 }
 #endif
 
-void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id)
-{
+void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
   _Data->getConfiguration(id, configuration);
   WireBUS->begin(configuration->gpio);
   Sensor->setOneWire(WireBUS);
   Sensor->begin();
 
-  if (Sensor->isConnected(configuration->address))
-  {
+  if (Sensor->isConnected(configuration->address)) {
     _initialized = true;
     Sensor->setResolution(configuration->resolution);
 #ifdef DEBUG
@@ -35,9 +33,7 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id)
     Debugger->printBulletPoint(F("Resolution: "));
     Debugger->printValue(Sensor->getResolution(), F(" bits"));
 #endif
-  }
-  else
-  {
+  } else {
     _initialized = false;
 #ifdef DEBUG
     char addressTxt[17];
@@ -45,42 +41,35 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id)
     Debugger->printBulletPoint(F("DS18B20: Not found and initialized"));
     Debugger->printBulletPoint(F("Address: "));
     Serial << addressTxt;
+#endif
   }
-
 #ifdef DEBUG
   Debugger->printHeader(1, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
 
-#endif
 
-float AFESensorDS18B20::getCurrentTemperature()
-{
+float AFESensorDS18B20::getCurrentTemperature() {
   float temperature = DEVICE_DISCONNECTED_C;
-  if (_initialized)
-  {
+  if (_initialized) {
 #ifdef DEBUG
     Debugger->printInformation(F("Reading temperature by: "), F("DS18B20"));
     Serial << configuration->name;
 #endif
 
-    if (readTimeOut == 0)
-    {
+    if (readTimeOut == 0) {
       readTimeOut = millis();
     }
 
-    if (Sensor->isConnected(configuration->address))
-    {
+    if (Sensor->isConnected(configuration->address)) {
 
       Sensor->requestTemperaturesByAddress(configuration->address);
 
-      do
-      {
+      do {
         temperature = configuration->unit == AFE_TEMPERATURE_UNIT_CELSIUS
                           ? Sensor->getTempC(configuration->address)
                           : Sensor->getTempF(configuration->address);
-        if (millis() - readTimeOut > AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT)
-        {
+        if (millis() - readTimeOut > AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT) {
           break;
         }
       } while (temperature == 85.0 || temperature == (-127.0));
@@ -88,8 +77,7 @@ float AFESensorDS18B20::getCurrentTemperature()
     }
   }
 #ifdef DEBUG
-  else
-  {
+  else {
     Debugger->printError(F("Connection to sensor is lost"), F("DS18B20"));
   }
   Debugger->printBulletPoint(F("Temperature: "));
@@ -104,36 +92,30 @@ float AFESensorDS18B20::getCurrentTemperature()
 
 float AFESensorDS18B20::getTemperature() { return currentTemperature; }
 
-boolean AFESensorDS18B20::listener()
-{
+boolean AFESensorDS18B20::listener() {
   boolean ready = false;
-  if (_initialized)
-  {
+  if (_initialized) {
     unsigned long time = millis();
 
-    if (startTime == 0)
-    {
+    if (startTime == 0) {
       startTime = time;
     }
 
-    if (time - startTime >= configuration->interval * 1000)
-    {
+    if (time - startTime >= configuration->interval * 1000) {
       float newTemperature = getCurrentTemperature();
 
-      if (newTemperature != DEVICE_DISCONNECTED_C)
-      {
+      if (newTemperature != DEVICE_DISCONNECTED_C) {
         if ((configuration->sendOnlyChanges &&
              newTemperature != currentTemperature) ||
-            !configuration->sendOnlyChanges)
-        {
+            !configuration->sendOnlyChanges) {
           currentTemperature = newTemperature;
           ready = true;
         }
       }
 #ifdef DEBUG
-      else
-      {
-        Debugger->printWarning(F("Returned -127 => disconnected"), F("DS18B20"));
+      else {
+        Debugger->printWarning(F("Returned -127 => disconnected"),
+                               F("DS18B20"));
       }
 #endif
 
@@ -144,8 +126,7 @@ boolean AFESensorDS18B20::listener()
   return ready;
 }
 
-uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses)
-{
+uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses) {
   uint8_t _found = 0;
   uint8_t numberOfDevicesOnBus = 0;
 #ifdef DEBUG
@@ -163,10 +144,10 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses)
   Debugger->printValue(numberOfDevicesOnBus);
 #endif
 
-  /* @TODO T1 This is a workaround as getDS18Count doesn't retun number of sensor
+  /* @TODO T1 This is a workaround as getDS18Count doesn't retun number of
+   * sensor
    */
-  if (numberOfDevicesOnBus == 0)
-  {
+  if (numberOfDevicesOnBus == 0) {
     numberOfDevicesOnBus = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20;
 #ifdef DEBUG
     Debugger->printBulletPoint(F("No sensors found. Hard scanning for "));
@@ -174,36 +155,28 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses)
 #endif
   }
 
-  if (numberOfDevicesOnBus > 0)
-  {
+  if (numberOfDevicesOnBus > 0) {
     DeviceAddress _address;
 
-    for (uint8_t i = 0; i < numberOfDevicesOnBus; i++)
-    {
+    for (uint8_t i = 0; i < numberOfDevicesOnBus; i++) {
       Sensor->getAddress(_address, i);
 
-      if (_address[0] != 0)
-      {
+      if (_address[0] != 0) {
         if (i == 0 || (i > 0 && (memcmp(addresses[i - 1], _address,
-                                        sizeof(addresses[i - 1])) != 0)))
-        {
+                                        sizeof(addresses[i - 1])) != 0))) {
 
           memcpy(addresses[i], _address, sizeof(_address[0]) * 8);
           _found++;
-        }
-        else
-        {
+        } else {
           break;
         }
-      }
-      else
-      {
+      } else {
         break;
       }
 #ifdef DEBUG
       Debugger->printBulletPoint(F("Found sensor: "));
-      Serial << addresses[i][0] << F(":") << addresses[i][1]
-             << F(":") << addresses[i][2] << F(":") << addresses[i][3] << F(":")
+      Serial << addresses[i][0] << F(":") << addresses[i][1] << F(":")
+             << addresses[i][2] << F(":") << addresses[i][3] << F(":")
              << addresses[i][4] << F(":") << addresses[i][5] << F(":")
              << addresses[i][6] << F(":") << addresses[i][7];
 
@@ -218,31 +191,24 @@ uint8_t AFESensorDS18B20::scan(uint8_t gpio, DS18B20Addresses &addresses)
 }
 
 void AFESensorDS18B20::addressToChar(DeviceAddress &address,
-                                     char *addressString)
-{
+                                     char *addressString) {
   sprintf(addressString, "%02X%02X%02X%02X%02X%02X%02X%02X", address[0],
           address[1], address[2], address[3], address[4], address[5],
           address[6], address[7]);
 }
 
 void AFESensorDS18B20::addressToInt(char *addressString,
-                                    DeviceAddress &address)
-{
+                                    DeviceAddress &address) {
 
   int x;
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH; i++)
-  {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH; i++) {
     x = 0;
-    for (uint8_t index = 0; index < 2; index++)
-    {
+    for (uint8_t index = 0; index < 2; index++) {
       char c = *addressString;
-      if (c >= '0' && c <= '9')
-      {
+      if (c >= '0' && c <= '9') {
         x *= 16;
         x += c - '0';
-      }
-      else if (c >= 'A' && c <= 'F')
-      {
+      } else if (c >= 'A' && c <= 'F') {
         x *= 16;
         x += (c - 'A') + 10;
       }
@@ -252,24 +218,21 @@ void AFESensorDS18B20::addressToInt(char *addressString,
   }
 }
 
-void AFESensorDS18B20::addressNULL(DeviceAddress &address)
-{
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH; i++)
-  {
+void AFESensorDS18B20::addressNULL(DeviceAddress &address) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH; i++) {
     address[i] = 0;
   }
 }
 
-void AFESensorDS18B20::getJSON(char *json)
-{
-  sprintf(json, "{\"temperature\":{\"value\":%.3f,\"unit\":\"%s\"}}",
+void AFESensorDS18B20::getJSON(char *json) {
+  sprintf(json,
+          (const char *)F("{\"temperature\":{\"value\":%.3f,\"unit\":\"%s\"}}"),
           currentTemperature,
           configuration->unit == AFE_TEMPERATURE_UNIT_CELSIUS ? "C" : "F");
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-unsigned long AFESensorDS18B20::getDomoticzIDX()
-{
+unsigned long AFESensorDS18B20::getDomoticzIDX() {
   return configuration->domoticz.idx;
 }
 #endif

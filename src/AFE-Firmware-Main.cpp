@@ -90,14 +90,6 @@ void setup() {
 
   if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-    initializeRegulator();
-#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
-
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-    initializeThermalProtector();
-#endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
-
 #ifdef AFE_CONFIG_HARDWARE_AS3935
     initializeAS3935Sensor();
 #endif // AFE_CONFIG_HARDWARE_AS3935

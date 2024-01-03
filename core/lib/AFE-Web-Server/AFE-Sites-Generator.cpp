@@ -3148,7 +3148,7 @@ void AFESitesGenerator::siteUpgrade(String &page) {
         "enctype=\"multipart/form-data\"><div "
         "class=\"cf\"><label>{{L1}}</label><input "
         "class=\"bs\" "
-        "name=\"update\" type=\"file\" accept=\".bin\"></div><input "
+        "name=\"update\" type=\"file\" accept=\".bin,.bin.gz\"></div><input "
         "style=\"margin-top:1.5em\" type=\"submit\" value=\"{{L2}}\" class=\"b "
         "be\"></form>"));
 

@@ -499,8 +499,15 @@ void AFEWiFi::listener() {
 
 boolean AFEWiFi::connected() {
   if (configuration->mDNSActive == AFE_CONFIG_NETWORK_MDNS_ACTIVE) {
+  
+  #ifndef AFE_ESP32
     MDNS.update();
+    #else
+    // @TODO 3.8.0 what is ESP32 equivalent ESP32
+    #endif
   }
+
+
   return AFEWiFi::isConnected;
 }
 
@@ -581,9 +588,11 @@ void AFEWiFi::onWiFiAPStationConnected(
          << F("INFO: HotSpot: New device connected. (Connected: ")
          << WiFi.softAPgetStationNum() << F(" devices)");
 }
-
-void AFEWiFi::addReference(AFEDebugger *_Debugger) { Debugger = _Debugger; }
+#endif
 
 #endif
 
+
+#ifdef DEBUG
+void AFEWiFi::addReference(AFEDebugger *_Debugger) { Debugger = _Debugger; }
 #endif

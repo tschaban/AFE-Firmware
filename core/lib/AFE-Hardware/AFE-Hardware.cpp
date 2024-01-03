@@ -14,9 +14,8 @@ void AFEHardware::initPriorityHardwareItems(void) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-initMCP23XXX();
+  initMCP23XXX();
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   if (Firmware->Device->getMode() != AFE_MODE_ACCESS_POINT) {
@@ -84,6 +83,14 @@ void AFEHardware::initHardwareItems(void) {
 #ifdef AFE_CONFIG_HARDWARE_FS3000
     initFS3000();
 #endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+    initRegulator();
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+    initThermalProtector();
+#endif
   }
 }
 
@@ -147,7 +154,13 @@ void AFEHardware::initADC(void) {
 #ifdef AFE_ESP32
     for (uint8_t i = 0; i < Firmware->Device->configuration.noOfAnalogInputs;
          i++) {
-      AnalogInput[i] = new AFEAnalogInput();
+
+#ifdef DEBUG
+      AnalogInput[i] = new AFEAnalogInput(Firmware->API->Flash, Firmware->Debugger);
+#else
+      AnalogInput[i] = new AFEAnalogInput(Firmware->API->Flash);
+#endif
+
       AnalogInput[i]->begin(i);
     }
 #else
@@ -387,4 +400,45 @@ boolean AFEHardware::initAnemometer(void) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 void AFEHardware::initMCP23XXX(void) { MCP23017Broker->begin(); }
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+void AFEHardware::initRegulator(void) {
+  if (Firmware->Device->configuration.noOfRegulators > 0) {
+    for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRegulators;
+         i++) {
+
+#ifdef DEBUG
+      Regulator[i] = new AFERegulator(Firmware->API->Flash, Firmware->Debugger);
+#else
+      Regulator[i] = new AFERegulator(Firmware->API->Flash);
+#endif
+
+      if (Regulator[i]->configuration->relayId != AFE_HARDWARE_ITEM_NOT_EXIST &&
+          Firmware->Device->configuration.noOfRelays >=
+              Regulator[i]->configuration->relayId + 1) {
+        Regulator[i]->begin(i, Relay[Regulator[i]->configuration->relayId]);
+      }
+    }
+  }
+}
+
+#endif
+
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
+void AFEHardware::initThermalProtector(void) {
+  if (Firmware->Device->configuration.noOfThermalProtectors > 0) {
+    for (uint8_t i = 0;
+         i < Firmware->Device->configuration.noOfThermalProtectors; i++) {
+
+#ifdef DEBUG
+      ThermalProtector[i] =
+          new AFEThermalProtector(Firmware->API->Flash, Firmware->Debugger);
+#else
+      ThermalProtector[i] = new AFEThermalProtector(Firmware->API->Flash);
+#endif
+      ThermalProtector[i]->begin(i);
+    }
+  }
+}
 #endif
