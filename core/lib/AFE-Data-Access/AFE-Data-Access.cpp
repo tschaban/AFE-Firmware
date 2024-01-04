@@ -2515,6 +2515,14 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   SwitchConfiguration.relayID = AFE_HARDWARE_ITEM_NOT_EXIST;
   saveConfiguration(2, &SwitchConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
+#elif defined(AFE_DEVICE_SONOFF_MINI_R4)
+  SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
+  SwitchConfiguration.functionality =
+      AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY;
+  SwitchConfiguration.gpio = AFE_HARDWARE_SWITCH_X_DEFAULT_GPIO;
+  SwitchConfiguration.relayID = 1;
+  saveConfiguration(1, &SwitchConfiguration);
+  index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #else
   index = 1; // First switch created already
 #endif

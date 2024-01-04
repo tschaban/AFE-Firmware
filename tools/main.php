@@ -1,12 +1,18 @@
 <?php
 
+/* Configuration */
+
+$gzipPathExe = "\"C:/Program Files (x86)/GnuWin32/bin/gzip.exe\" -9 ";
+$subFolderForCommpressedLib = "/compressed.versions";
+
 
 /* Set this before run */
 
 $type = "0";
-$version = "3.8.0.B2";
+$version = "3.8.0.B5";
 $language = "pl";
-$development = true;
+$development = false;
+$supportCompressed = 1; // 0 - doesn't support compressed firmware, 1 - supports compressed firmware
 
 
 /**
@@ -73,7 +79,10 @@ foreach ($targetLanguage as &$targetLanguageFolder) {
         foreach ($targetHardware as &$targetHardwareFolder) {
             if (!file_exists($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0])) {
                 mkdir($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0]);
-                createdIndexFile($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0]);                              
+                createdIndexFile($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0]);  
+                mkdir($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0].$subFolderForCommpressedLib);
+                createdIndexFile($targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0].$subFolderForCommpressedLib);  
+
             }        
             $finalFolder[$targetLanguageFolder][$targetAPIFolder][$targetHardwareFolder[0]] = $targetFolder."/".$targetLanguageFolder."/".$targetAPIFolder."/".$targetHardwareFolder[0];
         }    
@@ -89,17 +98,19 @@ $handle = fopen($targetFolder."/script-".$language.".sql", "a");
 if (!$development) {
   fwrite($handle, "UPDATE afe_firmwares set current_version = 0 WHERE type = ".$type." AND language = '".$language."';\n");
 }
-echo "\nCoping firmwares";
-
 foreach ($sourceFolder as &$source) {
     $sourceToCopy = $source["file"];
     $fileName = "afe.firmware.t".$type.".".$version.".".$language.".esp".$source["chip"].".". ($targetHardware[$source["hardware"]][2]?$targetHardware[$source["hardware"]][2].".":"") . $source["size"]."mb".($source["debug"]?".debug":"").".bin";
     $copyTo = $finalFolder[$language][$source["api"]][$targetHardware[$source["hardware"]][0]]."/".$fileName ;
-     
+    $copyToCommpressedFolder = $finalFolder[$language][$source["api"]][$targetHardware[$source["hardware"]][0]].$subFolderForCommpressedLib."/".$fileName;
+    
+    
     if (file_exists($sourceToCopy)) {
         copy($sourceToCopy, $copyTo);
+        copy($sourceToCopy, $copyToCommpressedFolder);
+        exec($gzipPathExe.$copyToCommpressedFolder);
         echo "\nSUCCESS: " . $fileName;
-        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":($source["api"]==$targetAPI[1]?"S":"H"))."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", ".($development?2:1).", 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."');\n");
+        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path,supportCompressed,pathCompressedVersion) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":($source["api"]==$targetAPI[1]?"S":"H"))."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", ".($development?2:1).", 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."',".$supportCompressed.", '".str_replace($rootPath,"",$copyToCommpressedFolder.".gz")."');\n");
         
     } else {
         echo "\nERROR: File doesn't exist:  " . $sourceToCopy;
