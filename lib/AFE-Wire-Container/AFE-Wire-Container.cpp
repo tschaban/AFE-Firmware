@@ -25,7 +25,7 @@ void AFEWireContainer::printConfiguration(I2CPORT *Configuration) {
   Debugger->printValue(Configuration->SCL);
 #ifdef AFE_ESP32
   Debugger->printBulletPoint(F("Frequency: "));
-  Serial >> (Configuration->frequency / 1000) << F("Hz");
+  Serial << (Configuration->frequency / 1000) << F("Hz");
 #endif
 }
 #endif

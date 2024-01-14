@@ -33,9 +33,9 @@ void AFESitesGenerator::generateMenuHeader(String &page, uint16_t redirect) {
   generateHeader(page, redirect);
   page.concat(F("<div class=\"l\">{{A}}<small style=\"opacity:.3\">"));
   page.concat(F(L_VERSION));
-  page.concat(F(" T{{f.t}}-{{f.v}} ESP{{f.e}} (Build:{{f.b}})<br>RAM "));
+  page.concat(F(" T{{f.t}}-{{f.v}} ESP{{f.e}} (Build:{{f.b}})<br>"));
   page.concat(F(L_USED));
-  page.concat(F(" {{f.r}}%</small>"));
+  page.concat(F(" {{f.r}}</small>"));
 }
 
 void AFESitesGenerator::generateEmptyMenu(String &page, uint16_t redirect) {
@@ -668,9 +668,11 @@ void AFESitesGenerator::siteDevice(String &page) {
                          Firmware->Device->configuration.api.domoticz);
   addRadioButtonFormItem(page, "m", "Domoticz MQTT API", "2",
                          Firmware->Device->configuration.api.mqtt);
+/* Just MQTT
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-  addCheckboxFormItem(page, "m", "Home Assistant MQTT API", "1",
+  addCheckboxFormItem(page, "m", "MQTT API", "1",
                       Firmware->Device->configuration.api.mqtt);
+*/
 #else
   addCheckboxFormItem(page, "m", "MQTT API", "1",
                       Firmware->Device->configuration.api.mqtt);
@@ -3482,18 +3484,60 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
   closeMessageSection(page);
 
   if (details) {
-    openMessageSection(page, F(L_ADDITIONAL_INFORMATION), F(""));
+    openMessageSection(page, F(L_WIFI_CONNECTION), F(""));
+
     page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-    page.replace(F("{{I}}"), F(L_OPERATING_TIME));
-    sprintf(_numberToText, "%dm:%dd:%dg:%dm", Firmware->timer->months,
-            Firmware->timer->days, Firmware->timer->hours,
-            Firmware->timer->minutes);
-    page.replace(F("{{x}}"), _numberToText);
+    page.replace(F("{{I}}"), F(L_WIFI_SSID));
+    page.replace(F("{{x}}"), Firmware->API->Network->WirelessNetwork.SSID());
+
     page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
-    page.replace(F("{{I}}"), F(L_REBOOTS_NUMBER));
-    sprintf(_numberToText, "%lu",
-            Firmware->API->Flash->getRebootCounter(false));
-    page.replace(F("{{x}}"), _numberToText);
+    page.replace(F("{{I}}"), F(L_WIFI_BSSID));
+    page.replace(F("{{x}}"),
+                 Firmware->API->Network->WirelessNetwork.BSSIDstr());
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_WAN_CONNECTED));
+    page.replace(F("{{x}}"),
+                 Firmware->API->REST->accessToWAN() ? F(L_YES) : F(L_NO));
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_DEVICE_HOSTNAME));
+
+#ifdef AFE_ESP32
+    page.replace(F("{{x}}"),
+                 Firmware->API->Network->WirelessNetwork.getHostname());
+#else
+    page.replace(F("{{x}}"),
+                 Firmware->API->Network->WirelessNetwork.hostname());
+#endif
+
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_DEVICE_IP));
+    page.replace(F("{{x}}"),
+                 Firmware->API->Network->WirelessNetwork.localIP().toString());
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_GATEWAY_IP));
+    page.replace(
+        F("{{x}}"),
+        Firmware->API->Network->WirelessNetwork.gatewayIP().toString());
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_SUBNET_IP));
+    page.replace(
+        F("{{x}}"),
+        Firmware->API->Network->WirelessNetwork.subnetMask().toString());
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_DNS1));
+    page.replace(F("{{x}}"),
+                 Firmware->API->Network->WirelessNetwork.dnsIP(0).toString());
+
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_DNS2));
+    page.replace(F("{{x}}"),
+                 Firmware->API->Network->WirelessNetwork.dnsIP(1).toString());
 
     page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
     int32_t _rssi = WiFi.RSSI();
@@ -3508,6 +3552,21 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
                            : _rssi >= -70 ? F(L_WIFI_RSSI_70)
                                           : _rssi >= -80 ? F(L_WIFI_RSSI_80)
                                                          : F(L_WIFI_RSSI_90));
+
+    closeMessageSection(page);
+
+    openMessageSection(page, F(L_ADDITIONAL_INFORMATION), F(""));
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_OPERATING_TIME));
+    sprintf(_numberToText, "%dm:%dd:%dg:%dm", Firmware->timer->months,
+            Firmware->timer->days, Firmware->timer->hours,
+            Firmware->timer->minutes);
+    page.replace(F("{{x}}"), _numberToText);
+    page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+    page.replace(F("{{I}}"), F(L_REBOOTS_NUMBER));
+    sprintf(_numberToText, "%lu",
+            Firmware->API->Flash->getRebootCounter(false));
+    page.replace(F("{{x}}"), _numberToText);
 
     closeMessageSection(page);
   }
@@ -4292,8 +4351,10 @@ void AFESitesGenerator::setAttributes(String *page) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   page->replace(F("{{f.a}}"), F("Domoticz"));
+/* Standard and HA is merged
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
   page->replace(F("{{f.a}}"), F("HomeAssistant"));
+  */
 #else
   page->replace(F("{{f.a}}"), F("Standard"));
 #endif
@@ -4348,12 +4409,12 @@ void AFESitesGenerator::setAttributes(String *page) {
 
   char _ramText[7];
 #ifndef AFE_ESP32
-  sprintf(_ramText, "%-.1f",
+  sprintf(_ramText, "%-.1f%%",
           100 -
               (float)((float)system_get_free_heap_size() / (float)AFE_MAX_RAM) *
                   100);
 #else
-  sprintf(_ramText, "?");
+  sprintf(_ramText, "%dkB", (esp_get_free_heap_size() / 1024));
 #endif
 
   page->replace(F("{{f.r}}"), _ramText);

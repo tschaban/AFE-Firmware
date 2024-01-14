@@ -18,20 +18,34 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
   _Data->getConfiguration(id, configuration);
   WireBUS->begin(configuration->gpio);
   Sensor->setOneWire(WireBUS);
+  // Sensor->setPullupPin(configuration->gpio);
   Sensor->begin();
 
-  if (Sensor->isConnected(configuration->address)) {
+  if (Sensor->validAddress(configuration->address) &&
+      Sensor->isConnected(configuration->address)) {
     _initialized = true;
     Sensor->setResolution(configuration->resolution);
 #ifdef DEBUG
     char addressTxt[17];
     addressToChar(configuration->address, addressTxt);
-    Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
+    Debugger->printHeader(2, 0, 30, AFE_DEBUG_HEADER_TYPE_DASH);
     Debugger->printBulletPoint(F("DS18B20: Initialized"));
     Debugger->printBulletPoint(F("Address: "));
     Serial << addressTxt;
     Debugger->printBulletPoint(F("Resolution: "));
-    Debugger->printValue(Sensor->getResolution(), F(" bits"));
+    Debugger->printValue(Sensor->getResolution(configuration->address),
+                         F(" bits"));
+    Debugger->printBulletPoint(F("Parasite power is: "));
+    Debugger->printValue(Sensor->isParasitePowerMode() ? F("On") : F("Off"));
+    Debugger->printBulletPoint(F("Valid sensor family: "));
+    Debugger->printValue(Sensor->validFamily(configuration->address) ? F("Yes")
+                                                                     : F("No"));
+    Debugger->printBulletPoint(F("Power supply: "));
+    Debugger->printValue(Sensor->readPowerSupply(configuration->address)
+                             ? F("2 wire")
+                             : F("3 wire"));
+    getCurrentTemperature();
+
 #endif
   } else {
     _initialized = false;
@@ -48,12 +62,11 @@ void AFESensorDS18B20::begin(AFEDataAccess *_Data, uint8_t id) {
 #endif
 }
 
-
 float AFESensorDS18B20::getCurrentTemperature() {
   float temperature = DEVICE_DISCONNECTED_C;
   if (_initialized) {
 #ifdef DEBUG
-    Debugger->printInformation(F("Reading temperature by: "), F("DS18B20"));
+    Debugger->printBulletPoint(F("Reading temperature by sensor: "));
     Serial << configuration->name;
 #endif
 
@@ -61,32 +74,48 @@ float AFESensorDS18B20::getCurrentTemperature() {
       readTimeOut = millis();
     }
 
-    if (Sensor->isConnected(configuration->address)) {
+    //  if (Sensor->validAddress(configuration->address) &&
+    //       Sensor->isConnected(configuration->address)) {
 
-      Sensor->requestTemperaturesByAddress(configuration->address);
+    //  Sensor->requestTemperaturesByAddress(configuration->address);
 
-      do {
-        temperature = configuration->unit == AFE_TEMPERATURE_UNIT_CELSIUS
-                          ? Sensor->getTempC(configuration->address)
-                          : Sensor->getTempF(configuration->address);
-        if (millis() - readTimeOut > AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT) {
-          break;
-        }
-      } while (temperature == 85.0 || temperature == (-127.0));
+    Sensor->requestTemperatures();
+
+#ifdef DEBUG
+    Debugger->printBulletPoint(F("Request duration: "));
+    Serial << (millis() - readTimeOut) << F(" msec");
+    Debugger->printBulletPoint(F("Waiting for conversion"));
+#endif
+    do {
+      temperature = configuration->unit == AFE_TEMPERATURE_UNIT_CELSIUS
+                        ? Sensor->getTempC(configuration->address)
+                        : Sensor->getTempF(configuration->address);
+      if (millis() - readTimeOut > AFE_CONFIG_HARDWARE_DS18B20_READ_TIMEOUT) {
+#ifdef DEBUG
+        Debugger->printBulletPoint(F("Warn: Timeout"));
+#endif
+        break;
+      }
+    } while (temperature == 85.0 || temperature == (DEVICE_DISCONNECTED_C));
+
+    if (temperature != DEVICE_DISCONNECTED_C) {
       temperature = temperature + configuration->correction;
     }
-  }
+
 #ifdef DEBUG
-  else {
-    Debugger->printError(F("Connection to sensor is lost"), F("DS18B20"));
-  }
-  Debugger->printBulletPoint(F("Temperature: "));
-  Debugger->printValue(temperature);
-  Debugger->printBulletPoint(F("Duration: "));
-  Debugger->printValue((millis() - readTimeOut), F("msec."));
+    Debugger->printBulletPoint(F("Temperature: "));
+    Serial << temperature;
+    Debugger->printBulletPoint(F("Duration: "));
+    Debugger->printValue((millis() - readTimeOut), F(" msec"));
+//   } else {
+//     Debugger->printBulletPoint(F("WARN: Sensor is NOT connected"));
 
 #endif
+    //   }
+  }
+
   readTimeOut = 0;
+
   return temperature;
 }
 
@@ -95,6 +124,8 @@ float AFESensorDS18B20::getTemperature() { return currentTemperature; }
 boolean AFESensorDS18B20::listener() {
   boolean ready = false;
   if (_initialized) {
+
+
     unsigned long time = millis();
 
     if (startTime == 0) {
@@ -102,6 +133,12 @@ boolean AFESensorDS18B20::listener() {
     }
 
     if (time - startTime >= configuration->interval * 1000) {
+
+#ifdef DEBUG
+    Debugger->printHeader(2, 0, 50, AFE_DEBUG_HEADER_TYPE_DASH);
+#endif
+
+
       float newTemperature = getCurrentTemperature();
 
       if (newTemperature != DEVICE_DISCONNECTED_C) {
@@ -114,12 +151,15 @@ boolean AFESensorDS18B20::listener() {
       }
 #ifdef DEBUG
       else {
-        Debugger->printWarning(F("Returned -127 => disconnected"),
-                               F("DS18B20"));
+        Debugger->printBulletPoint(F("WARN: Returned -127 => disconnected"));
       }
 #endif
 
       startTime = 0;
+
+#ifdef DEBUG
+      Debugger->printHeader(1, 1, 50, AFE_DEBUG_HEADER_TYPE_DASH);
+#endif
     }
   }
 

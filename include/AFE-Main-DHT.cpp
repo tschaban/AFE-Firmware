@@ -11,8 +11,8 @@ void DHTSensorEventsListener(void);
 /* Main code for processing sesnor */
 void DHTSensorEventsListener(void) {
 
-#if defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT) ||                            \
-    defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR)
+//#if defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT) ||  it was before 3.8.0 the why?
+#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR)
   boolean relayStateChanged;
 #endif
 

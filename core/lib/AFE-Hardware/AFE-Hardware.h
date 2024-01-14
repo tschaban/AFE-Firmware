@@ -166,7 +166,7 @@ private:
   void initRegulator(void);
 #endif
 
-#ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
+#ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   void initThermalProtector(void);
 #endif
 

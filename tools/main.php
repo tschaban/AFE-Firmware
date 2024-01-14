@@ -2,17 +2,22 @@
 
 /* Configuration */
 
-$gzipPathExe = "\"C:/Program Files (x86)/GnuWin32/bin/gzip.exe\" -9 ";
+$gzipPathExe = "\"C:/Program Files (x86)/GnuWin32/bin/gzip.exe\" -9f ";
 $subFolderForCommpressedLib = "/compressed.versions";
 
 
 /* Set this before run */
 
-$type = "0";
-$version = "3.8.0.B5";
-$language = "pl";
-$development = false;
-$supportCompressed = 1; // 0 - doesn't support compressed firmware, 1 - supports compressed firmware
+$type = "1";
+$version = "3.8.0.B7";
+$language = "en";
+$development = true;
+
+/**
+ * 0 - doesn't support compressed firmware
+ * 1 - supports compressed firmware
+ */
+$supportCompressed = 1;
 
 
 /**
@@ -109,6 +114,7 @@ foreach ($sourceFolder as &$source) {
         copy($sourceToCopy, $copyTo);
         copy($sourceToCopy, $copyToCommpressedFolder);
         exec($gzipPathExe.$copyToCommpressedFolder);
+        echo $gzipPathExe.$copyToCommpressedFolder;
         echo "\nSUCCESS: " . $fileName;
         fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path,supportCompressed,pathCompressedVersion) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":($source["api"]==$targetAPI[1]?"S":"H"))."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", ".($development?2:1).", 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."',".$supportCompressed.", '".str_replace($rootPath,"",$copyToCommpressedFolder.".gz")."');\n");
         

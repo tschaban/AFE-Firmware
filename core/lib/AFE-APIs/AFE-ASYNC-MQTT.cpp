@@ -181,7 +181,7 @@ boolean AFEAsyncMQTTClient::disconnectedEvent() {
         F("Forcing disconnection from MQTT Broker on object level"), F("MQTT"));
 #endif
     AFEAsyncMQTTClient::eventDisconnected = false;
-  //  _Broker->disconnect(true);
+    _Broker->disconnect(true); // @TODO Testing 3.8.0.B6
   }
 
 #ifdef AFE_CONFIG_HARDWARE_LED

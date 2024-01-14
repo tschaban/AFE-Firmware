@@ -333,16 +333,16 @@ void AFEAPIMQTTDomoticz::processRequest()
 
           _found = true;
 #endif
-          if (_Regulator[idxCache[i].id]->configuration->enabled !=
+          if (_Hardware->Regulator[idxCache[i].id]->configuration->enabled !=
               (byte)command.nvalue)
           {
             if (command.nvalue == AFE_SWITCH_OFF)
             {
-              _Regulator[idxCache[i].id]->off();
+              _Hardware->Regulator[idxCache[i].id]->off();
             }
             else
             {
-              _Regulator[idxCache[i].id]->on();
+              _Hardware->Regulator[idxCache[i].id]->on();
             }
             publishRegulatorState(idxCache[i].id);
           }
@@ -1271,8 +1271,8 @@ boolean AFEAPIMQTTDomoticz::publishDS18B20SensorData(uint8_t id)
 boolean AFEAPIMQTTDomoticz::publishRegulatorState(uint8_t id)
 {
   return enabled ? publishSwitchMessage(
-                       &_Regulator[id]->configuration->domoticz.idx,
-                       _Regulator[id]->configuration->enabled)
+                       &_Hardware->Regulator[id]->configuration->domoticz.idx,
+                       _Hardware->Regulator[id]->configuration->enabled)
                  : false;
 }
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR

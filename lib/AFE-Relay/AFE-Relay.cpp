@@ -135,7 +135,7 @@ void AFERelay::on() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Led->toggle();
+  Led->on();
 #endif
 }
 
@@ -185,7 +185,7 @@ void AFERelay::off() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Led->toggle();
+  Led->off();
 #endif
 }
 

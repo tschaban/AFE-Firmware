@@ -25,8 +25,8 @@ boolean AFESensorFS3000::begin(uint8_t id) {
   Data = NULL;
 
 #ifdef AFE_ESP32
-  bool _success = _fs3000->begin(configuration->wirePortId =
-                                     0 ? *WirePort->Port0 : *WirePort->Port1);
+  bool _success = _fs3000->begin(
+      configuration->wirePortId == 0 ? *WirePort->Port0 : *WirePort->Port1);
 #else
   bool _success = _fs3000->begin(*WirePort->Port0);
 #endif
@@ -98,8 +98,8 @@ void AFESensorFS3000::getJSON(char *json) {
                     "{\"fs3000\":[{\"value\":%d,\"unit\":\"raw\"},{\"value\":%."
                     "3f,\"unit\":\"%s\"},{\"value\":%.3f,\"unit\":\"%s\"},{"
                     "\"value\":%.3f,\"unit\":\"%s\"}]}"),
-          data->raw, data->metersPerSecond, F(AFE_UNIT_MS), data->milesPerHour,
-          F(AFE_UNIT_MILH), data->meters3PerHour, F(AFE_UNIT_M3H));
+          data->raw, data->metersPerSecond, (const char *)F(AFE_UNIT_MS), data->milesPerHour,
+          (const char *)F(AFE_UNIT_MILH), data->meters3PerHour, (const char *)F(AFE_UNIT_M3H));
 }
 
 #endif // AFE_CONFIG_HARDWARE_FS3000_Debuuger

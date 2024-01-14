@@ -2,8 +2,7 @@
 
 AFEFirmware::AFEFirmware(){};
 
-void AFEFirmware::begin()
-{
+void AFEFirmware::begin() {
 
   timer->miliseconds = millis();
   timer->minutes = 0;
@@ -49,11 +48,9 @@ void AFEFirmware::begin()
 
   API->Flash->getConfiguration(Configuration->Pro);
   API->Flash->getConfiguration(Configuration->Version);
-
 }
 
-void AFEFirmware::initializeNetwork(void)
-{
+void AFEFirmware::initializeNetwork(void) {
 
 #ifdef DEBUG
   Debugger->printInformation(F("Starting network"), F("BOOT"));
@@ -70,21 +67,17 @@ void AFEFirmware::initializeNetwork(void)
 }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEFirmware::initializeSystemLED(void)
-{
+void AFEFirmware::initializeSystemLED(void) {
   uint8_t id = API->Flash->getSystemLedID();
 #ifdef DEBUG
   boolean initialized = false;
 #endif
-  if (id != AFE_HARDWARE_ITEM_NOT_EXIST)
-  {
-    if (Device->configuration.noOfLEDs - 1 >= id)
-    {
+  if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (Device->configuration.noOfLEDs - 1 >= id) {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-     // @TODO T4 Led->addMCP23017Reference(MCP23017Broker);
+// @TODO T4 Led->addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
-      if (Hardware->SystemLed->begin(API->Flash, id))
-      {
+      if (Hardware->SystemLed->begin(API->Flash, id)) {
         Hardware->SystemLed->on();
 #ifdef DEBUG
         initialized = true;
@@ -92,12 +85,9 @@ void AFEFirmware::initializeSystemLED(void)
       }
     }
 #ifdef DEBUG
-    if (initialized)
-    {
+    if (initialized) {
       Debugger->printInformation(F("System LED initialized"), F("BOOT"));
-    }
-    else
-    {
+    } else {
       Debugger->printWarning(F("System LED NOT initialized"), F("BOOT"));
     }
 #endif // DEBUG
@@ -105,39 +95,33 @@ void AFEFirmware::initializeSystemLED(void)
 }
 #endif
 
-
-void AFEFirmware::validateProVersion(void)
-{
+void AFEFirmware::validateProVersion(void) {
 
 #ifdef DEBUG
   Debugger->printInformation(F("Checking AFE Pro Key"), F("AFE Pro"));
 #endif
 
-  if (strlen(Configuration->Pro->serial) == 0 && Configuration->Pro->valid)
-  {
+  if (strlen(Configuration->Pro->serial) == 0 && Configuration->Pro->valid) {
     Configuration->Pro->valid = false;
 #ifdef DEBUG
     Debugger->printInformation(F("Valid with no key"), F("AFE Pro"));
 #endif
     API->Flash->saveConfiguration(Configuration->Pro);
-  }
-  else if (strlen(Configuration->Pro->serial) > 0)
-  {
+  } else if (strlen(Configuration->Pro->serial) > 0) {
     String _HtmlResponse;
     boolean isValid;
     _HtmlResponse.reserve(6);
-    if (API->REST->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO))
-    {
+    if (API->REST->sent(_HtmlResponse, AFE_CONFIG_JSONRPC_REST_METHOD_IS_PRO)) {
       isValid = _HtmlResponse.length() > 0 && _HtmlResponse.equals("true")
                     ? true
                     : false;
 
-      if (Configuration->Pro->valid != isValid)
-      {
+      if (Configuration->Pro->valid != isValid) {
         Configuration->Pro->valid = isValid;
         API->Flash->saveConfiguration(Configuration->Pro);
 #ifdef DEBUG
-        Debugger->printInformation(F("Key state has been changed"), F("AFE Pro"));
+        Debugger->printInformation(F("Key state has been changed"),
+                                   F("AFE Pro"));
 #endif
       }
 
@@ -147,16 +131,14 @@ void AFEFirmware::validateProVersion(void)
 #endif
     }
 #ifdef DEBUG
-    else
-    {
+    else {
       Debugger->printError(F("while checing the key"), F("AFE Pro"));
     }
 #endif
   }
 }
 
-void AFEFirmware::checkFirmwareVersion(void)
-{
+void AFEFirmware::checkFirmwareVersion(void) {
 #ifdef DEBUG
   Debugger->printInformation(F("Checking firmware version"), F("FIRMWARE"));
 #endif
@@ -166,24 +148,23 @@ void AFEFirmware::checkFirmwareVersion(void)
 
   if (API->REST->sent(
           _HtmlResponse,
-          AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_VERSION))
-  {
-    if (_HtmlResponse.length() > 0 &&
-        _HtmlResponse.length() <=
-            sizeof(Configuration->Version->installed_version))
-    {
+          AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_VERSION)) {
+    
+    if (_HtmlResponse.length() > 0) {
+    
       char _tempVersion[sizeof(Configuration->Version->installed_version)];
+
       _HtmlResponse.toCharArray(
           _tempVersion, sizeof(Configuration->Version->installed_version));
+     
       if (strcmp(_tempVersion, Configuration->Version->installed_version) !=
-          0)
-      {
+          0) {
         API->Flash->saveLatestFirmwareVersion(_tempVersion);
+        API->Flash->getConfiguration(Configuration->Version);
 #ifdef DEBUG
-        Debugger->printInformation(F("New firmware version available"), F("FIRMWARE"));
-      }
-      else
-      {
+        Debugger->printInformation(F("New firmware version available"),
+                                   F("FIRMWARE"));
+      } else {
         Debugger->printInformation(F("Up2date"), F("FIRMWARE"));
 #endif
       }
@@ -191,30 +172,23 @@ void AFEFirmware::checkFirmwareVersion(void)
   }
 }
 
-void AFEFirmware::firstBooting(void)
-{
+void AFEFirmware::firstBooting(void) {
 
 #ifdef DEBUG
   Debugger->printInformation(F("Checking if first time launch"), F("FIRMWARE"));
 #endif
 
-  if (Device->getMode() == AFE_MODE_FIRST_TIME_LAUNCH)
-  {
+  if (Device->getMode() == AFE_MODE_FIRST_TIME_LAUNCH) {
 #ifdef DEBUG
     Debugger->printBulletPoint(F("Yes"));
 #endif
-    if (API->Flash->setDefaultConfiguration())
-    {
+    if (API->Flash->setDefaultConfiguration()) {
       Device->refreshConfiguration();
-    }
-    else
-    {
+    } else {
       Device->reboot();
     }
 #ifdef DEBUG
-  }
-  else
-  {
+  } else {
     Debugger->printBulletPoint(F("No"));
 #endif
   }

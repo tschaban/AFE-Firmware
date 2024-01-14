@@ -742,6 +742,19 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_FIRMWARE_PRO_YES "Pro version: Yes"
 #define L_FIRMWARE_PRO_NO "Pro version: No"
 #define L_REBOOTS_NUMBER "Firmware restarted {{x}} times"
+#define L_WIFI_CONNECTION "WiFi connection"
+#define L_WIFI_SSID "SSID: {{x}}"
+#define L_WIFI_BSSID "BSSID: {{x}}"
+#define L_DEVICE_IP "Device IP: {{x}}"
+#define L_DEVICE_HOSTNAME "Device Hostname: {{x}}"
+#define L_GATEWAY_IP "Gateway: {{x}}"
+#define L_SUBNET_IP "Subnet Mask: {{x}}"
+#define L_DNS1 "DNS1: {{x}}"
+#define L_DNS2 "DNS2: {{x}}"
+#define L_WAN_CONNECTED "Connected to the Internet: {{x}}"
+
+
+
 #define L_ADDITIONAL_INFORMATION "Additional information"
 #define L_OPERATING_TIME "Operating time {{x}}"
 #define L_WIFI_RSSI "WiFi Signal Strength Indicator {{x}} dBm ({{t}})"

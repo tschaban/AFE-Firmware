@@ -38,6 +38,12 @@ void AFEThermalProtector::begin(uint8_t id) {
 
 bool AFEThermalProtector::listener(float currentTemperature) {
   if (configuration->enabled) {
+
+#ifdef DEBUG
+    _Debugger->printInformation(F("Executing temperature check ..."),
+                                F("Thermal protection"));
+#endif
+
     if (currentTemperature > configuration->temperature && !turnOff) {
       turnOff = true;
 

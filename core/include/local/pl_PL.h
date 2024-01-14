@@ -38,7 +38,11 @@
 #define L_COMMNAD_NO_COMMAND "\"Brak komendy\""
 
 /* Menu */
-#define L_USED "wykorzystany w"
+#ifdef AFE_ESP32
+#define L_USED "Wolny RAM"
+#else
+#define L_USED "RAM wykorzystany w"
+#endif
 #define L_HARDWARE "Sprzęt"
 #define L_FUNCTIONS "Funkcje"
 #define L_FIRMWARE "Firmware"
@@ -169,11 +173,11 @@
 #define L_NETWORK_SLEEP_TIME "Czas po jakim powtórzyć próby łączenia się"
 #define L_NETWORK_ADVANCED "Zaawansowane"
 #define L_NETWORK_ALMOST "Prawie jesteśmy na miejscu!"
-#define L_NETWORK_DEVICE_CONNECTS "Urządzenie łaczy się z siecią"
-#define L_NETWORK_CONNECT_TO "Połącz się z siecią WiFi"
+#define L_NETWORK_DEVICE_CONNECTS "Trwa łączenie się z siecia WiFi.."
+#define L_NETWORK_CONNECT_TO "Gdy urządzenie połączy się z siecią WiFi uruchom <a href=\"http://{{A}}.local\">Panel Konfiguracyjny</a>"
 //#define L_NETWORK_CONNECT "Połącz"
-#define L_NETWORK_CONNECT_TO_PANEL "A następnie wejdź w <a href=\"http://{{A}}.local\">Panele Konfiguracyjny</a>"
-#define L_NETWORK_SEARCH_FOR_IP_ADDRESS "Jeśli adres nie jest odnajdywalny w twojej sieci w ustawieniach routera WiFi, wyszukaj adres IP urządzenia o adresie MAC: {{M}} lub hostname: AFE-Device"
+#define L_NETWORK_CONNECT_TO_PANEL "Jeśli adres nie zostanie odnaleziony w twojej sieci WiFi to wykorzystaj adres IP urządzenia"
+#define L_NETWORK_SEARCH_FOR_IP_ADDRESS "Adres IP znajdziesz w konfiguracji routera WiFi. Wyszukaj urządzenie o adresie MAC: {{M}} lub hostname: AFE-Device"
 #define L_NETWOK_NONE_BACKUP_SSID "--- Brak ---"
 #define L_NETWORK_BACKUP_CONFIGURATION "Zapasowa konfiguracja WiFi"
 #define L_NETWORK_SWITCH_TO_BACKUP "Liczba błędów połączeń przed uruchomieniem konfiguracji zapasowej"
@@ -716,6 +720,17 @@ const char* const Comfort[] PROGMEM = {comfort_OK,comfort_TooHot,comfort_TooCold
 #define L_FIRMWARE_API "API: {{f.a}}"
 #define L_FIRMWARE_PRO_YES "Wersja Pro: Tak"
 #define L_FIRMWARE_PRO_NO "Wersja Pro: Nie"
+#define L_WIFI_CONNECTION "Połączenie z siecią WiFI"
+#define L_WIFI_SSID "SSID: {{x}}"
+#define L_WIFI_BSSID "BSSID: {{x}}"
+#define L_DEVICE_IP "IP Urządzenia: {{x}}"
+#define L_DEVICE_HOSTNAME "Hostname urządzenia: {{x}}"
+#define L_GATEWAY_IP "Bramka: {{x}}"
+#define L_SUBNET_IP "Maska sieci: {{x}}"
+#define L_DNS1 "DNS1: {{x}}"
+#define L_DNS2 "DNS2: {{x}}"
+#define L_WAN_CONNECTED "Podłączenie do Internetu: {{x}}"
+
 #define L_ADDITIONAL_INFORMATION "Informacje dodatkowe"
 #define L_OPERATING_TIME "Czas pracy {{x}}"
 #define L_REBOOTS_NUMBER "Firmware restartowany {{x}} razy"

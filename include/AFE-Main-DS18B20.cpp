@@ -10,8 +10,8 @@ void DS18B20SensorEventsListener(void);
 /* Main code for processing sesnor */
 void DS18B20SensorEventsListener(void) {
 
-#if defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT) ||                            \
-    defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR)
+//#if defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT) ||    it was before 3.8.0 the why?
+ #if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) || defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
   float temperature;
   boolean relayStateChanged;
 #endif
@@ -20,8 +20,8 @@ void DS18B20SensorEventsListener(void) {
 
     if (Hardware->DS18B20Sensor[i]->listener()) {
 
-#if defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT) ||                            \
-    defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR)
+// #if defined(AFE_CONFIG_FUNCTIONALITY_THERMOSTAT) ||   it was before 3.8.0 the why?
+#if defined(AFE_CONFIG_FUNCTIONALITY_REGULATOR) || defined(AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR)
       temperature = Hardware->DS18B20Sensor[i]->getTemperature();
 #endif
 
