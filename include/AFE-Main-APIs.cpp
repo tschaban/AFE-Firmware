@@ -21,6 +21,7 @@ void initializeHTTPDomoticzAPI(void);
 /* --------- Body -----------*/
 
 AFEAPIHTTP *HttpAPI = new AFEAPIHTTP();
+
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 AFEAPIMQTTDomoticz *MqttAPI = new AFEAPIMQTTDomoticz();
 AFEAPIHTTPDomoticz *HttpDomoticzAPI = new AFEAPIHTTPDomoticz();

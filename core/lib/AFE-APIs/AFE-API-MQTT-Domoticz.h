@@ -6,6 +6,7 @@
 #include <AFE-Configuration.h>
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
+
 #include <AFE-Firmware.h>
 #include <AFE-Hardware.h>
 #include <ArduinoJson.h>

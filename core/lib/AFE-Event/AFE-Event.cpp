@@ -148,7 +148,7 @@ void AFEEvent::conenctedToNetwork(void)
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      _Firmware->Hardware->SystemLed->on();
+      _Hardware->SystemLed->on();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
@@ -264,7 +264,7 @@ void AFEEvent::conenctedToNetwork(void)
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      _Firmware->Hardware->SystemLed->off();
+      _Hardware->SystemLed->off();
 #endif
     }
 
@@ -283,7 +283,7 @@ void AFEEvent::disconnectedFromNetwork(void)
   _Firmware->Debugger->printInformation(F("Network disconnected: triggered"), F("EVENT"));
 #endif
 #ifdef AFE_CONFIG_HARDWARE_LED
-  _Firmware->Hardware->SystemLed->on();
+  _Hardware->SystemLed->on();
 #endif
   _Firmware->API->REST->setNoWANAccess();
 
@@ -296,7 +296,7 @@ void AFEEvent::disconnectedFromNetwork(void)
   }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  _Firmware->Hardware->SystemLed->off();
+  _Hardware->SystemLed->off();
 #endif
 }
 
@@ -314,7 +314,7 @@ void AFEEvent::connectedToMQTTBroker(void)
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-      _Firmware->Hardware->SystemLed->on();
+      _Hardware->SystemLed->on();
 #endif
       _MqttAPI->subscribe();
 
@@ -329,7 +329,7 @@ void AFEEvent::connectedToMQTTBroker(void)
     }
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-    _Firmware->Hardware->SystemLed->off();
+    _Hardware->SystemLed->off();
 #endif
   }
 }

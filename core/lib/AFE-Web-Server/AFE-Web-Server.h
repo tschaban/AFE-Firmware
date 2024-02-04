@@ -4,6 +4,7 @@
 #define _AFE_Web_Server_h
 
 #include <AFE-Firmware.h>
+#include <AFE-Hardware.h>
 #include <AFE-Sites-Generator.h>
 
 #ifdef AFE_ESP32
@@ -29,10 +30,6 @@
 #include <en_EN.h>
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_I2C
-#include <AFE-Wire-Container.h>
-#endif // AFE_CONFIG_HARDWARE_I2C
-
 struct AFE_SITE_PARAMETERS {
   uint8_t ID;
   boolean twoColumns = true;
@@ -49,10 +46,7 @@ class AFEWebServer {
 
 private:
   AFEFirmware *Firmware;
-
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  AFEWireContainer *WirePort;
-#endif // AFE_CONFIG_HARDWARE_I2C
+  AFEHardware *Hardware;
 
   /**
    * @brief Once HTTP API requet is recieved it's set to true
@@ -133,7 +127,7 @@ private:
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  void get(DHT &data);
+  void get(DHT_CONFIG &data);
 #endif // AFE_CONFIG_HARDWARE_DHT
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
@@ -269,17 +263,13 @@ public:
    */
   HTTPCOMMAND *httpAPICommand = new HTTPCOMMAND;
 
-  AFEWebServer();
+  AFEWebServer(AFEFirmware *, AFEHardware *);
 
 /**
  * @brief Method initialize WebServer and Updater server
  *
  */
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  void begin(AFEFirmware *, AFEWireContainer *);
-#endif
-
-  void begin(AFEFirmware *);
+  void begin();
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   /**

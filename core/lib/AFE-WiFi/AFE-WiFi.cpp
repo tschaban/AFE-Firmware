@@ -8,13 +8,6 @@ boolean AFEWiFi::eventConnectionLost = true;
 
 AFEWiFi::AFEWiFi() {}
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data, AFELED *_LED) {
-  Led = _LED;
-  begin(_Device, _Data);
-}
-#endif
-
 void AFEWiFi::begin(AFEDevice *_Device, AFEDataAccess *_Data) {
   Device = _Device;
   Data = _Data;
@@ -590,6 +583,12 @@ void AFEWiFi::onWiFiAPStationConnected(
 }
 #endif
 
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+void AFEWiFi::addReference(AFELED *_Led) {
+  Led = _Led;
+}
 #endif
 
 

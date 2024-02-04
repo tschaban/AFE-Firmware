@@ -94,6 +94,37 @@ void AFEHardware::initHardwareItems(void) {
   }
 }
 
+#ifdef AFE_CONFIG_HARDWARE_LED
+void AFEHardware::initializeSystemLED(void) {
+  uint8_t id = Firmware->API->Flash->getSystemLedID();
+#ifdef DEBUG
+  boolean initialized = false;
+#endif
+  if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
+    if (Firmware->Device->configuration.noOfLEDs - 1 >= id) {
+#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
+      SystemLed->addMCP23017Reference(MCP23017Broker);
+#endif // AFE_CONFIG_HARDWARE_MCP23XXX
+      if (SystemLed->begin(Firmware->API->Flash, id)) {
+        SystemLed->on();
+#ifdef DEBUG
+        initialized = true;
+#endif
+      }
+    }
+#ifdef DEBUG
+    if (initialized) {
+      Firmware->Debugger->printInformation(F("System LED initialized"),
+                                           F("BOOT"));
+    } else {
+      Firmware->Debugger->printWarning(F("System LED NOT initialized"),
+                                       F("BOOT"));
+    }
+#endif // DEBUG
+  }
+}
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFEHardware::initSwitch(void) {
   for (uint8_t i = 0; i < Firmware->Device->configuration.noOfSwitches; i++) {
@@ -102,7 +133,7 @@ void AFEHardware::initSwitch(void) {
     Switch[i]->addMCP23017Reference(MCP23017Broker);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Switch[i]->begin(i, Firmware->API->Flash, Firmware->Hardware->SystemLed);
+    Switch[i]->begin(i, Firmware->API->Flash, SystemLed);
 #else
     Switch[i]->begin(i, Firmware->API->Flash);
 #endif
@@ -156,7 +187,8 @@ void AFEHardware::initADC(void) {
          i++) {
 
 #ifdef DEBUG
-      AnalogInput[i] = new AFEAnalogInput(Firmware->API->Flash, Firmware->Debugger);
+      AnalogInput[i] =
+          new AFEAnalogInput(Firmware->API->Flash, Firmware->Debugger);
 #else
       AnalogInput[i] = new AFEAnalogInput(Firmware->API->Flash);
 #endif

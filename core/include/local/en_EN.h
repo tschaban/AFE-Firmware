@@ -43,7 +43,11 @@
 #define L_JSON_RPC_API "Unstable connection to the AFE Firmware server. There is no possibility to check and update the firmware over the Internet and to activate AFE Pro"
 
 /* Menu */
-#define L_USED "used in"
+#ifdef AFE_ESP32
+#define L_USED "Free RAM"
+#else
+#define L_USED "RAM used in"
+#endif
 #define L_HARDWARE "Hardware"
 #define L_FUNCTIONS "Functionalities"
 #define L_FIRMWARE "Firmware"

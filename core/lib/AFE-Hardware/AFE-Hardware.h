@@ -104,6 +104,7 @@ class AFEHardware {
 private:
   AFEFirmware *Firmware;
 
+
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   void initSwitch(void);
 #endif
@@ -179,6 +180,10 @@ public:
   AFEWireContainer *WirePort =
       new AFEWireContainer(Firmware->Device, Firmware->API->Flash);
 #endif
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  AFELED *SystemLed = new AFELED();
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
@@ -261,13 +266,8 @@ public:
 
 #ifdef AFE_CONFIG_HARDWARE_FS3000
   AFESensorFS3000 *FS3000Sensor[AFE_CONFIG_HARDWARE_NUMBER_OF_FS3000];
-#endif /*                                                                      \ \
-   \                                                                             \
-   \ \                                                                               \
-   AFEMCP23017Broker(AFEDataAccess *_Data, AFEDevice *_Device, TwoWire \ \ \                                                                               \
-   *_WirePort0, \ \ \                                                                               \
-                     TwoWire *_WirePort1, AFEDebugger *_Debugger); \ \ \                                                                               \
- */
+#endif
+
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef DEBUG
@@ -293,6 +293,10 @@ public:
 
   void initPriorityHardwareItems(void);
   void initHardwareItems(void);
+
+  #ifdef AFE_CONFIG_HARDWARE_LED
+  void initializeSystemLED(void);
+#endif
 
   void begin(void);
 };

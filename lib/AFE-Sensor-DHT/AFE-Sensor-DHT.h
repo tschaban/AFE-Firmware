@@ -5,9 +5,9 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_DHT
 
-#include <Arduino.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Sensors-Common.h>
+#include <Arduino.h>
 #include <DHTesp.h>
 
 #if AFE_LANGUAGE == 0
@@ -20,13 +20,13 @@
 #include <AFE-Debugger.h>
 #endif
 
-class AFESensorDHT : public AFESensorsCommon
-{
+class AFESensorDHT : public AFESensorsCommon {
 
 private:
   AFEDataAccess *Data;
+#ifdef DEBUG
   AFEDebugger *Debugger;
-
+#endif
   boolean _initialized = false;
 
   unsigned long startTime = 0;
@@ -38,7 +38,7 @@ private:
 #endif
 
 public:
-  DHT *configuration = new DHT;
+  DHT_CONFIG *configuration = new DHT_CONFIG;
 
   float currentTemperature;
   float currentHumidity;

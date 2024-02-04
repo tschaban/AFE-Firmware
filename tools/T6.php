@@ -4,8 +4,8 @@ $targetLanguage[0] = "pl";
 $targetLanguage[1] = "en";
 
 $targetAPI[0] = "domoticz.api";
-$targetAPI[1] = "standard.api";
-$targetAPI[2] = "homeassistant.api";
+$targetAPI[1] = "generic.api";
+$targetAPI[2] = "generic.api";
 
 $rootPath = "C:/Users/Adrian/Cloud/Pulpit/";
 $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
@@ -79,7 +79,7 @@ $folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
 // Standard API ESP8266 4MB
 
 $index = 0;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-standard/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 0;
@@ -87,7 +87,7 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-standard-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 0;
@@ -97,7 +97,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Standard API ESP8266 1MB
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_1m-standard/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_1m-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 0;
@@ -108,7 +108,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Standard API iECS 2.0 
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv20-standard/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv20-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 1;
@@ -118,7 +118,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Standard API iECS 2.1
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv21-standard/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-iECSv21-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -128,7 +128,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Standard API E1
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-e1-standard/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-e1-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 5;
@@ -138,7 +138,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Standard API E2
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-e2-standard/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_8266_4m-e2-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 6;
@@ -149,7 +149,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Standard API ESP32
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-standard/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;
@@ -157,7 +157,7 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 $index++; // It will not create a new binary; as 30p and 38p version have been merged
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-standard/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 4;
@@ -165,7 +165,7 @@ $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-standard-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;
@@ -173,7 +173,7 @@ $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[1];
 
 $index++; // It will not create a new binary; as 30p and 38p version have been merged
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-standard-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T6_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 4;

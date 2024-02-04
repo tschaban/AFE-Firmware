@@ -58,10 +58,6 @@ private:
 
   void generateMessage(String &message, const char *method, const char *params);
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *);
-#endif
-
 public:
   boolean isStableConnection = true;
 
@@ -72,10 +68,11 @@ public:
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  void begin(AFEDataAccess *, AFEDevice *, AFELED *);
-#else
-  void begin(AFEDataAccess *, AFEDevice *);
+  void addReference(AFELED *_Led);
 #endif
+
+  void begin(AFEDataAccess *, AFEDevice *);
+
 
   int sent(boolean &response, const char *method);
   int sent(String &response, const char *method);

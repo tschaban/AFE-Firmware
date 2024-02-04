@@ -2,20 +2,15 @@
 
 #include "AFE-Web-Server.h"
 
-AFEWebServer::AFEWebServer() {}
-
-#if defined(AFE_CONFIG_HARDWARE_I2C)
-void AFEWebServer::begin(AFEFirmware *_Firmware, AFEWireContainer *_WirePort) {
-  WirePort = _WirePort;
-  begin(_Firmware);
-}
-#endif //  AFE_CONFIG_HARDWARE_I2C
-
-void AFEWebServer::begin(AFEFirmware *_Firmware) {
+AFEWebServer::AFEWebServer(AFEFirmware *_Firmware, AFEHardware *_Hardware) {
   Firmware = _Firmware;
+  Hardware = _Hardware;
+}
+
+void AFEWebServer::begin() {
   server.begin(80);
 #ifdef AFE_CONFIG_HARDWARE_I2C
-  Site.begin(Firmware, WirePort);
+  Site.begin(Firmware, Hardware->WirePort);
 #else
   Site.begin(Firmware);
 #endif // AFE_CONFIG_HARDWARE_I2C
@@ -493,7 +488,7 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 #ifdef AFE_CONFIG_HARDWARE_DHT
         else if (siteConfig.ID == AFE_CONFIG_SITE_DHT) {
-          DHT dhtConfiguration;
+          DHT_CONFIG dhtConfiguration;
           get(dhtConfiguration);
           Firmware->API->Flash->saveConfiguration(siteConfig.deviceID,
                                                   &dhtConfiguration);
@@ -760,7 +755,7 @@ boolean AFEWebServer::generate(boolean upload) {
     /* Rebooting device */
     if (siteConfig.reboot) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-      Firmware->Hardware->SystemLed->on();
+      Hardware->SystemLed->on();
 #endif
       Firmware->Device->reboot(siteConfig.rebootMode);
     }
@@ -949,7 +944,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
 // firmwareId = 601;
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Firmware->Hardware->SystemLed->on();
+  Hardware->SystemLed->on();
 #endif
 
 #ifdef DEBUG
@@ -1117,7 +1112,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
     }
   }
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Firmware->Hardware->SystemLed->off();
+  Hardware->SystemLed->off();
 #endif
 
   return _success;
@@ -1156,7 +1151,7 @@ boolean AFEWebServer::upgradOTAFile(void) {
     }
   } else if (upload.status == UPLOAD_FILE_WRITE && !_updaterError.length()) {
 #ifdef AFE_CONFIG_HARDWARE_LED
-    Firmware->Hardware->SystemLed->toggle();
+    Hardware->SystemLed->toggle();
 #endif
 #ifdef DEBUG
     // Serial << endl << (upload.totalSize / 1024) << F(" kB");
@@ -1485,7 +1480,9 @@ void AFEWebServer::get(NETWORK &data) {
   data.primary.isDHCP = server.arg(F("d")).length() > 0 ? true : false;
   data.secondary.isDHCP = server.arg(F("db")).length() > 0 ? true : false;
 
-  data.mDNSActive = server.arg(F("md")).length() > 0 ? AFE_CONFIG_NETWORK_MDNS_ACTIVE : AFE_CONFIG_NETWORK_MDNS_INACTIVE;
+  data.mDNSActive = server.arg(F("md")).length() > 0
+                        ? AFE_CONFIG_NETWORK_MDNS_ACTIVE
+                        : AFE_CONFIG_NETWORK_MDNS_INACTIVE;
 
 #if !defined(ESP32)
   data.radioMode = server.arg(F("r")).length() > 0
@@ -1710,7 +1707,6 @@ void AFEWebServer::get(PRO_VERSION &data) {
   } else {
     data.serial[0] = AFE_EMPTY_STRING;
   }
-
   data.valid = false;
 }
 
@@ -1997,7 +1993,7 @@ void AFEWebServer::get(DS18B20 &data) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEWebServer::get(DHT &data) {
+void AFEWebServer::get(DHT_CONFIG &data) {
 
   if (server.arg(F("n")).length() > 0) {
     server.arg(F("n")).toCharArray(data.name, sizeof(data.name));

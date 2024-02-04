@@ -547,7 +547,7 @@ void AFEAPIHomeAssistantIntegration::publishSensorDHT(void)
   {
     return;
   }
-  DHT _configuration;
+  DHT_CONFIG _configuration;
 
   _deviceConfiguration->entityId = AFE_CONFIG_HA_TYPE_OF_ENTITY_SENSOR;
   _deviceConfiguration->hardwareId = AFE_CONFIG_HA_HARDWARE_SENSOR_DHTXX;

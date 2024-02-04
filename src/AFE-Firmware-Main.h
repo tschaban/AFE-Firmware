@@ -17,10 +17,11 @@
 /**
  * Work LOG T4 @TODO
  * - lokalizacje
- * - to set fOr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200, actual
+ * - to set fOr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200,
+ actual
  * JSON size: 40
  * - ESP32
- * 
+ *
 
 
  */
@@ -38,9 +39,8 @@
 #include <AFE-Web-Server.h>
 
 AFEFirmware *Firmware = new AFEFirmware();
-AFEWebServer *HTTPServer = new AFEWebServer();
 AFEHardware *Hardware = new AFEHardware(Firmware);
-
+AFEWebServer *HTTPServer = new AFEWebServer(Firmware, Hardware);
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Sensor-PN532.h>
@@ -50,7 +50,6 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #endif
 
 #include <AFE-Main-APIs.cpp>
-
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
 #include <AFE-Main-CLED.cpp>
@@ -115,7 +114,6 @@ AFEMiFareCard MiFareCard[AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS];
 #ifdef AFE_CONFIG_HARDWARE_FS3000
 #include <AFE-Main-FS3000.cpp>
 #endif
-
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
 #include <AFE-Main-PN532.cpp>

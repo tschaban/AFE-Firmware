@@ -165,8 +165,8 @@ public:
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  void getConfiguration(uint8_t id, DHT *);
-  void saveConfiguration(uint8_t id, DHT *);
+  void getConfiguration(uint8_t id, DHT_CONFIG *);
+  void saveConfiguration(uint8_t id, DHT_CONFIG *);
   void createDHTSensorConfigurationFile(void);
 #endif // AFE_CONFIG_HARDWARE_DHT
 

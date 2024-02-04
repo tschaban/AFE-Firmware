@@ -29,7 +29,7 @@ struct DHT_DOMOTICZ {
 #endif
 
 
-struct DHT {
+struct DHT_CONFIG {
   char name[33];
   uint8_t gpio;
   uint8_t type;

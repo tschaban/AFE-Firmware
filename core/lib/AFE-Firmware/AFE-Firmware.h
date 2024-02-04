@@ -8,14 +8,7 @@
 #include <AFE-Device.h>
 #include <AFE-WiFi.h>
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-#include <AFE-LED.h>
-#endif
 
-#ifdef AFE_CONFIG_HARDWARE_I2C
-#include <AFE-I2C-Scanner.h>
-#include <Wire.h>
-#endif
 
 #ifdef DEBUG
 #include <AFE-Debugger.h>
@@ -43,28 +36,8 @@ public:
     AFEWiFi *Network = new AFEWiFi();
     AFEJSONRPC *REST = new AFEJSONRPC();
     AFEDataAccess *Flash = new AFEDataAccess();
-    /*
-#ifdef AFE_CONFIG_HARDWARE_I2C
-    AFEI2CScanner *I2CScanner = new AFEI2CScanner();
-#endif
-*/
   };
 
-  struct GLOBAL_HARDWARE_OBJECTS {
-#ifdef AFE_CONFIG_HARDWARE_LED
-    AFELED *SystemLed = new AFELED();
-#endif
-/*
-#ifdef AFE_CONFIG_HARDWARE_I2C
-#ifdef AFE_ESP32
-    TwoWire *WirePort0 = new TwoWire(0);
-    TwoWire *WirePort1 = new TwoWire(1);
-#else
-    TwoWire *WirePort0 = new TwoWire();
-#endif
-#endif
-*/
-  };
 
   struct GLOBAL_CONFIGURATION_OBJECTS {
     PRO_VERSION *Pro = new PRO_VERSION;
@@ -82,7 +55,6 @@ public:
   TIMER_OBJECT *timer = new TIMER_OBJECT;
 
   GLOBAL_API_OBJECTS *API = new GLOBAL_API_OBJECTS;
-  GLOBAL_HARDWARE_OBJECTS *Hardware = new GLOBAL_HARDWARE_OBJECTS;
   GLOBAL_CONFIGURATION_OBJECTS *Configuration =
       new GLOBAL_CONFIGURATION_OBJECTS;
 
@@ -102,10 +74,6 @@ public:
   void initializeNetwork(void);
   void checkFirmwareVersion(void);
   void validateProVersion(void);
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  void initializeSystemLED(void);
-#endif
 
 };
 

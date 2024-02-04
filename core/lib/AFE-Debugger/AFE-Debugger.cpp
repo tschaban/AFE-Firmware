@@ -29,7 +29,6 @@ void AFEDebugger::printValue(uint8_t number, const __FlashStringHelper *text,
 }
 
 void AFEDebugger::printValue(uint8_t number, uint8_t newLineAfter) {
-  Serial << number;
   printValue(number, F(""), newLineAfter);
 }
 
@@ -41,7 +40,6 @@ void AFEDebugger::printValue(unsigned long number,
 }
 
 void AFEDebugger::printValue(unsigned long number, uint8_t newLineAfter) {
-  Serial << number;
   printValue(number, F(""), newLineAfter);
 }
 
@@ -62,7 +60,6 @@ void AFEDebugger::printValue(float number, const __FlashStringHelper *text,
 }
 
 void AFEDebugger::printValue(float number, uint8_t newLineAfter) {
-  Serial << number;
   printValue(number, F(""), newLineAfter);
 }
 

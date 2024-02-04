@@ -9,10 +9,12 @@ void AFEFirmware::begin() {
   timer->hours = 0;
   timer->days = 0;
   timer->months = 0;
+
 #ifdef DEBUG
   API->Flash->addReference(Debugger);
   API->REST->addReference(Debugger);
 #endif
+
   API->Flash->initializeFileSystem();
 
 #ifdef DEBUG
@@ -40,12 +42,8 @@ void AFEFirmware::begin() {
  * @brief Initializating REST API
  *
  */
-#ifdef AFE_CONFIG_HARDWARE_LED
-  API->REST->begin(API->Flash, Device, Hardware->SystemLed);
-#else
-  API->REST->begin(API->Flash, Device);
-#endif // AFE_CONFIG_HARDWARE_LED
 
+  API->REST->begin(API->Flash, Device);
   API->Flash->getConfiguration(Configuration->Pro);
   API->Flash->getConfiguration(Configuration->Version);
 }
@@ -57,43 +55,10 @@ void AFEFirmware::initializeNetwork(void) {
   API->Network->addReference(Debugger);
 #endif
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  API->Network->begin(Device, API->Flash, Hardware->SystemLed);
-#else
   API->Network->begin(Device, API->Flash);
-#endif // AFE_CONFIG_HARDWARE_LED
-
   API->Network->listener();
 }
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-void AFEFirmware::initializeSystemLED(void) {
-  uint8_t id = API->Flash->getSystemLedID();
-#ifdef DEBUG
-  boolean initialized = false;
-#endif
-  if (id != AFE_HARDWARE_ITEM_NOT_EXIST) {
-    if (Device->configuration.noOfLEDs - 1 >= id) {
-#ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-// @TODO T4 Led->addMCP23017Reference(MCP23017Broker);
-#endif // AFE_CONFIG_HARDWARE_MCP23XXX
-      if (Hardware->SystemLed->begin(API->Flash, id)) {
-        Hardware->SystemLed->on();
-#ifdef DEBUG
-        initialized = true;
-#endif
-      }
-    }
-#ifdef DEBUG
-    if (initialized) {
-      Debugger->printInformation(F("System LED initialized"), F("BOOT"));
-    } else {
-      Debugger->printWarning(F("System LED NOT initialized"), F("BOOT"));
-    }
-#endif // DEBUG
-  }
-}
-#endif
 
 void AFEFirmware::validateProVersion(void) {
 

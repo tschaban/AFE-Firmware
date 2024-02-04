@@ -7,43 +7,50 @@ AFESensorDHT::AFESensorDHT() {}
 
 #ifdef DEBUG
 /* Initializing method with Debugger on */
-void AFESensorDHT::begin(AFEDataAccess *_Data, AFEDebugger *_Debugger, int8_t id)
-{
+void AFESensorDHT::begin(AFEDataAccess *_Data, AFEDebugger *_Debugger,
+                         int8_t id) {
   Debugger = _Debugger;
   begin(_Data, id);
 }
 #endif
 
-void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id)
-{
+void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id) {
   Data = _Data;
 
   Data->getConfiguration(id, configuration);
 
 #ifdef DEBUG
-  Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
+  Debugger->printHeader(2, 0, 30, AFE_DEBUG_HEADER_TYPE_DASH);
   Debugger->printBulletPoint(F("Initializing DHT Sensor"));
   Debugger->printBulletPoint(F("GPIO: "));
   Debugger->printValue(configuration->gpio);
   Debugger->printBulletPoint(F("Type: "));
   Debugger->printValue(configuration->type);
 #endif
+  
 
-  dht->setup(configuration->gpio,
-             configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_AUTO
-                 ? DHTesp::AUTO_DETECT
-             : configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT11
-                 ? DHTesp::DHT11
-             : configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT22
-                 ? DHTesp::DHT22
-             : configuration->type ==
-                     AFE_CONFIG_HARDWARE_DHT_TYPE_AM2302
-                 ? DHTesp::AM2302
-             : configuration->type ==
-                     AFE_CONFIG_HARDWARE_DHT_TYPE_RHT03
-                 ? DHTesp::RHT03
-                 : DHTesp::AUTO_DETECT);
+    dht->setup(configuration->gpio,
+               configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_AUTO
+                   ? DHTesp::AUTO_DETECT
+               : configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT11
+                   ? DHTesp::DHT11
+               : configuration->type == AFE_CONFIG_HARDWARE_DHT_TYPE_DHT22
+                   ? DHTesp::DHT22
+               : configuration->type ==
+                       AFE_CONFIG_HARDWARE_DHT_TYPE_AM2302
+                   ? DHTesp::AM2302
+               : configuration->type ==
+                       AFE_CONFIG_HARDWARE_DHT_TYPE_RHT03
+                   ? DHTesp::RHT03
+                   : DHTesp::AUTO_DETECT);
 #ifdef DEBUG
+
+  Debugger->printBulletPoint(F("Temperature: "));
+  Debugger->printValue(dht->getTemperature());
+  Debugger->printBulletPoint(F("Hunidity: "));
+  Debugger->printValue(dht->getHumidity());
+  Debugger->printBulletPoint(F("Status: "));
+  Debugger->printValue(dht->getStatusString());
   Debugger->printBulletPoint(F("Completed"));
   Debugger->printHeader(1, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
@@ -51,37 +58,35 @@ void AFESensorDHT::begin(AFEDataAccess *_Data, uint8_t id)
   _initialized = true;
 }
 
-boolean AFESensorDHT::listener()
-{
+boolean AFESensorDHT::listener() {
 
   boolean _ready = false;
 
-  if (_initialized)
-  {
+  if (_initialized) {
     unsigned long time = millis();
 
-    if (startTime == 0)
-    {
+    if (startTime == 0) {
       startTime = time;
     }
 
-    if (time - startTime >= configuration->interval * 1000)
-    {
+    if (time - startTime >= configuration->interval * 1000) {
 
 #ifdef DEBUG
-      Debugger->printHeader(2, 1, 30, AFE_DEBUG_HEADER_TYPE_DASH);
+      Debugger->printHeader(2, 0, 30, AFE_DEBUG_HEADER_TYPE_DASH);
       Debugger->printBulletPoint(F("DHT: Reading"));
 #endif
 
-      float _humidity = dht->getHumidity();
-      float _temperature = dht->getTemperature();
+         float _humidity = dht->getHumidity();
+        float _temperature = dht->getTemperature();
 
-      if (!isnan(_humidity) && !isnan(_temperature))
-      {
+      //float _humidity = dht->readHumidity();
+      //float _temperature = dht->readTemperature();
 
-        if (configuration->temperature.unit == AFE_TEMPERATURE_UNIT_FAHRENHEIT)
-        {
-          _temperature = dht->toFahrenheit(_temperature);
+      if (!isnan(_humidity) && !isnan(_temperature)) {
+
+        if (configuration->temperature.unit ==
+            AFE_TEMPERATURE_UNIT_FAHRENHEIT) {
+          //      _temperature = dht->toFahrenheit(_temperature);
         }
 
         // applying corrections
@@ -90,24 +95,22 @@ boolean AFESensorDHT::listener()
 
         _ready = true;
 
-        if (configuration->sendOnlyChanges)
-        {
+        if (configuration->sendOnlyChanges) {
           if (_temperature == currentTemperature &&
-              _humidity == currentHumidity)
-          {
+              _humidity == currentHumidity) {
             _ready = false;
           }
         }
 
-        if (_ready)
-        {
+        if (_ready) {
           currentTemperature = _temperature;
           currentHumidity = _humidity;
         }
 
 #ifdef DEBUG
         Debugger->printBulletPoint(F("Interval: "));
-        Debugger->printValue((unsigned long)((time - startTime) / 1000), F("sec"));
+        Debugger->printValue((unsigned long)((time - startTime) / 1000),
+                             F("sec"));
         Debugger->printBulletPoint(F("Temperature: "));
         Debugger->printValue(currentTemperature);
         Debugger->printBulletPoint(F("Humidity: "));
@@ -115,10 +118,10 @@ boolean AFESensorDHT::listener()
 #endif
       }
 #ifdef DEBUG
-      else
-      {
+      else {
         Debugger->printBulletPoint(F("Interval: "));
-        Debugger->printValue((unsigned long)((time - startTime) / 1000), F("sec"));
+        Debugger->printValue((unsigned long)((time - startTime) / 1000),
+                             F("sec"));
         Debugger->printBulletPoint(F("Returned NaN: Sensor not connected"));
       }
 #endif
@@ -134,8 +137,7 @@ boolean AFESensorDHT::listener()
   return _ready;
 }
 
-void AFESensorDHT::getJSON(char *json)
-{
+void AFESensorDHT::getJSON(char *json) {
 
   char _perception[90]; // Max size of dewPointPerception from lang.pack
   strcpy_P(_perception, (char *)pgm_read_dword(&(dewPointPerception[perception(

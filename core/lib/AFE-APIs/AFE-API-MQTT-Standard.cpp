@@ -19,7 +19,7 @@ void AFEAPIMQTTStandard::begin(AFEFirmware *Firmware, AFEHardware *Hardware) {
   if (_Firmware->Device->configuration.api.mqtt) {
 #ifdef AFE_CONFIG_HARDWARE_LED
     enabled = Mqtt->begin(_Firmware->API->Flash, _Firmware->Device,
-                          _Firmware->Hardware->SystemLed);
+                          _Hardware->SystemLed);
 #else
     enabled = Mqtt->begin(_Firmware->API->Flash, _Firmware->Device);
 #endif
@@ -136,16 +136,18 @@ void AFEAPIMQTTStandard::subscribe() {
 
 /* Subscribe: ADC */
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
+  if (_Firmware->Configuration->Pro->valid) {
 #ifdef AFE_ESP32
-  for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfAnalogInputs;
-       i++) {
-    subscribeToCommand(_Hardware->AnalogInput[i]->configuration->mqtt.topic);
-  }
+    for (uint8_t i = 0; i < _Firmware->Device->configuration.noOfAnalogInputs;
+         i++) {
+      subscribeToCommand(_Hardware->AnalogInput[i]->configuration->mqtt.topic);
+    }
 #else
-  if (_Firmware->Device->configuration.isAnalogInput) {
-    subscribeToCommand(_Hardware->AnalogInput->configuration->mqtt.topic);
-  }
+    if (_Firmware->Device->configuration.isAnalogInput) {
+      subscribeToCommand(_Hardware->AnalogInput->configuration->mqtt.topic);
+    }
 #endif // AFE_ESP32
+  }
 #endif
 
 /* Subscribe: BMx80 */
@@ -240,7 +242,8 @@ void AFEAPIMQTTStandard::subscribe() {
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   for (uint8_t i = 0;
        i < _Firmware->Device->configuration.noOfThermalProtectors; i++) {
-    subscribeToCommand(_Hardware->ThermalProtector[i]->configuration->mqtt.topic);
+    subscribeToCommand(
+        _Hardware->ThermalProtector[i]->configuration->mqtt.topic);
   }
 #endif
 
@@ -602,7 +605,8 @@ void AFEAPIMQTTStandard::listener() {
 #endif
     for (uint8_t i = 0;
          i < _Firmware->Device->configuration.noOfThermalProtectors; i++) {
-      if (strlen(_Hardware->ThermalProtector[i]->configuration->mqtt.topic) > 0) {
+      if (strlen(_Hardware->ThermalProtector[i]->configuration->mqtt.topic) >
+          0) {
         sprintf(mqttCommandTopic, "%s/cmd",
                 _Hardware->ThermalProtector[i]->configuration->mqtt.topic);
         if (strcmp(Mqtt->message.topic, mqttCommandTopic) == 0) {
@@ -1080,7 +1084,8 @@ void AFEAPIMQTTStandard::publishAnemometerSensorData() {
 
 void AFEAPIMQTTStandard::processAnemometerSensor() {
 #ifdef DEBUG
-  _Firmware->Debugger->printProcessingRequest(F("Anemometer"),AFE_NONE,F("MQTT"));
+  _Firmware->Debugger->printProcessingRequest(F("Anemometer"), AFE_NONE,
+                                              F("MQTT"));
 #endif
   if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishAnemometerSensorData();
@@ -1105,7 +1110,8 @@ void AFEAPIMQTTStandard::publishRainSensorData() {
 
 void AFEAPIMQTTStandard::processRainSensor() {
 #ifdef DEBUG
-  _Firmware->Debugger->printProcessingRequest(F("Rainmeter"),AFE_NONE,F("MQTT"));
+  _Firmware->Debugger->printProcessingRequest(F("Rainmeter"), AFE_NONE,
+                                              F("MQTT"));
 #endif
   if (strcmp(Mqtt->message.content, AFE_CONFIG_MQTT_COMMAND_GET) == 0) {
     publishRainSensorData();
@@ -1215,7 +1221,8 @@ boolean AFEAPIMQTTStandard::publishRegulatorState(uint8_t id) {
   return enabled
              ? publishOnOffState(
                    _Hardware->Regulator[id]->configuration->mqtt.topic,
-                   _Hardware->Regulator[id]->configuration->enabled ? AFE_ON : AFE_OFF)
+                   _Hardware->Regulator[id]->configuration->enabled ? AFE_ON
+                                                                    : AFE_OFF)
              : false;
 }
 
@@ -1247,11 +1254,13 @@ void AFEAPIMQTTStandard::processRegulator(uint8_t *id) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 boolean AFEAPIMQTTStandard::publishThermalProtectorState(uint8_t id) {
-  return enabled ? publishOnOffState(
-                       _Hardware->ThermalProtector[id]->configuration->mqtt.topic,
-                       _Hardware->ThermalProtector[id]->configuration->enabled ? AFE_ON
-                                                                     : AFE_OFF)
-                 : false;
+  return enabled
+             ? publishOnOffState(
+                   _Hardware->ThermalProtector[id]->configuration->mqtt.topic,
+                   _Hardware->ThermalProtector[id]->configuration->enabled
+                       ? AFE_ON
+                       : AFE_OFF)
+             : false;
 }
 
 void AFEAPIMQTTStandard::processThermalProtector(uint8_t *id) {

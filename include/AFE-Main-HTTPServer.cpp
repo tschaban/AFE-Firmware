@@ -32,7 +32,7 @@ void initializeHTTPServer(void) {
   HTTPServer->handleFirmwareUpgrade("/upgrade", handleHTTPRequests,
                                     handleUpload);
   HTTPServer->onNotFound(handleOnNotFound);
-  HTTPServer->begin(Firmware);
+  HTTPServer->begin();
 
 #ifdef DEBUG
   Firmware->Debugger->printInformation(F("HTTP Server initialized"),F("BOOT"));

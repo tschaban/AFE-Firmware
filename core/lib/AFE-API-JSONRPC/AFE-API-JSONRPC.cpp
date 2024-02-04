@@ -4,13 +4,7 @@
 
 AFEJSONRPC::AFEJSONRPC(){};
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device, AFELED *_Led)
-{
-      Led = _Led;
-      begin(_Data, _Device);
-}
-#endif // AFE_CONFIG_HARDWARE_LED
+
 
 void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device)
 {
@@ -29,6 +23,13 @@ void AFEJSONRPC::addReference(AFEDebugger *_Debugger)
       Debugger = _Debugger;
 }
 #endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+void AFEJSONRPC::addReference(AFELED *_Led)
+{
+      Led = _Led;
+}
+#endif // AFE_CONFIG_HARDWARE_LED
 
 void AFEJSONRPC::generateMessage(String &message, const char *method,
                                  const char *params)

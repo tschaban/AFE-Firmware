@@ -4680,7 +4680,7 @@ void AFEDataAccess::createAS3935SensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, DHT_CONFIG *configuration) {
 
   char fileName[sizeof(AFE_FILE_DHT_SENSOR_CONFIGURATION) + 1];
   sprintf(fileName, (const char *)F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id);
@@ -4776,7 +4776,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT *configuration) {
   }
 #endif
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, DHT_CONFIG *configuration) {
 
   char fileName[sizeof(AFE_FILE_DHT_SENSOR_CONFIGURATION) + 1];
   sprintf(fileName, (const char *)F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id);
@@ -4843,7 +4843,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT *configuration) {
 }
 
 void AFEDataAccess::createDHTSensorConfigurationFile(void) {
-  DHT configuration;
+  DHT_CONFIG configuration;
 
   configuration.gpio = AFE_CONFIG_HARDWARE_DHT_DEFAULT_GPIO;
   configuration.interval = AFE_CONFIG_HARDWARE_DHT_DEFAULT_INTERVAL;

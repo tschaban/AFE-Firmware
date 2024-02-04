@@ -56,7 +56,6 @@ private:
 
 #ifdef AFE_CONFIG_HARDWARE_LED
   AFELED *Led;
-  void begin(AFEDevice *, AFEDataAccess *);
 #endif // AFE_CONFIG_HARDWARE_LED
 
   /**
@@ -121,15 +120,7 @@ public:
   ESP8266WiFiClass WirelessNetwork;
 #endif // ESP32/ESP8266
 
-#ifdef AFE_CONFIG_HARDWARE_LED
-  /**
-   * @brief Sets connection parameters and host name. Must be invoked before
-   * connect method
-   *
-   * @param
-   */
-  void begin(AFEDevice *, AFEDataAccess *, AFELED *);
-#else
+
   /**
    * @brief Sets connection parameters and host name. Must be invoked before
    * connect method
@@ -137,7 +128,7 @@ public:
    * @param
    */
   void begin(AFEDevice *, AFEDataAccess *);
-#endif // AFE_CONFIG_HARDWARE_LED
+
 
   /**
    * @brief Return TRUE if device is connected to WiFi Access Point
@@ -202,6 +193,10 @@ public:
 
 #ifdef DEBUG
   void addReference(AFEDebugger *_Debugger);
+#endif
+
+#ifdef AFE_CONFIG_HARDWARE_LED
+  void addReference(AFELED *_Led);
 #endif
 };
 

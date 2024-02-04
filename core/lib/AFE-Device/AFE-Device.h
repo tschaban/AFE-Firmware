@@ -10,14 +10,13 @@
 #include <AFE-Debugger.h>
 #endif
 
-class AFEDevice
-{
+class AFEDevice {
 
 private:
   AFEDataAccess *Data;
-  #ifdef DEBUG
+#ifdef DEBUG
   AFEDebugger *Debugger;
-  #endif
+#endif
   uint8_t deviceMode;
 
 /* Method reads device configuration data. It used in config panel */

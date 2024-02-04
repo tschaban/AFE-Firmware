@@ -5,8 +5,8 @@ $targetLanguage[0] = "pl";
 $targetLanguage[1] = "en";
 
 $targetAPI[0] = "domoticz.api";
-$targetAPI[1] = "standard.api";
-$targetAPI[2] = "homeassistant.api";
+$targetAPI[1] = "generic.api";
+$targetAPI[2] = "generic.api";
 
 $rootPath = "C:/Users/Adrian/Cloud/Pulpit/";
 $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
@@ -57,7 +57,7 @@ $folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
 
 /* ESP8266 1MB */
 $index=0;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_8266_1m-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_8266_1m-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 0;
@@ -66,7 +66,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP8266 4MB */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_8266_4m-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_8266_4m-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 0;
@@ -75,7 +75,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP8266 4MB Debug */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_8266_4m-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_8266_4m-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 0;
@@ -85,7 +85,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP8285 1MB */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_8285_1m-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_8285_1m-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8285;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 1;
@@ -94,7 +94,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP32 4MB 30p */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_esp32_4m_38P-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -103,7 +103,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP32 4MB 30p Debug */
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_esp32_4m_38P-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 2;
@@ -112,7 +112,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP32 4MB 38p */
 $index++; // The bin file is not created (30p merged with 38p) stays for bin cont.
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_esp32_4m_38P-generic/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_esp32_4m_38P-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;
@@ -121,7 +121,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 
 /* ESP32 4MB 38p  Debug*/
 $index++; // The bin file is not created (30p merged with 38p) stays for bin cont.
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_esp32_4m_38P-generic-development/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T7_esp32_4m_38P-ha-development/firmware.bin";
 $sourceFolder[$index]["chip"] = 32;
 $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;

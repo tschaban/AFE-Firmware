@@ -104,7 +104,7 @@ float AFESensorDS18B20::getCurrentTemperature() {
 
 #ifdef DEBUG
     Debugger->printBulletPoint(F("Temperature: "));
-    Serial << temperature;
+    Debugger->printValue(temperature);
     Debugger->printBulletPoint(F("Duration: "));
     Debugger->printValue((millis() - readTimeOut), F(" msec"));
 //   } else {
@@ -125,7 +125,6 @@ boolean AFESensorDS18B20::listener() {
   boolean ready = false;
   if (_initialized) {
 
-
     unsigned long time = millis();
 
     if (startTime == 0) {
@@ -135,9 +134,8 @@ boolean AFESensorDS18B20::listener() {
     if (time - startTime >= configuration->interval * 1000) {
 
 #ifdef DEBUG
-    Debugger->printHeader(2, 0, 50, AFE_DEBUG_HEADER_TYPE_DASH);
+      Debugger->printHeader(2, 0, 50, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
-
 
       float newTemperature = getCurrentTemperature();
 

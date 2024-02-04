@@ -7,7 +7,7 @@ void setup() {
 #ifdef DEBUG
   Serial.begin(AFE_CONFIG_SERIAL_SPEED);
   delay(10);
-  Firmware->Debugger->printHeader(2,0);
+  Firmware->Debugger->printHeader(2, 0);
   Firmware->Debugger->printInformation(
       F("All classes and global variables initialized"), F("BOOT"));
   Firmware->Debugger->printInformation(F("Initializing device"), F("BOOT"));
@@ -30,12 +30,22 @@ void setup() {
     Firmware->Debugger->printValue(F("FAILURE"), 0, 1);
   }
 #endif
+
 #endif // ESP32/ESP8266
 
 #ifdef DEBUG
   Firmware->Debugger->printInformation(F("Configuring global Objects"),
                                        F("BOOT"));
 #endif
+
+/**
+ * @brief Initializing system LED (if exists) and turning it on
+ *
+ */
+#ifdef AFE_CONFIG_HARDWARE_LED
+  Firmware->API->Network->addReference(Hardware->SystemLed);
+  Firmware->API->REST->addReference(Hardware->SystemLed);
+#endif // AFE_CONFIG_HARDWARE_LED
 
   Firmware->begin();
 
@@ -44,13 +54,14 @@ void setup() {
  *
  */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Firmware->initializeSystemLED();
+  Hardware->initializeSystemLED();
 #endif // AFE_CONFIG_HARDWARE_LED
 
 #ifdef DEBUG
   Firmware->Debugger->printInformation(F("Checking, if WiFi was configured"),
                                        F("WIFI"));
 #endif
+
   if (Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
 #ifdef DEBUG
     Firmware->Debugger->printValue(F("... No"), 0);
@@ -77,6 +88,7 @@ void setup() {
    * @brief Initialzing network
    *
    */
+  
   Firmware->initializeNetwork();
 
   /**
@@ -98,12 +110,9 @@ void setup() {
     attacheInteruptToAnenoMeter();
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
-
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
     attacheInteruptToRainMeter();
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
-
-
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
     initializePN532Sensor();
@@ -150,14 +159,14 @@ void setup() {
  */
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Firmware->Hardware->SystemLed->off();
+  Hardware->SystemLed->off();
   /**
    * @brief If device in configuration mode then it starts LED blinking
    *
    */
   if (Firmware->Device->getMode() == AFE_MODE_ACCESS_POINT ||
       Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
-    Firmware->Hardware->SystemLed->blinkingOn(100);
+    Hardware->SystemLed->blinkingOn(100);
   }
 #endif // AFE_CONFIG_HARDWARE_LED
 
@@ -172,7 +181,7 @@ void setup() {
     Firmware->Debugger->printValue(F("Mode: Configuration mode"), 1);
   }
 
- Firmware->Debugger->printHeader();
+  Firmware->Debugger->printHeader();
 
 #endif
 }
@@ -261,8 +270,8 @@ void loop() {
                 *
                 */
 #ifdef AFE_CONFIG_HARDWARE_LED
-        if (!Firmware->Hardware->SystemLed->isBlinking()) {
-          Firmware->Hardware->SystemLed->blinkingOn(100);
+        if (!Hardware->SystemLed->isBlinking()) {
+          Hardware->SystemLed->blinkingOn(100);
         }
 #endif
 
@@ -273,8 +282,8 @@ void loop() {
 #ifdef AFE_CONFIG_HARDWARE_LED
     else {
       if (Firmware->Device->getMode() == AFE_MODE_CONFIGURATION &&
-          Firmware->Hardware->SystemLed->isBlinking()) {
-        Firmware->Hardware->SystemLed->blinkingOff();
+          Hardware->SystemLed->isBlinking()) {
+        Hardware->SystemLed->blinkingOff();
       }
     }
 #endif
@@ -335,6 +344,6 @@ void loop() {
  *
  */
 #ifdef AFE_CONFIG_HARDWARE_LED
-  Firmware->Hardware->SystemLed->loop();
+  Hardware->SystemLed->loop();
 #endif
 }

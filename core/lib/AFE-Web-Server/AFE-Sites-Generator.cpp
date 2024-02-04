@@ -1045,7 +1045,7 @@ void AFESitesGenerator::siteLED(String &page, uint8_t id) {
   char title[8];
   LED configuration;
   Firmware->API->Flash->getConfiguration(id, &configuration);
-  sprintf(title, "LED: #%d", id + 1);
+  sprintf(title, (const char *)F("LED: #%d"), (uint8_t)id + 1);
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   openSection(page, title, F(L_MCP23017_LED_CONNECTION));
 #else
@@ -1302,7 +1302,7 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   DS18B20 ds18b20Configuration;
   for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDS18B20s; i++) {
     Firmware->API->Flash->getConfiguration(i, &ds18b20Configuration);
-    sprintf(text, "DS18B20 %d: %s", i + 1, ds18b20Configuration.name);
+    sprintf(text, (const char*)F("DS18B20 %d: %s"), (uint8_t)(i + 1), ds18b20Configuration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
                             configuration.sensorId == i ? true : false);
@@ -1310,10 +1310,10 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  DHT DHTConfiguration;
+  DHT_CONFIG DHTConfiguration;
   for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDHTs; i++) {
     Firmware->API->Flash->getConfiguration(i, &DHTConfiguration);
-    sprintf(text, "DHT %d: %s", i + 1, DHTConfiguration.name);
+    sprintf(text, (const char*)F("DHT %d: %s"), (uint8_t)(i + 1), DHTConfiguration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
                             configuration.sensorId == i ? true : false);
@@ -1447,7 +1447,7 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-  DHT DHTConfiguration;
+  DHT_CONFIG DHTConfiguration;
   for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDHTs; i++) {
     Firmware->API->Flash->getConfiguration(i, &DHTConfiguration);
     sprintf(text, "DHT %d: %s", i + 1, DHTConfiguration.name);
@@ -1749,7 +1749,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id) {
 void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id) {
 
   AFESensorDHT _Sensor;
-  DHT configuration;
+  DHT_CONFIG configuration;
   Firmware->API->Flash->getConfiguration(id, &configuration);
   char _number[13];
   char _text[13];
@@ -3403,6 +3403,7 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
 }
 
 void AFESitesGenerator::siteProKey(String &page) {
+
   PRO_VERSION configuration;
   Firmware->API->Flash->getConfiguration(&configuration);
   openMessageSection(page, F(L_PRO_VERSION), F(""));
@@ -3427,6 +3428,12 @@ void AFESitesGenerator::siteProKey(String &page) {
         page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
         page.replace(F("{{I}}"), _HtmlResponse);
       }
+
+      /** This isn't optimal code as it check twice the API Servce below call is
+       * updating database if beeded
+      */
+
+      Firmware->validateProVersion();
     }
 
   } else {
@@ -3510,7 +3517,6 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
     page.replace(F("{{x}}"),
                  Firmware->API->Network->WirelessNetwork.hostname());
 #endif
-
 
     page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
     page.replace(F("{{I}}"), F(L_DEVICE_IP));
