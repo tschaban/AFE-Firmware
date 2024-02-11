@@ -8,9 +8,9 @@ $subFolderForCommpressedLib = "/compressed.versions";
 
 /* Set this before run */
 
-$type = "2";
-$version = "3.8.0.B7";
-$language = "en";
+$type = "0";
+$version = "3.8.0.B9";
+$language = "pl";
 $development = true;
 
 /**

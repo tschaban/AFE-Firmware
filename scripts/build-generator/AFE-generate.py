@@ -1,5 +1,5 @@
-FILENAME_BUILDNO = 'core/include/config/builds/scripts/AFE-T1-last'
-FILENAME_VERSION_H = 'core/include/config/builds/AFE-T1-Build.h'
+FILENAME_BUILDNO = 'scripts/build-generator/AFE-last'
+FILENAME_VERSION_H = 'core/include/config/AFE-Build.h'
 
 import datetime
 

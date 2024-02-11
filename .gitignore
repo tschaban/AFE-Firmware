@@ -5,6 +5,7 @@
 .gcc-flags.json
 .idea
 .vscode
+.cache
 webservice/_config.php
 webservice/api
 lib-external

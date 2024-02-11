@@ -149,7 +149,7 @@ $sourceFolder[$index]["api"] = $targetAPI[1];
 // Standard API Sonoffs
 
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_Sonoff-Basic-V1-ha/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_Sonoff-Basic-V1-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 5;
@@ -295,15 +295,17 @@ $sourceFolder[$index]["hardware"] = 1;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
+
+// Domoticz API Sonoffs
+
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_Sonoff-Basic-V1-domoticz/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_Sonoff-Basic-V1-domoticz/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 5;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
-// Domoticz API Sonoffs
 
 $index++;
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_Sonoff-Basic-V1-domoticz/firmware.bin";
@@ -444,15 +446,16 @@ $sourceFolder[$index]["hardware"] = 1;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
+// ha API Sonoffs
+
 $index++;
-$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8266_Sonoff-Basic-V1-ha/firmware.bin";
+$sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_Sonoff-Basic-V1-ha/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 1;
 $sourceFolder[$index]["hardware"] = 5;
 $sourceFolder[$index]["debug"] = false;
 $sourceFolder[$index]["api"] = $targetAPI[2];
 
-// ha API Sonoffs
 
 $index++;
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T0_8285_Sonoff-Basic-V1-ha/firmware.bin";
