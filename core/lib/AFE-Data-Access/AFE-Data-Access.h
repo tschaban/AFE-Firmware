@@ -22,7 +22,7 @@
 #include <ESP8266WiFi.h>
 #include <FS.h>
 
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFSLittle
 #include <LittleFS.h>
 #endif
 
