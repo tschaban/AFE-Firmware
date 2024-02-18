@@ -88,7 +88,7 @@ void setup() {
    * @brief Initialzing network
    *
    */
-  
+
   Firmware->initializeNetwork();
 
   /**

@@ -42,7 +42,7 @@ void AFEAPIMQTTDomoticz::begin(AFEFirmware *Firmware, AFEHardware *Hardware)
   {
 #ifdef AFE_CONFIG_HARDWARE_LED
     enabled = Mqtt->begin(_Firmware->API->Flash, _Firmware->Device,
-                          _Firmware->Hardware->SystemLed);
+                          _Hardware->SystemLed);
 #else
     enabled = Mqtt->begin(_Firmware->API->Flash, _Firmware->Device);
 #endif

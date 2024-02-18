@@ -31,6 +31,11 @@ void AFEFirmware::begin() {
    *
    */
   unsigned long _counter = API->Flash->getRebootCounter();
+  char _log[20];
+  sprintf(_log, (PGM_P)F("restarted:%d"), _counter);
+  API->Flash->cleanLogsFile();
+  API->Flash->addLog(_log);
+
 #ifdef DEBUG
 
   Debugger->printInformation(F("Firmware rebooted: "), F("BOOT"));
@@ -38,10 +43,10 @@ void AFEFirmware::begin() {
 
 #endif
 
-/**
- * @brief Initializating REST API
- *
- */
+  /**
+   * @brief Initializating REST API
+   *
+   */
 
   API->REST->begin(API->Flash, Device);
   API->Flash->getConfiguration(Configuration->Pro);
@@ -58,7 +63,6 @@ void AFEFirmware::initializeNetwork(void) {
   API->Network->begin(Device, API->Flash);
   API->Network->listener();
 }
-
 
 void AFEFirmware::validateProVersion(void) {
 
@@ -114,14 +118,14 @@ void AFEFirmware::checkFirmwareVersion(void) {
   if (API->REST->sent(
           _HtmlResponse,
           AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_VERSION)) {
-    
+
     if (_HtmlResponse.length() > 0) {
-    
+
       char _tempVersion[sizeof(Configuration->Version->installed_version)];
 
       _HtmlResponse.toCharArray(
           _tempVersion, sizeof(Configuration->Version->installed_version));
-     
+
       if (strcmp(_tempVersion, Configuration->Version->installed_version) !=
           0) {
         API->Flash->saveLatestFirmwareVersion(_tempVersion);

@@ -28,7 +28,8 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device,
 
 boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   boolean _isConfigured = true;
-  Data->getConfiguration(configuration);
+  _Data = Data;
+  _Data->getConfiguration(configuration);
 
   _Broker->onConnect(AFEAsyncMQTTClient::onMqttConnect);
   _Broker->onDisconnect(AFEAsyncMQTTClient::onMqttDisconnect);
@@ -40,14 +41,13 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Broker->onPublish(AFEAsyncMQTTClient::onMqttPublish);
 #endif
   char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
-  Data->getDeviceID(_deviceId);
+  _Data->getDeviceID(_deviceId);
   sprintf(_DeviceName, "%s-%s", Device->configuration.name, _deviceId);
 
   _Broker->setClientId(_DeviceName);
   _Broker->setMaxTopicLength(AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH);
 
- // _Broker->setKeepAlive(60);
-
+  // _Broker->setKeepAlive(60);
 
   if (strlen(configuration->user) > 0 && strlen(configuration->password) > 0) {
     _Broker->setCredentials(configuration->user, configuration->password);
@@ -166,6 +166,9 @@ boolean AFEAsyncMQTTClient::connectedEvent() {
     publishConnected();
     AFEAsyncMQTTClient::eventConnected = false;
     _reconnectionTimeout = 0;
+    char _log[15];
+    sprintf(_log, (PGM_P)F("mqtt:connected"));
+    _Data->addLog(_log);
   }
   return returnValue;
 }
@@ -182,11 +185,16 @@ boolean AFEAsyncMQTTClient::disconnectedEvent() {
 #endif
     AFEAsyncMQTTClient::eventDisconnected = false;
     _Broker->disconnect(true); // @TODO Testing 3.8.0.B6
-  }
+
+    char _log[18];
+    sprintf(_log, (PGM_P)F("mqtt:disconnected"));
+    _Data->addLog(_log);
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-  _Led->off();
+    _Led->off();
 #endif
+  }
+
   return returnValue;
 }
 

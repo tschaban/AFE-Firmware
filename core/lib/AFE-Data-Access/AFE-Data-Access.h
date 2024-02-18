@@ -9,12 +9,11 @@
 #include <ArduinoJson.h>
 #include <IPAddress.h>
 
-
 #include <AFE-Data-JSON-templates.h>
 
 #ifdef AFE_ESP32
 
-#include <LittleFS.h>
+#include <LITTLEFS.h>
 #include <WiFi.h>
 
 #else /* ESP8266 */
@@ -22,8 +21,8 @@
 #include <ESP8266WiFi.h>
 #include <FS.h>
 
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFSLittle
-#include <LittleFS.h>
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+#include <LITTLEFS.h>
 #endif
 
 #endif // ESP32/ESP8266
@@ -62,7 +61,18 @@ public:
   boolean setDefaultConfiguration();
   boolean initializeFileSystem();
   boolean formatFileSystem();
+
+  /* Generic files processing methods */
   boolean fileExist(const char *path);
+  boolean createFile(const char *path);
+  boolean openFile(File &openedFile, const char *mode,
+                   const __FlashStringHelper *path, uint8_t id = AFE_NONE,
+                   boolean createIfNotExists = true);
+
+
+  void addLog(const char *);
+  boolean readLogs(String &logs);
+  void cleanLogsFile();
 
 #ifdef DEBUG
   void addReference(AFEDebugger *_Debugger);

@@ -29,7 +29,7 @@ private:
   AFEAPIMQTTStandard *_MqttAPI;
 #endif
 
-  void conenctedToNetwork(void);
+  void connectedToNetwork(void);
   void disconnectedFromNetwork(void);
   void connectedToMQTTBroker(void);
   void disconnectedFromMQTTBroker(void);

@@ -1,3 +1,7 @@
+T0 - ESP8266, 4MB, HA, Development 
+RAM:   [=====     ]  47.3% (used 38752 bytes from 81920 bytes)
+Flash: [=====     ]  45.8% (used 478317 bytes from 1044464 bytes)
+
 T5 - ESP8266, 4MB, Domoticz
 Flash: 564504
 RAM: 41168

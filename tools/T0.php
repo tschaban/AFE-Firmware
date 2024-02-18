@@ -5,7 +5,7 @@ $targetLanguage[1] = "en";
 
 $targetAPI[0] = "domoticz.api";
 $targetAPI[1] = "generic.api";
-$targetAPI[2] = "generic.api"; // for backward compatibility
+//$targetAPI[2] = "generic.api"; // for backward compatibility
 
 $rootPath = "C:/Users/Adrian/Cloud/Pulpit/";
 $targetFolder = $rootPath."afe.firmware.t".$type.".".$version;
@@ -399,7 +399,7 @@ $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[0];
 
-/* HOME ASSISTANT */
+/* HOME ASSISTANT 
 
 // HA API ESP8266
 
@@ -548,5 +548,5 @@ $sourceFolder[$index]["size"] = 4;
 $sourceFolder[$index]["hardware"] = 3;
 $sourceFolder[$index]["debug"] = true;
 $sourceFolder[$index]["api"] = $targetAPI[2];
- 
+ */
 ?>

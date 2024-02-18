@@ -48,7 +48,7 @@ const String AFEAPIHTTPDomoticz::getApiCall(const char *param,
 boolean AFEAPIHTTPDomoticz::callURL(const String url) {
   boolean _return;
 #ifdef AFE_CONFIG_HARDWARE_LED
-  _Firmware->Hardware->SystemLed->on();
+  _Hardware->SystemLed->on();
 #endif
 
 #ifdef DEBUG
@@ -60,7 +60,7 @@ boolean AFEAPIHTTPDomoticz::callURL(const String url) {
   http->end();
   delay(10);
 #ifdef AFE_CONFIG_HARDWARE_LED
-  _Firmware->Hardware->SystemLed->off();
+  _Hardware->SystemLed->off();
 #endif
   return _return;
 }

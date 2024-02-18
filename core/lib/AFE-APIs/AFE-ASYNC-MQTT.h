@@ -29,6 +29,8 @@ class AFEAsyncMQTTClient
 {
 
 private:
+
+  AFEDataAccess *_Data;
   char _DeviceName[33 + AFE_CONFIG_DEVICE_ID_SIZE + 1];
 
 #ifdef AFE_CONFIG_HARDWARE_LED

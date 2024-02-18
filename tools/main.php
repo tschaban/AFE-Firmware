@@ -9,7 +9,7 @@ $subFolderForCommpressedLib = "/compressed.versions";
 /* Set this before run */
 
 $type = "0";
-$version = "3.8.0.B9";
+$version = "3.8.0.B10";
 $language = "pl";
 $development = true;
 
@@ -116,8 +116,10 @@ foreach ($sourceFolder as &$source) {
         exec($gzipPathExe.$copyToCommpressedFolder);
         echo $gzipPathExe.$copyToCommpressedFolder;
         echo "\nSUCCESS: " . $fileName;
-        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path,supportCompressed,pathCompressedVersion) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":($source["api"]==$targetAPI[1]?"S":"H"))."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", ".($development?2:1).", 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."',".$supportCompressed.", '".str_replace($rootPath,"",$copyToCommpressedFolder.".gz")."');\n");
-        
+        fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path,supportCompressed,pathCompressedVersion) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', '".($source["api"]==$targetAPI[0]?"D":"S")."', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", ".($development?2:1).", 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."',".$supportCompressed.", '".str_replace($rootPath,"",$copyToCommpressedFolder.".gz")."');\n");
+        if ($source["api"]==$targetAPI[1]) {
+            fwrite($handle, "INSERT INTO afe_firmwares (type,version,chip,language,api,hardware,flash_size,current_version,downloaded,debug,path,supportCompressed,pathCompressedVersion) VALUES (".$type.", '".$version."', ".$source["chip"].", '".$language."', 'H', ".$targetHardware[$source["hardware"]][1].", ".$source["size"].", ".($development?2:1).", 0, ".($source["debug"]?1:0).", '".str_replace($rootPath,"",$copyTo)."',".$supportCompressed.", '".str_replace($rootPath,"",$copyToCommpressedFolder.".gz")."');\n");
+        }
     } else {
         echo "\nERROR: File doesn't exist:  " . $sourceToCopy;
     }

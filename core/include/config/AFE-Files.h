@@ -15,6 +15,10 @@
 #endif
 
 
+/* Max Log file content */
+#define AFE_LOG_FILE_MAX_SIZE 1020
+#define AFE_LOG_MAX_SIZE AFE_LOG_FILE_MAX_SIZE+3
+
 /* Configuration files names */
 #ifndef AFE_ESP32 /* ESP82xx */
 #define AFE_FILE_DOMOTICZ_CONFIGURATION "cfg-domoticz-server.json"
@@ -95,6 +99,7 @@
 #define AFE_FILE_MCP23XXX_CONFIGURATION "/cfg-mcp23xxx-%d.json"
 #define AFE_FILE_FS3000_CONFIGURATION "/cfg-fs3000-%d.json"
 
+#define AFE_FILE_LOGS "/log.json"
 
 //const char AFE_FILE_MCP23XXX_CONFIGURATION[] PROGMEM = "/cfg-mcp23xxx-%d.json";
 

@@ -492,14 +492,13 @@ void AFEWiFi::listener() {
 
 boolean AFEWiFi::connected() {
   if (configuration->mDNSActive == AFE_CONFIG_NETWORK_MDNS_ACTIVE) {
-  
-  #ifndef AFE_ESP32
-    MDNS.update();
-    #else
-    // @TODO 3.8.0 what is ESP32 equivalent ESP32
-    #endif
-  }
 
+#ifndef AFE_ESP32
+    MDNS.update();
+#else
+// @TODO 3.8.0 what is ESP32 equivalent ESP32
+#endif
+  }
 
   return AFEWiFi::isConnected;
 }
@@ -526,6 +525,9 @@ boolean AFEWiFi::eventConnected() {
 #endif
       }
     }
+    char _log[15];
+    sprintf(_log, (PGM_P)F("wifi:connected"));
+    Data->addLog(_log);
     AFEWiFi::eventConnectionEstablished = false;
   }
 
@@ -534,7 +536,15 @@ boolean AFEWiFi::eventConnected() {
 
 boolean AFEWiFi::eventDisconnected() {
   boolean returnValue = AFEWiFi::eventConnectionLost;
+
+  if (returnValue) {
+    char _log[18];
+    sprintf(_log, (PGM_P)F("wifi:disconnected"));
+    Data->addLog(_log);
+  }
+
   AFEWiFi::eventConnectionLost = false;
+
   return returnValue;
 }
 
@@ -586,11 +596,8 @@ void AFEWiFi::onWiFiAPStationConnected(
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEWiFi::addReference(AFELED *_Led) {
-  Led = _Led;
-}
+void AFEWiFi::addReference(AFELED *_Led) { Led = _Led; }
 #endif
-
 
 #ifdef DEBUG
 void AFEWiFi::addReference(AFEDebugger *_Debugger) { Debugger = _Debugger; }

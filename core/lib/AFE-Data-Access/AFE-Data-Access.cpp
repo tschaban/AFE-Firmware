@@ -13,7 +13,7 @@ boolean AFEDataAccess::formatFileSystem() {
   Debugger->printInformation(F("Formatig File System"), F("FS"), 2);
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  return LittleFS.format();
+  return LITTLEFS.format();
 #else
   return SPIFFS.format();
 #endif
@@ -26,15 +26,182 @@ boolean AFEDataAccess::formatFileSystem() {
  * @return boolean
  */
 boolean AFEDataAccess::fileExist(const char *path) {
+  boolean _ret = false;
+
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  return LittleFS.exists(path);
+  _ret = LITTLEFS.exists(path);
 #else
-  return SPIFFS.exists(path);
+  _ret = SPIFFS.exists(path);
+#endif
+
+#ifdef DEBUG
+  Debugger->printBulletPoint(F("Found: "));
+  Debugger->printValue(_ret ? F("Yes") : F("No"));
+#endif
+
+  return _ret;
+}
+
+boolean AFEDataAccess::createFile(const char *path) {
+  boolean _ret = false;
+
+#ifdef DEBUG
+  Debugger->printBulletPoint(F("Created: "));
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File createFile = LITTLEFS.open(path, "w");
+#else
+  File createFile = SPIFFS.open(path, "w");
+#endif
+
+  if (createFile) {
+    _ret = true;
+    createFile.close();
+  }
+
+#ifdef DEBUG
+  Debugger->printValue(_ret ? F("Yes") : F("No"));
+#endif
+
+  return _ret;
+}
+
+boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
+                                const __FlashStringHelper *path, uint8_t id,
+                                boolean createIfNotExists) {
+
+#ifdef DEBUG
+  Debugger->printHeader(1, 0, 72, AFE_DEBUG_HEADER_TYPE_DASH);
+#endif
+
+  boolean _status = false;
+
+  char fileName[strlen_P((PGM_P)path) + 1];
+  if (id == AFE_NONE) {
+    sprintf(fileName, (PGM_P)path);
+  } else {
+    sprintf(fileName, (PGM_P)path, id);
+  }
+
+#ifdef DEBUG
+  Debugger->printBulletPoint(F("Opening file: "));
+  Debugger->printValue(fileName);
+#endif
+
+  _status = fileExist(fileName);
+
+  if (!_status && createIfNotExists) {
+    _status = createFile(fileName);
+  }
+
+  if (_status) {
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+    openedFile = LITTLEFS.open(fileName, mode);
+#else
+    openedFile = SPIFFS.open(fileName, mode);
+#endif
+  }
+
+  _status = openedFile ? true : false;
+
+#ifdef DEBUG
+  Debugger->printBulletPoint(F("Opened: "));
+  Debugger->printValue(_status ? F("Yes") : F("No"));
+#endif
+
+  return _status;
+}
+
+void AFEDataAccess::addLog(const char *log) {
+  File configFile;
+  if (openFile(configFile, "a", F(AFE_FILE_LOGS))) {
+    if (configFile.size() > 0) {
+      configFile.print(F(","));
+    }
+    configFile.print(F("{\"t\":\""));
+    unsigned long curentTime = millis();
+    uint16_t millisec = curentTime % 100;
+    uint16_t tseconds = curentTime / 1000;
+    uint16_t tminutes = tseconds / 60;
+    uint16_t seconds = tseconds % 60;
+    configFile.print(tminutes);
+    configFile.print(F(":"));
+    configFile.print(seconds);
+    configFile.print(F("."));
+    configFile.print(millisec);
+    configFile.print(F("\",\"m\":\""));
+    configFile.print(log);
+    configFile.print(F("\"}"));
+    configFile.close();
+
+#ifdef DEBUG
+    Debugger->printBulletPoint(F("Added log: "));
+    Debugger->printValue(log);
+#endif
+  }
+#ifdef DEBUG
+  Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
+#endif
+}
+
+boolean AFEDataAccess::readLogs(String &logs) {
+
+  File configFile;
+  boolean _ret = false;
+
+  if (openFile(configFile, "r", F(AFE_FILE_LOGS))) {
+
+#ifdef DEBUG
+    Debugger->printBulletPoint(F("Reading: "));
+#endif
+
+    if (configFile.size() > 0 && configFile.size() < AFE_LOG_FILE_MAX_SIZE) {
+      logs = F("[");
+      logs.concat(configFile.readString());
+      logs.concat(F("]"));
+      _ret = true;
+#ifdef DEBUG
+      Debugger->printValue(F("Ok"));
+      Debugger->printBulletPoint(F("Content: "));
+      Serial << logs;
+    } else {
+      Debugger->printValue(F("Empty"));
+#endif
+    }
+    configFile.close();
+  }
+#ifdef DEBUG
+  Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
+#endif
+
+  // Cleaning file is it's size is too large
+  if (!_ret) {
+    if (configFile.size() >= AFE_LOG_FILE_MAX_SIZE) {
+      cleanLogsFile();
+    }
+  }
+
+  return _ret;
+}
+
+void AFEDataAccess::cleanLogsFile() {
+  File configFile;
+  boolean _status = false;
+  if (openFile(configFile, "w", F(AFE_FILE_LOGS))) {
+    _status = true;
+    configFile.close();
+  }
+#ifdef DEBUG
+  Debugger->printBulletPoint(F("Truncating: "));
+  Debugger->printValue(_status ? F("Ok") : F("Failed"));
+  Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
 
 /**
- * @brief Reads a string from AFE_FILE_WELCOME_MESSAGE file. After it's read the
+ * @brief Reads a string from AFE_FILE_WELCOME_MESSAGE file. After it's read
+ * the
  * string is removed from the file
  *
  * @param  message          read string
@@ -45,7 +212,7 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
 #endif
@@ -74,7 +241,7 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
 #endif
@@ -102,7 +269,7 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "r");
 #endif
@@ -151,7 +318,7 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_PRO_VERSION_CONFIGURATION, "w");
 #endif
@@ -198,7 +365,7 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
   printFileOpeningInformation(F(AFE_FILE_PASSWORD_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "r");
 #endif
@@ -243,7 +410,7 @@ void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
   printFileOpeningInformation(F(AFE_FILE_PASSWORD_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_PASSWORD_CONFIGURATION, "w");
 #endif
@@ -300,7 +467,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
   JsonVariant exists;
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #endif
@@ -496,7 +663,7 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_CONFIGURATION, "w");
 #endif
@@ -789,7 +956,7 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
   printFileOpeningInformation(F(AFE_FILE_FIRMWARE_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "r");
 #endif
@@ -839,7 +1006,7 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_FIRMWARE_CONFIGURATION, "w");
 #endif
@@ -912,7 +1079,7 @@ uint8_t AFEDataAccess::getDeviceMode() {
   printFileOpeningInformation(F(AFE_FILE_DEVICE_MODE));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_MODE, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_MODE, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_MODE, "r");
 #endif
@@ -959,7 +1126,7 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_MODE, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_MODE, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_MODE, "w");
 #endif
@@ -997,7 +1164,7 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_NETWORK_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_NETWORK_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_NETWORK_CONFIGURATION, "r");
 #endif
@@ -1108,7 +1275,7 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_NETWORK_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_NETWORK_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_NETWORK_CONFIGURATION, "w");
 #endif
@@ -1241,7 +1408,7 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "r");
 #endif
@@ -1316,7 +1483,7 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_MQTT_BROKER_CONFIGURATION, "w");
 #endif
@@ -1393,7 +1560,7 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
   printFileOpeningInformation(F(AFE_FILE_DOMOTICZ_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "r");
 #endif
@@ -1443,7 +1610,7 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
   printFileOpeningInformation(F(AFE_FILE_DOMOTICZ_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DOMOTICZ_CONFIGURATION, "w");
 #endif
@@ -1496,7 +1663,7 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "r");
 #endif
@@ -1550,7 +1717,7 @@ void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
   printFileOpeningInformation(F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_HOME_ASSISTANT_CONFIGURATION, "w");
 #endif
@@ -1609,10 +1776,10 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  // if (!LittleFS.exists(fileName)) {
+  // if (!LITTLEFS.exists(fileName)) {
   //  createLEDConfigurationFile(id);
   // }
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   //  if (!SPIFFS.exists(fileName)) {
   //    createLEDConfigurationFile(id);
@@ -1671,10 +1838,10 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -1778,7 +1945,7 @@ uint8_t AFEDataAccess::getSystemLedID() {
   printFileOpeningInformation(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "r");
 #endif
@@ -1825,7 +1992,7 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_SYSTEM_LED_CONFIGURATION, "w");
 #endif
@@ -1876,7 +2043,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -1953,7 +2120,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2186,7 +2353,7 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -2236,7 +2403,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2280,7 +2447,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -2355,7 +2522,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2469,7 +2636,8 @@ void AFEDataAccess::createSwitchConfigurationFile() {
   saveConfiguration(3, &SwitchConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_1G)
-  // Just one switch is possible for sonoff touch 1 gang, and one config file is
+  // Just one switch is possible for sonoff touch 1 gang, and one config file
+  // is
   // created
   index = AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
 #elif defined(AFE_DEVICE_SONOFF_TOUCH_2G)
@@ -2569,7 +2737,7 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #endif // AFE_ESP32
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -2671,7 +2839,7 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
 #endif // AFE_ESP32
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2807,7 +2975,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -2874,7 +3042,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -2960,7 +3128,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3021,7 +3189,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3131,7 +3299,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3197,7 +3365,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3308,7 +3476,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3360,7 +3528,7 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3408,7 +3576,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3483,7 +3651,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3578,7 +3746,7 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3645,7 +3813,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3740,7 +3908,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -3809,7 +3977,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -3891,7 +4059,7 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
   printFileOpeningInformation(F(AFE_FILE_UART_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_UART_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_UART_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_UART_CONFIGURATION, "r");
 #endif
@@ -3938,7 +4106,7 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_UART_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_UART_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_UART_CONFIGURATION, "w");
 #endif
@@ -4003,7 +4171,7 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration)
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4077,7 +4245,7 @@ void AFEDataAccess::saveConfiguration(I2CPORT *configuration)
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4146,7 +4314,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4245,7 +4413,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4383,7 +4551,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4453,7 +4621,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4535,7 +4703,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4603,7 +4771,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4690,7 +4858,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT_CONFIG *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -4786,7 +4954,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT_CONFIG *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -4905,7 +5073,7 @@ DEVICE_T0_200 AFEDataAccess::getDeviceT0v200Configuration() {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_DEVICE_CONFIGURATION, "r");
 #endif
@@ -4982,7 +5150,7 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile =
-      LittleFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "r");
+      LITTLEFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "r");
 #endif
@@ -5046,7 +5214,7 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File configFile =
-      LittleFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "w");
+      LITTLEFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION, "w");
 #endif
@@ -5117,7 +5285,7 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
   printFileOpeningInformation(F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION));
 #endif
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "r");
 #endif
@@ -5176,7 +5344,7 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION, "w");
 #endif
@@ -5241,7 +5409,7 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "r");
+  File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "r");
 #else
   File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "r");
 #endif
@@ -5305,7 +5473,7 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "w");
+  File configFile = LITTLEFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "w");
 #else
   File configFile = SPIFFS.open(AFE_FILE_RAINMETER_SENSOR_DATA, "w");
 #endif
@@ -5391,7 +5559,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -5465,7 +5633,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -5561,7 +5729,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -5630,7 +5798,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -5719,7 +5887,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -5781,7 +5949,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -5866,10 +6034,10 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  if (!LittleFS.exists(fileName)) {
+  if (!LITTLEFS.exists(fileName)) {
     createCLEDConfigurationFile();
   }
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -5968,7 +6136,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6071,10 +6239,10 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  if (!LittleFS.exists(fileName)) {
+  if (!LITTLEFS.exists(fileName)) {
     createCLEDConfigurationFile();
   }
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -6138,7 +6306,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6225,10 +6393,10 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  if (!LittleFS.exists(fileName)) {
+  if (!LITTLEFS.exists(fileName)) {
     createCLEDConfigurationFile();
   }
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -6289,7 +6457,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6373,10 +6541,10 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  if (!LittleFS.exists(fileName)) {
+  if (!LITTLEFS.exists(fileName)) {
     createCLEDConfigurationFile();
   }
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -6436,7 +6604,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6512,7 +6680,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -6589,7 +6757,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6683,7 +6851,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -6740,7 +6908,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6807,7 +6975,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   File configFile = SPIFFS.open(fileName, "r");
 #endif
@@ -6885,7 +7053,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -6978,10 +7146,10 @@ unsigned long AFEDataAccess::getRebootCounter(boolean increase) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  if (!LittleFS.exists(fileName)) {
+  if (!LITTLEFS.exists(fileName)) {
     saveRebootCounter(0);
   }
-  File configFile = LittleFS.open(fileName, "r");
+  File configFile = LITTLEFS.open(fileName, "r");
 #else
   if (!SPIFFS.exists(fileName)) {
     saveRebootCounter(0);
@@ -7037,7 +7205,7 @@ void AFEDataAccess::saveRebootCounter(unsigned long counter) {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LittleFS.open(fileName, "w");
+  File configFile = LITTLEFS.open(fileName, "w");
 #else
   File configFile = SPIFFS.open(fileName, "w");
 #endif
@@ -7144,7 +7312,7 @@ boolean AFEDataAccess::initializeFileSystem() {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  _ret = LittleFS.begin();
+  _ret = LITTLEFS.begin();
 #else
   _ret = SPIFFS.begin();
   if (_ret) {
