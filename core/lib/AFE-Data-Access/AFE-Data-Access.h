@@ -8,6 +8,7 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <IPAddress.h>
+#include <TimeLib.h>
 
 #include <AFE-Data-JSON-templates.h>
 

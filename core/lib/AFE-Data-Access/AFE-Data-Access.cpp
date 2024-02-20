@@ -116,23 +116,15 @@ boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
 void AFEDataAccess::addLog(const char *log) {
   File configFile;
   if (openFile(configFile, "a", F(AFE_FILE_LOGS))) {
-    if (configFile.size() > 0) {
-      configFile.print(F(","));
-    }
-    configFile.print(F("{\"t\":\""));
-    unsigned long curentTime = millis();
-    uint16_t millisec = curentTime % 100;
-    uint16_t tseconds = curentTime / 1000;
-    uint16_t tminutes = tseconds / 60;
-    uint16_t seconds = tseconds % 60;
-    configFile.print(tminutes);
-    configFile.print(F(":"));
-    configFile.print(seconds);
-    configFile.print(F("."));
-    configFile.print(millisec);
-    configFile.print(F("\",\"m\":\""));
+    char _timestamp[20]; // 1970.01.01 01:01:01
+    time_t t = now();
+    sprintf(_timestamp, "%04d.%02d.%02d %02d:%02d:%02d",
+            year(t) == 1970 ? 0 : year(t), month(t), day(t), hour(t), minute(t),
+            second(t));
+    configFile.print(_timestamp);
+    configFile.print(F(" => "));
     configFile.print(log);
-    configFile.print(F("\"}"));
+    configFile.print(F("<br>"));
     configFile.close();
 
 #ifdef DEBUG
@@ -157,9 +149,7 @@ boolean AFEDataAccess::readLogs(String &logs) {
 #endif
 
     if (configFile.size() > 0 && configFile.size() < AFE_LOG_FILE_MAX_SIZE) {
-      logs = F("[");
-      logs.concat(configFile.readString());
-      logs.concat(F("]"));
+      logs = configFile.readString();
       _ret = true;
 #ifdef DEBUG
       Debugger->printValue(F("Ok"));
@@ -207,27 +197,36 @@ void AFEDataAccess::cleanLogsFile() {
  * @param  message          read string
  */
 void AFEDataAccess::getWelcomeMessage(String &message) {
+  File configFile;
+
+  if (openFile(configFile, "r", F(AFE_FILE_WELCOME_MESSAGE))) {
+
 #ifdef DEBUG
-  printFileOpeningInformation(F(AFE_FILE_WELCOME_MESSAGE));
+    Debugger->printBulletPoint(F("Reading: "));
 #endif
 
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
-#else
-  File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "r");
-#endif
+    if (configFile.size() > 0) {
+      message = configFile.readString();
 
-  if (configFile) {
-    message = configFile.readString();
+#ifdef DEBUG
+      Debugger->printValue(F("Ok"));
+      Debugger->printBulletPoint(F("Content: "));
+      Serial << message;
+#endif
+    } else {
+      message = "";
+#ifdef DEBUG
+      Debugger->printValue(F("Empty"));
+#endif
+    }
     configFile.close();
-
-    saveWelecomeMessage("");
-  } else {
-    message = "";
-#ifdef DEBUG
-    printFileOpeningError(F(AFE_FILE_WELCOME_MESSAGE));
-#endif
   }
+
+  createFile(AFE_FILE_WELCOME_MESSAGE);
+
+#ifdef DEBUG
+  Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
+#endif
 }
 
 /**
@@ -236,29 +235,19 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
  * @param  message          string to be saved
  */
 void AFEDataAccess::saveWelecomeMessage(const char *message) {
-#ifdef DEBUG
-  printFileOpeningInformation(F(AFE_FILE_WELCOME_MESSAGE));
-#endif
+  File configFile;
+  if (openFile(configFile, "w", F(AFE_FILE_WELCOME_MESSAGE))) {
 
-#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  File configFile = LITTLEFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
-#else
-  File configFile = SPIFFS.open(AFE_FILE_WELCOME_MESSAGE, "w");
-#endif
-
-  if (configFile) {
 #ifdef DEBUG
-    printFileWritingInformation();
-    Serial << message;
+    Debugger->printBulletPoint(F("Writting: "));
+    Debugger->printValue(message);
 #endif
 
     configFile.print(message);
     configFile.close();
   }
 #ifdef DEBUG
-  else {
-    printFileOpeningError(F(AFE_FILE_WELCOME_MESSAGE));
-  }
+  Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
 

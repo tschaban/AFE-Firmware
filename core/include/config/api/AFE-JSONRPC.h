@@ -19,7 +19,7 @@
 #define AFE_CONFIG_JSONRPC_REST_METHOD_UPGRADE_FIRMMWARE "get-firmware-upgrade-message"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_GET_LATEST_FIRMWARE_VERSION "get-latest-firmware-version"
 #define AFE_CONFIG_JSONRPC_REST_METHOD_GET_JSON_LATEST_FIRMWARE_VERSION "get-json-latest-firmware-version"
-
+#define AFE_CONFIG_JSONRPC_REST_METHOD_GET_CURRENT_TIME "get-current-time"
 
 /**
  * @brief JSON REST API calls

@@ -32,7 +32,7 @@ void AFEFirmware::begin() {
    */
   unsigned long _counter = API->Flash->getRebootCounter();
   char _log[20];
-  sprintf(_log, (PGM_P)F("restarted:%d"), _counter);
+  sprintf(_log, (PGM_P)F("restarted\":%d"), _counter);
   API->Flash->cleanLogsFile();
   API->Flash->addLog(_log);
 
@@ -162,3 +162,37 @@ void AFEFirmware::firstBooting(void) {
 #endif
   }
 }
+
+void AFEFirmware::synchronizeTime(void) {
+#ifdef DEBUG
+  Debugger->printInformation(F("Synchronizing the device timestamp"),
+                             F("FIRMWARE"));
+#endif
+  String _HtmlResponse;
+  _HtmlResponse.reserve(11);
+
+  API->REST->sent(_HtmlResponse,
+                  (PGM_P)(AFE_CONFIG_JSONRPC_REST_METHOD_GET_CURRENT_TIME));
+
+  if (_HtmlResponse.length() > 0) {
+    time_t value = _HtmlResponse.toInt();
+    if (value > 0) {
+      setTime(value);
+      adjustTime(3600); // @TODO Make it configurable
+    }
+  }
+
+#ifdef DEBUG
+  time_t t = now();
+  Debugger->printBulletPoint(F("Device time is: "));
+  Serial << year(t) << "." << month(t) << "." << day(t) << " " << hour(t) << ":"
+         << minute(t) << ":" << second(t);
+#endif
+}
+ /* Currently not used. If needed uncomment it 
+void AFEFirmware::getCurrentTime(char *timestamp) {
+  time_t t = now();
+  sprintf(timestamp, "%4d.%02d.%02d %2d:%02d:%02d", year(t), month(t), day(t),
+          hour(t), minute(t), second(t));
+}
+*/

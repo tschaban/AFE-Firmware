@@ -32,7 +32,6 @@ void AFEEvent::listener(void) {
     _Firmware->timer->miliseconds = millis();
     _Firmware->timer->minutes++;
 
-
     if (_Firmware->Device->getMode() == AFE_MODE_NORMAL &&
         _Firmware->Device->configuration.api.mqtt &&
         strlen(_MqttAPI->Mqtt->configuration->status.topic) > 0) {
@@ -50,7 +49,7 @@ void AFEEvent::listener(void) {
                 _MqttAPI->Mqtt->configuration->status.topic);
 
         if (_MqttAPI->Mqtt->publish(_logsTopic, _logsToSent)) {
-          _Firmware->API->Flash->cleanLogsFile();
+          // @TODO _Firmware->API->Flash->cleanLogsFile();
         }
       }
     }
@@ -79,6 +78,9 @@ void AFEEvent::listener(void) {
 #endif
       if (!_Firmware->API->REST->accessToWAN()) {
         _Firmware->API->REST->checkAccessToWAN();
+        if (_Firmware->API->REST->accessToWAN()) {
+          _Firmware->synchronizeTime();
+        }
 #ifdef DEBUG
       } else {
         Serial << F(" ... already connected");
@@ -280,6 +282,9 @@ void AFEEvent::connectedToNetwork(void) {
 #endif
   // Checing access to WAN
   _Firmware->API->REST->checkAccessToWAN();
+  if (_Firmware->API->REST->accessToWAN()) {
+    _Firmware->synchronizeTime();
+  }
 }
 
 void AFEEvent::disconnectedFromNetwork(void) {

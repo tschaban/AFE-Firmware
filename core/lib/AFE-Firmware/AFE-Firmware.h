@@ -50,6 +50,7 @@ public:
     uint8_t hours;
     uint8_t days;
     uint8_t months;
+    time_t currentTime;
   };
 
   TIMER_OBJECT *timer = new TIMER_OBJECT;
@@ -74,6 +75,9 @@ public:
   void initializeNetwork(void);
   void checkFirmwareVersion(void);
   void validateProVersion(void);
+  void synchronizeTime(void);
+ /* Currently not used. If needed uncomment it */
+  void getCurrentTime(char *timestamp);
 
 };
 
