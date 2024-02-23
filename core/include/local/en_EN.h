@@ -121,6 +121,7 @@
 #define L_INDEX_LAUNCH_CONFIGURATION_PANEL_HINT "To open configuration panel press one of the buttons."
 #define L_INDEX_OPENING_CONFIG_PANEL "Opening {{n}} configuration panel"
 #define L_INDX_INFORMATION_ABOUT_YOUR_VERSION "<a style=\"color:#0475b6\" href=\"/?o=47\">More</a> information about the device"
+#define L_INDEX_LOGS "System <a style=\"color:#0475b6\" href=\"/?o=50\">logs</a>"
 #define L_INDEX_DONATION "Donation"
 
 #define L_INDEX_MULITICAST_TURNED_ON "Multicast DNS is active"

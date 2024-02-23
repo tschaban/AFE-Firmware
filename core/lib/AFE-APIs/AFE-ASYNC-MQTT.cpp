@@ -5,6 +5,7 @@
 boolean AFEAsyncMQTTClient::eventConnected = false;
 boolean AFEAsyncMQTTClient::eventDisconnected = false;
 boolean AFEAsyncMQTTClient::isConnected = false;
+uint8_t AFEAsyncMQTTClient::disconnectReason = 0;
 
 MQTT_MESSAGE
 AFEAsyncMQTTClient::messagesBuffer[AFE_CONFIG_MQTT_MESSAGES_BUFFER];
@@ -47,7 +48,7 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Broker->setClientId(_DeviceName);
   _Broker->setMaxTopicLength(AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH);
 
-  // _Broker->setKeepAlive(60);
+  _Broker->setKeepAlive(30);
 
   if (strlen(configuration->user) > 0 && strlen(configuration->password) > 0) {
     _Broker->setCredentials(configuration->user, configuration->password);
@@ -166,9 +167,7 @@ boolean AFEAsyncMQTTClient::connectedEvent() {
     publishConnected();
     AFEAsyncMQTTClient::eventConnected = false;
     _reconnectionTimeout = 0;
-    char _log[15];
-    sprintf(_log, (PGM_P)F("mqtt:connected"));
-    _Data->addLog(_log);
+    _Data->addLog(F("mqtt:connected"));
   }
   return returnValue;
 }
@@ -184,11 +183,10 @@ boolean AFEAsyncMQTTClient::disconnectedEvent() {
         F("Forcing disconnection from MQTT Broker on object level"), F("MQTT"));
 #endif
     AFEAsyncMQTTClient::eventDisconnected = false;
-    _Broker->disconnect(true); // @TODO Testing 3.8.0.B6
+   
+   // _Broker->disconnect(true); // @TODO Testing 3.8.0.B6
 
-    char _log[18];
-    sprintf(_log, (PGM_P)F("mqtt:disconnected"));
-    _Data->addLog(_log);
+    _Data->addLog(F("mqtt:disconnected:reason:%d"),(uint16_t)AFEAsyncMQTTClient::disconnectReason);
 
 #ifdef AFE_CONFIG_HARDWARE_LED
     _Led->off();
@@ -300,7 +298,9 @@ void AFEAsyncMQTTClient::onMqttConnect(bool sessionPresent) {
 void AFEAsyncMQTTClient::onMqttDisconnect(
     AsyncMqttClientDisconnectReason reason) {
 
+
   if (AFEAsyncMQTTClient::isConnected) {
+    AFEAsyncMQTTClient::disconnectReason = (uint8_t)reason;
 #ifdef DEBUG
     Serial << endl << F("WARN: MQTT: Disconnected from MQTT Broker : ");
 

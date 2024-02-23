@@ -3,9 +3,10 @@
 #ifndef _AFE_API_JSONRPC_h
 #define _AFE_API_JSONRPC_h
 
-#include <Arduino.h>
 #include <AFE-Configuration.h>
 #include <AFE-Device.h>
+#include <Arduino.h>
+
 #ifdef AFE_CONFIG_HARDWARE_LED
 #include <AFE-LED.h>
 #endif
@@ -15,8 +16,9 @@
 // #include <AsyncPing.h>
 
 #ifdef AFE_ESP32 /* ESP32 */
-#include <HTTPClient.h>
 #include <ESP32Ping.h>
+#include <HTTPClient.h>
+
 #else /* ESP82x */
 #include <ESP8266HTTPClient.h>
 #include <ESP8266Ping.h>
@@ -36,8 +38,7 @@ const char JSONRPC_MESSAGE[] PROGMEM = "{\"jsonrpc\":\"2.0\",\"method\":\"{{"
                                        "json.method}}\",\"params\":{{json."
                                        "params}},\"id\":1}";
 
-class AFEJSONRPC
-{
+class AFEJSONRPC {
 private:
   WiFiClient WirelessClient;
   HTTPClient *http = new HTTPClient();
@@ -72,7 +73,6 @@ public:
 #endif
 
   void begin(AFEDataAccess *, AFEDevice *);
-
 
   int sent(boolean &response, const char *method);
   int sent(String &response, const char *method);

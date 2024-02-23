@@ -25,11 +25,6 @@ private:
 
 #ifndef AFE_ESP32
 
-#ifdef T0_CONFIG
-  /* Upgrades firmware from version T0-2.0.x to T0-2.1.x */
-  void upgradeToT0V210();
-#endif
-
 #ifdef T5_CONFIG
   /* Upgrades firmware from version T5-2.2.x */
   void upgradeToT5V220();

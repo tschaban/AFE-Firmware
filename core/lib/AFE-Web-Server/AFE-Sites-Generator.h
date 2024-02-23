@@ -333,6 +333,13 @@ public:
   void siteFirmware(String &page, boolean details = false);
 
   /**
+   * @brief Site: Logs
+   *
+   * @param  page             return string with the site
+   */
+  void siteLogs(String &page);
+
+  /**
    * @brief All following methods generates configuration sections
    *
    * @param  page             desc

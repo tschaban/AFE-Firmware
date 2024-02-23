@@ -31,10 +31,8 @@ void AFEFirmware::begin() {
    *
    */
   unsigned long _counter = API->Flash->getRebootCounter();
-  char _log[20];
-  sprintf(_log, (PGM_P)F("restarted\":%d"), _counter);
   API->Flash->cleanLogsFile();
-  API->Flash->addLog(_log);
+  API->Flash->addLog(F("restarted:%dx"), _counter);
 
 #ifdef DEBUG
 
@@ -104,6 +102,12 @@ void AFEFirmware::validateProVersion(void) {
       Debugger->printError(F("while checing the key"), F("AFE Pro"));
     }
 #endif
+  }
+
+  if (Configuration->Pro->valid) {
+    API->Flash->addLog(F("pro:yes"));
+  } else {
+    API->Flash->addLog(F("pro:no"));
   }
 }
 
@@ -179,6 +183,7 @@ void AFEFirmware::synchronizeTime(void) {
     if (value > 0) {
       setTime(value);
       adjustTime(3600); // @TODO Make it configurable
+      API->Flash->addLog(F("time:synchronized"));
     }
   }
 
@@ -189,10 +194,10 @@ void AFEFirmware::synchronizeTime(void) {
          << minute(t) << ":" << second(t);
 #endif
 }
- /* Currently not used. If needed uncomment it 
+/* Currently not used. If needed uncomment it
 void AFEFirmware::getCurrentTime(char *timestamp) {
-  time_t t = now();
-  sprintf(timestamp, "%4d.%02d.%02d %2d:%02d:%02d", year(t), month(t), day(t),
-          hour(t), minute(t), second(t));
+ time_t t = now();
+ sprintf(timestamp, "%4d.%02d.%02d %2d:%02d:%02d", year(t), month(t), day(t),
+         hour(t), minute(t), second(t));
 }
 */

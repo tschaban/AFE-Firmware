@@ -72,6 +72,10 @@ public:
 
 
   void addLog(const char *);
+  void addLog(const __FlashStringHelper *);
+  void addLog(const __FlashStringHelper *, const char *);
+  void addLog(const __FlashStringHelper *, uint16_t number, uint8_t intSize = 8);
+
   boolean readLogs(String &logs);
   void cleanLogsFile();
 
@@ -82,12 +86,6 @@ public:
   void getConfiguration(DEVICE *);
   void getDeviceID(char *id, boolean extended = false);
 
-#if defined(T0_CONFIG) &&                                                      \
-    !defined(                                                                  \
-        ESP32) // Version 2.0.0 - 2 Device configuration. Method used only to
-               // upgrade to new version
-  DEVICE_T0_200 getDeviceT0v200Configuration();
-#endif
   void saveConfiguration(DEVICE *);
   void createDeviceConfigurationFile();
 
@@ -122,7 +120,7 @@ public:
   uint8_t getDeviceMode();
   void saveDeviceMode(uint8_t mode);
 
-  unsigned long getRebootCounter(boolean increase = true);
+  uint16_t getRebootCounter(boolean increase = true);
   void saveRebootCounter(unsigned long counter);
 
   void getConfiguration(PRO_VERSION *);

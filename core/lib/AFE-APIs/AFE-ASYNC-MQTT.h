@@ -62,6 +62,7 @@ public:
    */
   static boolean eventConnected;
   static boolean eventDisconnected;
+  static uint8_t disconnectReason;
 
   /**
    * @brief is true when device is connected to MQTT broker

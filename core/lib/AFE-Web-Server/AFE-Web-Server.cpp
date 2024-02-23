@@ -45,6 +45,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
   case AFE_CONFIG_SITE_INDEX_MONITOR:
     Site.siteFirmware(page, true);
     break;
+  case AFE_CONFIG_SITE_LOGS:
+    Site.siteLogs(page);
+    break;
   case AFE_CONFIG_SITE_FIRST_TIME:
     Site.siteNetwork(page);
     break;
@@ -639,6 +642,9 @@ boolean AFEWebServer::generate(boolean upload) {
         } else if (siteConfig.ID == AFE_CONFIG_SITE_INDEX_MONITOR) {
           siteConfig.form = false;
           siteConfig.twoColumns = false;
+        } else if (siteConfig.ID == AFE_CONFIG_SITE_LOGS) {
+          siteConfig.form = false;
+          siteConfig.twoColumns = false;
         } else if (siteConfig.ID == AFE_CONFIG_SITE_EXIT) {
           siteConfig.reboot = true;
           siteConfig.rebootMode = AFE_MODE_NORMAL;
@@ -811,17 +817,29 @@ boolean AFEWebServer::getOptionName() {
 }
 
 uint8_t AFEWebServer::getSiteID() {
-
+  uint8_t _ret;
   if (Firmware->Device->getMode() == AFE_MODE_NETWORK_NOT_SET) {
-    return AFE_CONFIG_SITE_FIRST_TIME;
+    _ret = AFE_CONFIG_SITE_FIRST_TIME;
   } else {
-    return Firmware->Device->getMode() == AFE_MODE_NORMAL
-               ? server.arg(F("o")).toInt() == AFE_CONFIG_SITE_INDEX_MONITOR
-                     ? AFE_CONFIG_SITE_INDEX_MONITOR
-                     : AFE_CONFIG_SITE_INDEX
-               : server.arg(F("o")).toInt() > 0 ? server.arg(F("o")).toInt()
-                                                : AFE_CONFIG_SITE_DEVICE;
+    if (Firmware->Device->getMode() == AFE_MODE_NORMAL) {
+      switch (server.arg(F("o")).toInt()) {
+      case AFE_CONFIG_SITE_INDEX_MONITOR:
+        _ret = AFE_CONFIG_SITE_INDEX_MONITOR;
+        break;
+      case AFE_CONFIG_SITE_LOGS:
+        _ret = AFE_CONFIG_SITE_LOGS;
+        break;
+      default:
+        _ret = AFE_CONFIG_SITE_INDEX;
+        break;
+      }
+    } else {
+      _ret = server.arg(F("o")).toInt() > 0 ? server.arg(F("o")).toInt()
+                                            : AFE_CONFIG_SITE_DEVICE;
+    }
   }
+
+  return _ret;
 }
 
 uint8_t AFEWebServer::getCommand() {

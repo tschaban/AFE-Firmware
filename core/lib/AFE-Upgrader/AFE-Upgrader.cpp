@@ -155,19 +155,6 @@ void AFEUpgrader::updateFirmwareVersion()
 
 #ifndef AFE_ESP32
 
-/* Upgrade to version T0-2.0.3 */
-#ifdef T0_CONFIG
-  if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") ==
-          0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.0.1") ==
-          0 ||
-      strcmp(Firmware->Configuration->Version->installed_version, "2.0.2") ==
-          0)
-  {
-    upgradeToT0V210();
-  }
-#endif // T0_CONFIG
-
 #ifdef T5_CONFIG
   if (strcmp(Firmware->Configuration->Version->installed_version, "2.0.0") ==
           0 ||
@@ -231,60 +218,6 @@ void AFEUpgrader::updateFirmwareAPIVersion()
 }
 
 #ifndef AFE_ESP32
-
-/* Specyfic upgrade to version T0 2.1 from version 2.0 */
-
-#ifdef T0_CONFIG
-void AFEUpgrader::upgradeToT0V210()
-{
-
-  DEVICE newDevice;
-  DEVICE_T0_200 oldDevice =
-      Firmware->API->Flash->getDeviceT0v200Configuration();
-  uint8_t counter = 0;
-
-  // Copy data from old structure to new structure
-
-  sprintf(newDevice.name, oldDevice.name);
-  newDevice.api.http = oldDevice.api.http;
-  newDevice.api.mqtt = oldDevice.api.mqtt;
-#if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  newDevice.api.domoticz = oldDevice.api.domoticz;
-#endif
-
-#if defined(AFE_CONFIG_HARDWARE_ANALOG_INPUT) && !defined(AFE_ESP32)
-  newDevice.isAnalogInput = oldDevice.isAnalogInput;
-#endif
-
-  for (uint8_t i = 0; i < sizeof(oldDevice.isSwitch); i++)
-  {
-    counter += oldDevice.isSwitch[i] ? 1 : 0;
-  }
-
-  newDevice.noOfSwitches = counter;
-
-  counter = 0;
-  for (uint8_t i = 0; i < sizeof(oldDevice.isRelay); i++)
-  {
-    counter += oldDevice.isRelay[i] ? 1 : 0;
-  }
-
-  newDevice.noOfRelays = counter;
-
-#ifdef AFE_CONFIG_HARDWARE_LED
-  counter = 0;
-  for (uint8_t i = 0; i < sizeof(oldDevice.isLED); i++)
-  {
-    counter += oldDevice.isLED[i] ? 1 : 0;
-  }
-  newDevice.noOfLEDs = counter;
-#endif
-
-  // Save to new JSON structure configuration file
-  Firmware->API->Flash->saveConfiguration(&newDevice);
-}
-
-#endif // T0_CONFIG
 
 #ifdef T5_CONFIG
 void AFEUpgrader::upgradeToT5V220()

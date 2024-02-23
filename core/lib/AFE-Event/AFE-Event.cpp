@@ -32,28 +32,6 @@ void AFEEvent::listener(void) {
     _Firmware->timer->miliseconds = millis();
     _Firmware->timer->minutes++;
 
-    if (_Firmware->Device->getMode() == AFE_MODE_NORMAL &&
-        _Firmware->Device->configuration.api.mqtt &&
-        strlen(_MqttAPI->Mqtt->configuration->status.topic) > 0) {
-      // Sending log to MQTT
-      // @TODO 3.8.0 added better mem allocation
-      String _logs;
-
-      if (_Firmware->API->Flash->readLogs(_logs)) {
-        char _logsTopic[AFE_CONFIG_MQTT_TOPIC_STATE_LENGTH];
-        char _logsToSent[_logs.length() + 1];
-
-        _logs.toCharArray(_logsToSent, _logs.length() + 1);
-
-        sprintf(_logsTopic, "%s/logs",
-                _MqttAPI->Mqtt->configuration->status.topic);
-
-        if (_MqttAPI->Mqtt->publish(_logsTopic, _logsToSent)) {
-          // @TODO _Firmware->API->Flash->cleanLogsFile();
-        }
-      }
-    }
-
 /**
  * @brief Debug information
  *
@@ -87,6 +65,15 @@ void AFEEvent::listener(void) {
 #endif
       }
     }
+
+    _Firmware->API->Flash->addLog(F("memory:free:%dkB"),
+                                  (uint16_t)
+#ifdef AFE_ESP32
+                                      (esp_get_free_heap_size() / 1024)
+#else
+                                      (system_get_free_heap_size() / 1024)
+#endif
+                                      );
   }
 
   /* Events triggered every 24hrs  */

@@ -137,6 +137,8 @@ void AFERelay::on() {
 #ifdef AFE_CONFIG_HARDWARE_LED
   Led->on();
 #endif
+
+_Data->addLog(F("relay:%s:on"), configuration->name);
 }
 
 /* Set relay to OFF */
@@ -187,6 +189,8 @@ void AFERelay::off() {
 #ifdef AFE_CONFIG_HARDWARE_LED
   Led->off();
 #endif
+
+_Data->addLog(F("relay:%s:off"), configuration->name);
 }
 
 /* Toggle relay */

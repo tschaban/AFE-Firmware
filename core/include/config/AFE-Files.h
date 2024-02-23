@@ -14,9 +14,14 @@
 #define AFE_FILE_SYSTEM AFE_FS_SPIFFS
 #endif
 
+/* File openig modes */
+#define AFE_OPEN_FILE_READING "r"
+#define AFE_OPEN_FILE_WRITING "w"
+#define AFE_OPEN_FILE_APPEND "a"
+
 
 /* Max Log file content */
-#define AFE_LOG_FILE_MAX_SIZE 1020
+#define AFE_LOG_FILE_MAX_SIZE 9*1024 // @TODO Experimental not tested if the size isn't too much
 #define AFE_LOG_MAX_SIZE AFE_LOG_FILE_MAX_SIZE+3
 
 /* Configuration files names */

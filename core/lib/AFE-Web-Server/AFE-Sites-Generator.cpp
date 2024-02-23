@@ -1302,7 +1302,8 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   DS18B20 ds18b20Configuration;
   for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDS18B20s; i++) {
     Firmware->API->Flash->getConfiguration(i, &ds18b20Configuration);
-    sprintf(text, (const char*)F("DS18B20 %d: %s"), (uint8_t)(i + 1), ds18b20Configuration.name);
+    sprintf(text, (const char *)F("DS18B20 %d: %s"), (uint8_t)(i + 1),
+            ds18b20Configuration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
                             configuration.sensorId == i ? true : false);
@@ -1313,7 +1314,8 @@ void AFESitesGenerator::siteRegulator(String &page, uint8_t id) {
   DHT_CONFIG DHTConfiguration;
   for (uint8_t i = 0; i < Firmware->Device->configuration.noOfDHTs; i++) {
     Firmware->API->Flash->getConfiguration(i, &DHTConfiguration);
-    sprintf(text, (const char*)F("DHT %d: %s"), (uint8_t)(i + 1), DHTConfiguration.name);
+    sprintf(text, (const char *)F("DHT %d: %s"), (uint8_t)(i + 1),
+            DHTConfiguration.name);
     sprintf(value, "%d", i);
     addSelectOptionFormItem(page, text, value,
                             configuration.sensorId == i ? true : false);
@@ -3354,6 +3356,9 @@ void AFESitesGenerator::siteIndex(String &page, boolean authorized) {
   page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
   page.replace(F("{{I}}"), F(L_INDX_INFORMATION_ABOUT_YOUR_VERSION));
 
+  page.concat(FPSTR(HTTP_MESSAGE_LINE_ITEM));
+  page.replace(F("{{I}}"), F(L_INDEX_LOGS));
+
   closeMessageSection(page);
 
   openSection(page, F(L_INDEX_LAUNCH_CONFIGURATION_PANEL),
@@ -3576,6 +3581,19 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
 
     closeMessageSection(page);
   }
+}
+
+void AFESitesGenerator::siteLogs(String &page) {
+  char _numberToText[17];
+  openSection(page, F("Log"), F(""));
+  page.concat(F("<code>"));
+  String _logs;
+  Firmware->API->Flash->readLogs(_logs);
+  _logs.replace(F("-n"), F(" => "));
+  _logs.replace(F("-b"), F("<br>"));
+  page.concat(_logs);
+   page.concat(F("</code>"));
+  closeSection(page);
 }
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR

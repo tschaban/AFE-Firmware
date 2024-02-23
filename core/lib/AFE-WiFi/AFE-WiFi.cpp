@@ -525,9 +525,7 @@ boolean AFEWiFi::eventConnected() {
 #endif
       }
     }
-    char _log[15];
-    sprintf(_log, (PGM_P)F("wifi:connected"));
-    Data->addLog(_log);
+    Data->addLog(F("wifi:connected"));
     AFEWiFi::eventConnectionEstablished = false;
   }
 
@@ -538,9 +536,7 @@ boolean AFEWiFi::eventDisconnected() {
   boolean returnValue = AFEWiFi::eventConnectionLost;
 
   if (returnValue) {
-    char _log[18];
-    sprintf(_log, (PGM_P)F("wifi:disconnected"));
-    Data->addLog(_log);
+    Data->addLog(F("wifi:disconnected"));
   }
 
   AFEWiFi::eventConnectionLost = false;

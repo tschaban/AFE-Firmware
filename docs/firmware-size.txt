@@ -5,6 +5,28 @@ Flash: [=====     ]  45.8% (used 478317 bytes from 1044464 bytes)
 RAM:   [=====     ]  47.3% (used 38708 bytes from 81920 bytes)
 Flash: [=====     ]  45.9% (used 478921 bytes from 1044464 bytes)
 
+RAM:   [=====     ]  47.4% (used 38792 bytes from 81920 bytes)
+Flash: [=====     ]  46.0% (used 480905 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  47.3% (used 38780 bytes from 81920 bytes)
+Flash: [=====     ]  46.0% (used 480789 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  47.3% (used 38780 bytes from 81920 bytes)
+Flash: [=====     ]  46.0% (used 480785 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  47.2% (used 38632 bytes from 81920 bytes)
+Flash: [=====     ]  46.0% (used 480789 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  47.0% (used 38540 bytes from 81920 bytes)
+Flash: [=====     ]  45.9% (used 479705 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  47.0% (used 38540 bytes from 81920 bytes)
+Flash: [=====     ]  45.9% (used 479381 bytes from 1044464 bytes)
+
+RAM:   [=====     ]  47.0% (used 38540 bytes from 81920 bytes)
+Flash: [=====     ]  45.9% (used 479277 bytes from 1044464 bytes)
+
+
 T5 - ESP8266, 4MB, Domoticz
 Flash: 564504
 RAM: 41168
