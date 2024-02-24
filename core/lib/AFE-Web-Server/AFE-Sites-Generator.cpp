@@ -916,6 +916,10 @@ void AFESitesGenerator::siteMQTTBroker(String &page) {
   addSelectOptionFormItem(page, "2", "2", configuration.qos == 2);
   addSelectFormItemClose(page);
 
+  sprintf(_number, "%d", configuration.keepAlive);
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "ka", L_MQTT_KEEP_ALIVE,
+                   _number, AFE_FORM_ITEM_SKIP_PROPERTY, "1", "65535", "1");
+
   closeSection(page);
 /**
  * @brief Removed for version with ASyncMQTTClient
@@ -3592,7 +3596,7 @@ void AFESitesGenerator::siteLogs(String &page) {
   _logs.replace(F("-n"), F(" => "));
   _logs.replace(F("-b"), F("<br>"));
   page.concat(_logs);
-   page.concat(F("</code>"));
+  page.concat(F("</code>"));
   closeSection(page);
 }
 

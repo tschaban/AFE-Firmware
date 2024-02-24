@@ -1295,6 +1295,8 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
     printFileContentInformation();
 #endif
 
+    JsonVariant exists;
+
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
@@ -1315,7 +1317,7 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
 #else
       sprintf(configuration->lwt.topic, root["lwt"] | "");
 
-      JsonVariant exists = root["s"];
+      exists = root["s"];
       if (exists.success()) {
         sprintf(configuration->status.topic, root["s"]);
       } else {
@@ -1326,6 +1328,9 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
       }
 
 #endif
+      exists = root["ka"];
+      configuration->keepAlive =
+          exists.success() ? root["ka"] : AFE_CONFIG_MQTT_DEFAULT_KEEP_ALIVE;
 
       configuration->retainLWT =
           root["retainLWT"] | AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
@@ -1377,6 +1382,7 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
     root["retainAll"] = configuration->retainAll;
     root["retainLWT"] = configuration->retainLWT;
     root["qos"] = configuration->qos;
+    root["ka"] = configuration->keepAlive;
 
     root.printTo(configFile);
 #ifdef DEBUG
@@ -1416,6 +1422,7 @@ void AFEDataAccess::createMQTTConfigurationFile() {
   configuration.retainAll = AFE_CONFIG_MQTT_DEFAULT_RETAIN_LWT;
   configuration.retainLWT = AFE_CONFIG_MQTT_DEFAULT_RETAIN_ALL;
   configuration.qos = AFE_CONFIG_MQTT_DEFAULT_QOS;
+  configuration.keepAlive = AFE_CONFIG_MQTT_DEFAULT_KEEP_ALIVE;
   saveConfiguration(&configuration);
 }
 

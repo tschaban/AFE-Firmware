@@ -205,6 +205,7 @@
 #define L_MQTT_CONNECTION_HINT "Włącz sprawdzanie dostępności serwera w sieci LAN, jeśli urządzenie musi działać, gdy serwer jest niedostępny. Możesz dodatkowo zmnieszyć lub zwiększyć czas oczekiwania na odpowiedź z serwera"
 #define L_MQTT_USE_PING "Sprawdzić dostępność serwera przed połączeniem?"
 #define L_MQTT_USE_PING_HINT "Serwer nie może blokować poleceń PING"
+#define L_MQTT_KEEP_ALIVE "Czas utrzymania połączenia"
 
 /* Form: Domoticz server configuration */
 #define L_DOMOTICZ_PROTOCOL "Protokół"

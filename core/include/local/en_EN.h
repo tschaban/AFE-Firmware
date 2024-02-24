@@ -211,7 +211,7 @@
 #define L_MQTT_CONNECTION_HINT "In case the device must work without MQTT server host availability in the LAN, enable host PING check before establishing a connection to MQTT Broker.  You can aslo set the duration of a timeout per connection attempt. "
 #define L_MQTT_USE_PING "Check if MQTT Server host is reachable in the LAN?"
 #define L_MQTT_USE_PING_HINT "The host cannot block PING command"
-
+#define L_MQTT_KEEP_ALIVE "Keep alive"
 
 
 /* Form: Domoticz server configuration */

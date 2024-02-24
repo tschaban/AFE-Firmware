@@ -48,6 +48,7 @@ private:
   // AsyncPing Pings;
   PingClass *Ping = new PingClass();
   boolean _PingResponded = false;
+  PRO_VERSION *Pro = new PRO_VERSION;
 
 #ifdef DEBUG
   AFEDebugger *Debugger;

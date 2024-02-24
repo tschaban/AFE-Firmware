@@ -8,6 +8,7 @@ void AFEJSONRPC::begin(AFEDataAccess *_Data, AFEDevice *_Device) {
   Data = _Data;
   Device = _Device;
   message.reserve(AFE_CONFIG_JSONRPC_MESSAGE_MAX_SIZE);
+  Data->getConfiguration(Pro);
 
 #ifdef DEBUG
   Debugger->printInformation(F("Initialized"), F("REST-API"));
@@ -82,9 +83,6 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
 #endif
 
       unsigned long resposneTime = millis();
-
-      PRO_VERSION *Pro = new PRO_VERSION;
-      Data->getConfiguration(Pro);
 
       // if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_URL)) {
       if (http->begin(WirelessClient, AFE_CONFIG_JSONRPC_REST_API_SERVER,

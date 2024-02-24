@@ -55,6 +55,7 @@ struct MQTT {
   boolean retainAll;
   boolean pingHostBeforeConnection;
   uint8_t qos;
+  uint16_t keepAlive;
 };
 
 #endif

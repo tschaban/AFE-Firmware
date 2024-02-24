@@ -1564,6 +1564,10 @@ void AFEWebServer::get(MQTT &data) {
 
   data.qos = server.arg(F("q")).length() > 0 ? server.arg(F("q")).toInt()
                                              : AFE_CONFIG_MQTT_DEFAULT_QOS;
+
+  data.keepAlive = server.arg(F("ka")).length() > 0
+                       ? server.arg(F("ka")).toInt()
+                       : AFE_CONFIG_MQTT_DEFAULT_KEEP_ALIVE;
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ

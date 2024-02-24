@@ -48,7 +48,7 @@ boolean AFEAsyncMQTTClient::begin(AFEDataAccess *Data, AFEDevice *Device) {
   _Broker->setClientId(_DeviceName);
   _Broker->setMaxTopicLength(AFE_CONFIG_MQTT_TOPIC_CMD_LENGTH);
 
-  _Broker->setKeepAlive(30);
+  _Broker->setKeepAlive(configuration->keepAlive);
 
   if (strlen(configuration->user) > 0 && strlen(configuration->password) > 0) {
     _Broker->setCredentials(configuration->user, configuration->password);
