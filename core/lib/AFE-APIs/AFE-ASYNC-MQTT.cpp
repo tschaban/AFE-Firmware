@@ -184,7 +184,7 @@ boolean AFEAsyncMQTTClient::disconnectedEvent() {
 #endif
     AFEAsyncMQTTClient::eventDisconnected = false;
    
-   // _Broker->disconnect(true); // @TODO Testing 3.8.0.B6
+    _Broker->disconnect(true); // @TODO Testing 3.8.0.B11
 
     _Data->addLog(F("mqtt:disconnected:reason:%d"),(uint16_t)AFEAsyncMQTTClient::disconnectReason);
 
