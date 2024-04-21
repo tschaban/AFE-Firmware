@@ -31,7 +31,6 @@ void AFEFirmware::begin() {
    *
    */
   unsigned long _counter = API->Flash->getRebootCounter();
-  API->Flash->cleanLogsFile();
   API->Flash->addLog(F("restarted:%dx"), _counter);
 
 #ifdef DEBUG

@@ -324,6 +324,8 @@ public:
 
 #endif // ESP32/ESP8266
 
+  void downloadLogFile();
+
   String getHeaderValue(String header, String headerName);
 
   /**

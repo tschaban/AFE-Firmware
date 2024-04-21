@@ -21,8 +21,8 @@
 
 
 /* Max Log file content */
-#define AFE_LOG_FILE_MAX_SIZE 9*1024 // @TODO Experimental not tested if the size isn't too much
-#define AFE_LOG_MAX_SIZE AFE_LOG_FILE_MAX_SIZE+3
+#define AFE_LOG_FILE_MAX_SIZE_FOR_DISPLAY 9*1024 // @TODO Experimental not tested if the size isn't too much
+#define AFE_LOG_FILE_MAX_SIZE 64*1024 // Size after which log file is deleted
 
 /* Configuration files names */
 #ifndef AFE_ESP32 /* ESP82xx */
@@ -104,7 +104,9 @@
 #define AFE_FILE_MCP23XXX_CONFIGURATION "/cfg-mcp23xxx-%d.json"
 #define AFE_FILE_FS3000_CONFIGURATION "/cfg-fs3000-%d.json"
 
-#define AFE_FILE_LOGS "/log.json"
+#define AFE_FILE_LOG_DIR "/log"
+#define AFE_FILE_BOOT_LOG "/log/boot.log"
+#define AFE_FILE_LOGS "/log/%04d-%02d-%02d.log"
 
 //const char AFE_FILE_MCP23XXX_CONFIGURATION[] PROGMEM = "/cfg-mcp23xxx-%d.json";
 

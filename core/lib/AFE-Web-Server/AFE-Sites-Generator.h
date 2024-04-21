@@ -337,7 +337,7 @@ public:
    *
    * @param  page             return string with the site
    */
-  void siteLogs(String &page);
+  void siteLogs(String &page,uint8_t action);
 
   /**
    * @brief All following methods generates configuration sections

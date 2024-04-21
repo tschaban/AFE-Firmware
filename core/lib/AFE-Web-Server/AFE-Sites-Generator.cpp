@@ -3587,14 +3587,76 @@ void AFESitesGenerator::siteFirmware(String &page, boolean details) {
   }
 }
 
-void AFESitesGenerator::siteLogs(String &page) {
-  char _numberToText[17];
-  openSection(page, F("Log"), F(""));
+void AFESitesGenerator::siteLogs(String &page, uint8_t action) {
+
+  if (action == 1) {
+    Firmware->API->Flash->cleanLogsFile();
+    Firmware->API->Flash->addLog(F("logs:removed"));
+  }
+
+  File f;
+  openSection(page, F(L_LOG_FILES), F(L_LOG_FILES_INFO));
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File logDir = LITTLEFS.open(AFE_FILE_LOG_DIR);
+#else
+  Dir logDir = SPIFFS.openDir(AFE_FILE_LOG_DIR);
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  if (logDir.isDirectory()) {
+    f = logDir.openNextFile();
+    while (f) {
+#else
+  while (logDir.next()) {
+#endif
+
+#if AFE_FILE_SYSTEM != AFE_FS_LITTLEFS
+      f = logDir.openFile("r");
+#endif
+
+      if (f.size() > 0) {
+        page.concat(F("<a href=\"/log?file="));
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+        page.concat(f.name());
+#else
+      page.concat(logDir.fileName());
+#endif
+        page.concat(F("\">"));
+      }
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+      page.concat(f.name());
+#else
+    page.concat(logDir.fileName());
+#endif
+      page.replace(F("/log/"), F(""));
+      if (f.size() > 0) {
+        page.concat(F("</a>"));
+      }
+      page.concat(F(" : "));
+      page.concat(f.size() >= 1024 ? f.size() / 1024 : f.size());
+      page.concat(f.size() >= 1024 ? F("kb") : F("B"));
+      page.concat(F("<br>"));
+      f.close();
+    }
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+    f = logDir.openNextFile();
+  }
+#endif
+
+  page.concat(F("<hr><a href=\"/?o="));
+  page.concat(AFE_CONFIG_SITE_LOGS);
+  page.concat(F("&i=1\">"));
+  page.concat(F(L_LOG_DELETE));
+  page.concat(F("</a>"));
+
+  closeSection(page);
+
+  openSection(page, F(L_LOG_LATEST), F(""));
   page.concat(F("<code>"));
   String _logs;
   Firmware->API->Flash->readLogs(_logs);
-  _logs.replace(F("-n"), F(" => "));
-  _logs.replace(F("-b"), F("<br>"));
+  _logs.replace(F("\n"), F("<br>"));
   page.concat(_logs);
   page.concat(F("</code>"));
   closeSection(page);

@@ -8,8 +8,6 @@
 #include <AFE-Device.h>
 #include <AFE-WiFi.h>
 
-
-
 #ifdef DEBUG
 #include <AFE-Debugger.h>
 #endif
@@ -38,7 +36,6 @@ public:
     AFEDataAccess *Flash = new AFEDataAccess();
   };
 
-
   struct GLOBAL_CONFIGURATION_OBJECTS {
     PRO_VERSION *Pro = new PRO_VERSION;
     FIRMWARE *Version = new FIRMWARE;
@@ -50,7 +47,7 @@ public:
     uint8_t hours;
     uint8_t days;
     uint8_t months;
-    time_t currentTime;
+    // time_t currentTime;
   };
 
   TIMER_OBJECT *timer = new TIMER_OBJECT;
@@ -76,9 +73,8 @@ public:
   void checkFirmwareVersion(void);
   void validateProVersion(void);
   void synchronizeTime(void);
- /* Currently not used. If needed uncomment it */
+  /* Currently not used. If needed uncomment it */
   void getCurrentTime(char *timestamp);
-
 };
 
 #endif

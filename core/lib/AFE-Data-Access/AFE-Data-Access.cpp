@@ -67,37 +67,30 @@ boolean AFEDataAccess::createFile(const char *path) {
 }
 
 boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
-                                const __FlashStringHelper *path, uint8_t id,
-                                boolean createIfNotExists) {
+                                const char *path, boolean createIfNotExists) {
+
 #ifdef DEBUG
   Debugger->printHeader(1, 0, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 
   boolean _status = false;
 
-  char fileName[strlen_P((PGM_P)path) + 1];
-  if (id == AFE_NONE) {
-    sprintf(fileName, (PGM_P)path);
-  } else {
-    sprintf(fileName, (PGM_P)path, id);
-  }
-
 #ifdef DEBUG
   Debugger->printBulletPoint(F("Opening file: "));
-  Debugger->printValue(fileName);
+  Debugger->printValue(path);
 #endif
 
-  _status = fileExist(fileName);
+  _status = fileExist(path);
 
   if (!_status && createIfNotExists) {
-    _status = createFile(fileName);
+    _status = createFile(path);
   }
 
   if (_status) {
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-    openedFile = LITTLEFS.open(fileName, mode);
+    openedFile = LITTLEFS.open(path, mode);
 #else
-    openedFile = SPIFFS.open(fileName, mode);
+    openedFile = SPIFFS.open(path, mode);
 #endif
   }
 
@@ -111,25 +104,88 @@ boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
   return _status;
 }
 
-void AFEDataAccess::addLog(const char *log) {
-  File configFile;
-  if (openFile(configFile, AFE_OPEN_FILE_APPEND, F(AFE_FILE_LOGS))) {
-    char _timestamp[20]; // 1970.01.01 01:01:01
-    time_t t = now();
-    sprintf(_timestamp, (PGM_P)F("%04d.%02d.%02d %02d:%02d:%02d"),
-            year(t) == 1970 ? 0 : year(t), month(t), day(t), hour(t), minute(t),
-            second(t));
-    configFile.print(_timestamp);
-    configFile.print(F("-n"));
-    configFile.print(log);
-    configFile.print(F("-b"));
-    configFile.close();
+boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
+                                const __FlashStringHelper *path, uint8_t id,
+                                boolean createIfNotExists) {
+
+  char fileName[strlen_P((PGM_P)path) + 1];
+  if (id == AFE_NONE) {
+    sprintf(fileName, (PGM_P)path);
+  } else {
+    sprintf(fileName, (PGM_P)path, id);
+  }
+
+  return openFile(openedFile, mode, fileName, createIfNotExists);
+}
+
+/**
+ * @brief Methods related to logs
+ *
+ * @param  log              desc
+ */
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+boolean AFEDataAccess::checkIfFolderExists(const char *dir,
+                                           boolean createdIfNotExsts) {
 
 #ifdef DEBUG
-    Debugger->printBulletPoint(F("Added log: "));
-    Debugger->printValue(log);
+  Debugger->printBulletPoint(F("Checkig if folder "));
+  Serial << dir << F(" exist: ");
 #endif
+
+  boolean _ret = LITTLEFS.exists(dir);
+
+  if (!_ret && createdIfNotExsts) {
+    _ret = LITTLEFS.mkdir(dir);
   }
+
+#ifdef DEBUG
+  Serial << (_ret ? F("Yes") : F("No"));
+#endif
+
+  return _ret;
+}
+#endif
+
+void AFEDataAccess::getLogFileName(char *fileName) {
+  time_t t = now();
+  if (year(t) < 2000) {
+    sprintf(fileName, (PGM_P)F(AFE_FILE_BOOT_LOG));
+  } else {
+    sprintf(fileName, (PGM_P)F(AFE_FILE_LOGS), year(t), month(t), day(t));
+  }
+}
+
+void AFEDataAccess::addLog(const char *log) {
+  char fileName[strlen_P((PGM_P)F(AFE_FILE_LOGS)) + 1];
+  getLogFileName(fileName);
+  File configFile;
+  if (openFile(configFile, AFE_OPEN_FILE_APPEND, fileName)) {
+
+    if (configFile.size() > AFE_LOG_FILE_MAX_SIZE) {
+      configFile.close();
+      openFile(configFile, AFE_OPEN_FILE_WRITING, fileName);
+      configFile.close();
+      addLog(F("log:tuncated:exceededSize"));
+      addLog(log);
+    } else {
+
+      char _timestamp[20]; // 1970.01.01 01:01:01
+      time_t t = now();
+      sprintf(_timestamp, (PGM_P)F("%02d:%02d:%02d"), hour(t), minute(t),
+              second(t));
+      configFile.print(_timestamp);
+      configFile.print(F(" "));
+      configFile.println(log);
+      configFile.close();
+
+#ifdef DEBUG
+      Debugger->printBulletPoint(F("Added log: "));
+      Debugger->printValue(log);
+#endif
+    }
+  }
+
 #ifdef DEBUG
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
@@ -156,24 +212,25 @@ void AFEDataAccess::addLog(const __FlashStringHelper *log, const char *text) {
 
 boolean AFEDataAccess::readLogs(String &logs) {
 
+  char fileName[strlen_P((PGM_P)F(AFE_FILE_LOGS)) + 1];
+  getLogFileName(fileName);
   File configFile;
+
   boolean _ret = false;
 
-  if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_LOGS))) {
+  if (openFile(configFile, AFE_OPEN_FILE_READING, fileName)) {
 
 #ifdef DEBUG
     Debugger->printBulletPoint(F("File size: "));
     Serial << configFile.size();
 #endif
-
-    if (configFile.size() >= AFE_LOG_FILE_MAX_SIZE) {
+    if (configFile.size() >= AFE_LOG_FILE_MAX_SIZE_FOR_DISPLAY) {
 #ifdef DEBUG
-      Debugger->printBulletPoint(F("Warn: File exedeed it's max size"));
+      Debugger->printBulletPoint(
+          F("Warn: File exedeed it's max size to be displayed"));
 #endif
+      logs.concat(F("Log can't be displayed. Too large"));
       configFile.close();
-      cleanLogsFile();
-      addLog(F("log:size:exeeded:%dkB"),
-             (uint16_t)(AFE_LOG_FILE_MAX_SIZE / 1024));
     } else if (configFile.size() > 0) {
       logs = configFile.readString();
       _ret = true;
@@ -194,16 +251,36 @@ boolean AFEDataAccess::readLogs(String &logs) {
 }
 
 void AFEDataAccess::cleanLogsFile() {
-  File configFile;
-  boolean _status = false;
-  if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_LOGS))) {
-    _status = true;
-    configFile.close();
-  }
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  File logDir = LITTLEFS.open("/log");
+#else
+  Dir logDir = SPIFFS.openDir("/log");
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  if (logDir.isDirectory()) {
+    while (logDir.openNextFile()) {
+#else
+  while (logDir.next()) {
+#endif
+
 #ifdef DEBUG
-  Debugger->printBulletPoint(F("Truncating: "));
-  Debugger->printValue(_status ? F("Ok") : F("Failed"));
-  Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
+      Debugger->printBulletPoint(F("Deleting log file: "));
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+      Serial << logDir.name();
+#else
+      Serial << logDir.fileName();
+#endif
+#endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+      LITTLEFS.remove(logDir.name());
+#else
+    SPIFFS.remove(logDir.fileName());
+#endif
+    }
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  }
 #endif
 }
 
@@ -311,7 +388,7 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
 
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_PRO_VERSION_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_PRO_VERSION_CONFIGURATION))) {
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PRO_VERSION> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
@@ -381,7 +458,7 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
 void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_PASSWORD_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_PASSWORD_CONFIGURATION))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -614,7 +691,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_DEVICE_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_DEVICE_CONFIGURATION))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -937,7 +1014,7 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
 void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_FIRMWARE_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_FIRMWARE_CONFIGURATION))) {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1037,8 +1114,7 @@ uint8_t AFEDataAccess::getDeviceMode() {
 }
 void AFEDataAccess::saveDeviceMode(uint8_t mode) {
   File configFile;
-  if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_DEVICE_MODE),
-               AFE_NONE, false)) {
+  if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_DEVICE_MODE))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1167,7 +1243,7 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_NETWORK_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_NETWORK_CONFIGURATION))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1360,7 +1436,7 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
 void AFEDataAccess::saveConfiguration(MQTT *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_MQTT_BROKER_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_MQTT_BROKER_CONFIGURATION))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1471,7 +1547,7 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
 void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_DOMOTICZ_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_DOMOTICZ_CONFIGURATION))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1561,7 +1637,7 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
 void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1650,7 +1726,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_LED_CONFIGURATION),
-               id, false)) {
+               id, true)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1781,7 +1857,7 @@ uint8_t AFEDataAccess::getSystemLedID() {
 void AFEDataAccess::saveSystemLedID(uint8_t id) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_SYSTEM_LED_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_SYSTEM_LED_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1883,7 +1959,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_RELAY_CONFIGURATION), id, false)) {
+               F(AFE_FILE_RELAY_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2139,7 +2215,7 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
 void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_RELAY_STATE_CONFIGURATION), id, false)) {
+               F(AFE_FILE_RELAY_STATE_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2232,7 +2308,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_SWITCH_CONFIGURATION), id, false)) {
+               F(AFE_FILE_SWITCH_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2506,7 +2582,7 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, ADCINPUT *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_ADC_CONFIGURATION),
-               id, false)) {
+               id, true)) {
 #else // AFE_ESP32
 void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
   File configFile;
@@ -2685,7 +2761,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2805,7 +2881,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_CONTACTRON_CONFIGURATION), id, false)) {
+               F(AFE_FILE_CONTACTRON_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2954,7 +3030,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_GATE_CONFIGURATION), id, false)) {
+               F(AFE_FILE_GATE_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3089,7 +3165,7 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_GATE_STATE_CONFIGURATION), id, false)) {
+               F(AFE_FILE_GATE_STATE_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3185,7 +3261,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_REGULATOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_REGULATOR_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3318,7 +3394,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
                                       THERMAL_PROTECTOR *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3456,7 +3532,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_HPMA114S0_CONFIGURATION), id, false)) {
+               F(AFE_FILE_HPMA114S0_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3566,7 +3642,7 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
 void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_UART_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_UART_CONFIGURATION))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3808,7 +3884,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_BMX680_CONFIGURATION), id, false)) {
+               F(AFE_FILE_BMX680_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3992,7 +4068,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
                                       BH1750_CONFIG *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_BH1750_CONFIGURATION), id, false)) {
+               F(AFE_FILE_BH1750_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4112,7 +4188,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_AS3935_CONFIGURATION), id, false)) {
+               F(AFE_FILE_AS3935_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4267,7 +4343,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT_CONFIG *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, DHT_CONFIG *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4428,7 +4504,7 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION))) {
 
 #ifdef DEBUG
     printFileWritingInformation();
@@ -4541,7 +4617,7 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
 void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4650,7 +4726,7 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 void AFEDataAccess::save(RAINMETER_DATA *data) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_RAINMETER_SENSOR_DATA), AFE_NONE, false)) {
+               F(AFE_FILE_RAINMETER_SENSOR_DATA))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4784,7 +4860,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
                                       BINARY_SENSOR *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4923,7 +4999,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5048,7 +5124,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id, false)) {
+               F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5207,7 +5283,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_LED_CONFIGURATION),
-               id, false)) {
+               id, true)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5346,7 +5422,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
                                       CLED_EFFECT_BLINKING *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id, false)) {
+               F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5467,7 +5543,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
                                       CLED_EFFECT_WAVE *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id, false)) {
+               F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5580,7 +5656,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
                                       CLED_EFFECT_FADE_INOUT *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id, false)) {
+               F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5710,7 +5786,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_TSL2561_CONFIGURATION), id, false)) {
+               F(AFE_FILE_TSL2561_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5837,7 +5913,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
 void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_MCP23XXX_CONFIGURATION), id, false)) {
+               F(AFE_FILE_MCP23XXX_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5958,7 +6034,7 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
                                       FS3000_CONFIG *configuration) {
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_FS3000_CONFIGURATION), id, false)) {
+               F(AFE_FILE_FS3000_CONFIGURATION), id)) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -6077,8 +6153,8 @@ uint16_t AFEDataAccess::getRebootCounter(boolean increase) {
 
 void AFEDataAccess::saveRebootCounter(unsigned long counter) {
   File configFile;
-  if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_REBOOTS_COUNTER),
-               AFE_NONE, false)) {
+  if (openFile(configFile, AFE_OPEN_FILE_WRITING,
+               F(AFE_FILE_REBOOTS_COUNTER))) {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -6153,7 +6229,7 @@ void AFEDataAccess::printFileCreatingInformation(
 boolean AFEDataAccess::initializeFileSystem() {
   boolean _ret;
 #ifdef DEBUG
-  Debugger->printInformation(F("Mounting file system..."), F("FS"));
+  Debugger->printBulletPoint(F("Mounting file system: "));
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -6168,11 +6244,18 @@ boolean AFEDataAccess::initializeFileSystem() {
 
 #ifdef DEBUG
   if (_ret) {
-    Debugger->printValue(F("Success"));
+    Debugger->printValue(F("OK"));
   } else {
-    Debugger->printValue(F(" ... FAILURE"), 1);
+    Debugger->printValue(F("FAILURE"));
   }
 #endif
+
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  if (_ret) {
+    checkIfFolderExists(AFE_FILE_LOG_DIR);
+  }
+#endif  
+
 
   return _ret;
 }

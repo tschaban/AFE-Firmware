@@ -6,6 +6,7 @@ void handleFavicon(void);
 void handleHTTPRequests(void);
 void handleUpload(void);
 void handleOnNotFound(void);
+void handleDownloaLogdFile(void);
 void initializeHTTPServer(void);
 
 /* --------- Body -----------*/
@@ -25,10 +26,15 @@ void handleOnNotFound(void) {
   HTTPServer->server.send(404, "text/plain", F(L_404));
 }
 
+void handleDownloadLogFile(void) {
+   HTTPServer->downloadLogFile();
+}
+
 void initializeHTTPServer(void) {
   /* Initializing HTTP HTTPServer */
   HTTPServer->handle("/", handleHTTPRequests);
   HTTPServer->handle("/favicon.ico", handleFavicon);
+  HTTPServer->handle("/log", handleDownloadLogFile);
   HTTPServer->handleFirmwareUpgrade("/upgrade", handleHTTPRequests,
                                     handleUpload);
   HTTPServer->onNotFound(handleOnNotFound);

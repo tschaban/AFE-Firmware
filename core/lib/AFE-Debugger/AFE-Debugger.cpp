@@ -250,7 +250,6 @@ void AFEDebugger::getFirmwareFlashInformation() {
   uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
 #endif // AFE_ESP32
 
-  printInformation(F("Firmware"), F("FLASH"));
   printBulletPoint(F("Current: "));
   Serial << (ESP.getSketchSize() / 1024) << F("Kb");
   printBulletPoint(F("Available space: "));

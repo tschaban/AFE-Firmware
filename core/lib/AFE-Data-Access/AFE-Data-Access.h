@@ -66,16 +66,24 @@ public:
   /* Generic files processing methods */
   boolean fileExist(const char *path);
   boolean createFile(const char *path);
+
   boolean openFile(File &openedFile, const char *mode,
                    const __FlashStringHelper *path, uint8_t id = AFE_NONE,
                    boolean createIfNotExists = true);
 
+  boolean openFile(File &openedFile, const char *mode, const char *path,
+                   boolean createIfNotExists = true);
 
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+  boolean checkIfFolderExists(const char *, boolean createdIfNotExsts = true);
+#endif
+
+  void getLogFileName(char *);
   void addLog(const char *);
   void addLog(const __FlashStringHelper *);
   void addLog(const __FlashStringHelper *, const char *);
-  void addLog(const __FlashStringHelper *, uint16_t number, uint8_t intSize = 8);
-
+  void addLog(const __FlashStringHelper *, uint16_t number,
+              uint8_t intSize = 8);
   boolean readLogs(String &logs);
   void cleanLogsFile();
 

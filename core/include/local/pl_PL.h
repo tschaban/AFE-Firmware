@@ -347,7 +347,11 @@
 #define L_UPGRADE_NO_SPACE "Aktualizacja nie powiodła się. Za mało miejsca, aby rozpocząć ładowanie firmware"
 #define L_UPGRADE_NO_CONTENT "Aktualizacja nie powiodła się. Błąd z serwerem oprogramowania [Brak odpowiedzi]"
 
-
+/* Site Logs */
+#define L_LOG_FILES "Logi"
+#define L_LOG_FILES_INFO "Wybierz, aby pobrać"
+#define L_LOG_DELETE "Usuń wszystkie logi"
+#define L_LOG_LATEST "Dzisiejsze logi"
 
 
 /* Form: password */

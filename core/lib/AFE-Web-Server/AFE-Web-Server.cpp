@@ -46,7 +46,7 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
     Site.siteFirmware(page, true);
     break;
   case AFE_CONFIG_SITE_LOGS:
-    Site.siteLogs(page);
+    Site.siteLogs(page, siteConfig->deviceID);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME:
     Site.siteNetwork(page);
@@ -854,7 +854,7 @@ uint8_t AFEWebServer::getID() {
   if (server.hasArg(F("i"))) {
     return server.arg(F("i")).toInt();
   } else {
-    return -1;
+    return AFE_NONE;
   }
 }
 
@@ -942,6 +942,64 @@ void AFEWebServer::onNotFound(WebServer::THandlerFunction fn) {
   server.onNotFound(fn);
 }
 #endif
+
+void AFEWebServer::downloadLogFile() {
+
+#ifdef DEBUG
+  Firmware->Debugger->printHeader(1, 0, 72, AFE_DEBUG_HEADER_TYPE_DASH);
+  Firmware->Debugger->printBulletPoint(F("Downloading Log file"));
+#endif
+
+  if (server.args() > 0) {
+    if (server.hasArg(F("file"))) {
+
+#ifdef DEBUG
+      Firmware->Debugger->printBulletPoint(F("File: "));
+      Serial << F("/log/") << server.arg(F("file"));
+#endif
+#if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
+      File dataFile = LITTLEFS.open("/log/" + server.arg(F("file")), "r");
+#else
+      File dataFile = SPIFFS.open("/log/" + server.arg(F("file")), "r");
+#endif
+      if (dataFile) {
+#ifdef DEBUG
+        Firmware->Debugger->printBulletPoint(F("Downloading: "));
+#endif
+        if (dataFile.available()) {
+          String dataType = "application/octet-stream";
+          server.sendHeader("Content-Type", "text/text");
+          server.sendHeader("Content-Disposition",
+                            "attachment; filename=" + server.arg(F("file")));
+          server.sendHeader("Connection", "close");
+          if (server.streamFile(dataFile, dataType) != dataFile.size()) {
+#ifdef DEBUG
+            Firmware->Debugger->printValue(F("Sent less data than expected!"));
+#endif
+          }
+        }
+        dataFile.close(); // close the file:
+#ifdef DEBUG
+        Firmware->Debugger->printValue(F("OK"));
+      } else {
+        Firmware->Debugger->printBulletPoint(F("Error: File doesn't exist"));
+#endif
+      }
+#ifdef DEBUG
+    } else {
+      Firmware->Debugger->printBulletPoint(
+          F("Error: Argument file doesn't exist"));
+#endif
+    }
+#ifdef DEBUG
+  } else {
+    Firmware->Debugger->printBulletPoint(F("Error: No arguments in the URL"));
+#endif
+  }
+#ifdef DEBUG
+  Firmware->Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
+#endif
+}
 
 /* Upgrade methods */
 
@@ -1054,7 +1112,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
         getHeaderValue(line, F("content-disposition: attachment; filename="))
             .toCharArray(firmwareFileName, AFE_FIRMARE_FILE_NAME_LENGTH);
 #ifdef DEBUG
-        Firmware->Debugger->printInformation(F("Firmware file name: "),
+        Firmware->Debugger->printInformation(F("File: "),
                                              F("UPGRADE"));
         Firmware->Debugger->printValue(firmwareFileName);
 
@@ -1076,6 +1134,7 @@ boolean AFEWebServer::upgradeOTAWAN(uint16_t firmwareId) {
     Firmware->Debugger->printInformation(
         F("Upgrade started. Device might be quite for a while"), F("UPGRADE"));
 #endif
+
     if (Update.begin(contentLength)) {
       size_t written = Update.writeStream(WirelessClient);
 
@@ -1147,16 +1206,20 @@ boolean AFEWebServer::upgradOTAFile(void) {
 #endif
 
 #ifdef DEBUG
-    Firmware->Debugger->printHeader();
-    Firmware->Debugger->printInformation(F("Firmware file name: "),
-                                         F("UPGRADE"));
+    Firmware->Debugger->printHeader(1, 0);
+    Firmware->Debugger->printBulletPoint(F("Upgrading firmware"));
+    Firmware->Debugger->printBulletPoint(F("File: "));
     Serial << upload.filename.c_str();
     Firmware->Debugger->getFirmwareFlashInformation();
-    Firmware->Debugger->printInformation(F(">"), F("UPGRADE"));
 #endif
 
-#ifdef AFE_ESP32 // TODO can be moved to other class, is used also in debug
-                 // class
+    Firmware->API->Flash->cleanLogsFile();
+
+#ifdef DEBUG
+    Firmware->Debugger->printBulletPoint(F("Upgrading: "));
+#endif
+
+#ifdef AFE_ESP32
     uint32_t maxSketchSpace = UPDATE_SIZE_UNKNOWN;
 #else  // ESP8266
     uint32_t maxSketchSpace = (ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000;
@@ -1164,6 +1227,7 @@ boolean AFEWebServer::upgradOTAFile(void) {
 
     if (!Update.begin(maxSketchSpace)) {
 #ifdef DEBUG
+      Firmware->Debugger->printBulletPoint(F("Error: "));
       Update.printError(Serial);
 #endif
     }
@@ -1178,7 +1242,7 @@ boolean AFEWebServer::upgradOTAFile(void) {
 
     if (Update.write(upload.buf, upload.currentSize) != upload.currentSize) {
 #ifdef DEBUG
-      Serial << endl;
+      Firmware->Debugger->printBulletPoint(F("Error: "));
       Update.printError(Serial);
 #endif
     }
@@ -1187,24 +1251,37 @@ boolean AFEWebServer::upgradOTAFile(void) {
       // progress
       _success = true;
 #ifdef DEBUG
-      Firmware->Debugger->printInformation(F("Success. New firmware size: "),
-                                           F("UPGRADE"));
+      Firmware->Debugger->printBulletPoint(F("Completed"));
+      Firmware->Debugger->printBulletPoint(F("New firmware size: "));
       Serial << upload.totalSize;
-      Firmware->Debugger->printHeader();
-      Firmware->Debugger->printInformation(F("Rebooting..."), F("UPGRADE"));
+      Firmware->Debugger->printBulletPoint(F("Rebooting..."));
+
+      Firmware->Debugger->printHeader(1, 0);
+
+      char _text[strlen_P((PGM_P)F("firmware:name:%s")) +
+                 upload.filename.length()];
+
+      Firmware->API->Flash->addLog(F("firmware:upgraded"));
+      sprintf(_text, (PGM_P)F("firmware:name:%s"), upload.filename.c_str());
+      Firmware->API->Flash->addLog(_text);
+      sprintf(_text, (PGM_P)F("firmware:size:%dkB"), upload.totalSize / 1024);
+      Firmware->API->Flash->addLog(_text);
+
 #endif
     }
 #ifdef DEBUG
     else {
+      Firmware->Debugger->printBulletPoint(F("Error: "));
       Update.printError(Serial);
     }
 #endif
   } else if (upload.status == UPLOAD_FILE_ABORTED) {
     Update.end();
 #ifdef DEBUG
-    Firmware->Debugger->printError(F("Update was aborted"), F("UPGRADE"));
+    Firmware->Debugger->printBulletPoint(F("Warning: Update was aborted"));
 #endif
   }
+
   return _success;
 }
 
