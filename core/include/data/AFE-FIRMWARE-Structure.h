@@ -3,7 +3,7 @@
 #ifndef _AFE_FIRMWARE_Structure_h
 #define _AFE_FIRMWARE_Structure_h
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct FIRMWARE {
   char version[10];

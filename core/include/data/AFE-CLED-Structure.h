@@ -13,7 +13,7 @@
 #endif
 #include <AFE-MQTT-Structure.h>
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct CLED_STRIP {
   uint16_t numberOfLEDs;

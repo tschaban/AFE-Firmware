@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct RELAY_DEFAULTS {
   uint8_t powerOn;

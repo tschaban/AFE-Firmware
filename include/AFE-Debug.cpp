@@ -12,14 +12,17 @@ void getFileSystemInfo();
 #endif
 void getESPInformation();
 
-void debugListener() {
+void debugListener()
+{
   unsigned long time = millis();
 
-  if (debugStartTime == 0) { // starting timer. used for switch sensitiveness
+  if (debugStartTime == 0)
+  { // starting timer. used for switch sensitiveness
     debugStartTime = time;
   }
 
-  if (time - debugStartTime >= DEBUG_INTERVAL * 1000) {
+  if (time - debugStartTime >= DEBUG_INTERVAL * 1000)
+  {
     getAvailableMem();
 #if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
     getFileSystemInfo();
@@ -28,13 +31,22 @@ void debugListener() {
   }
 }
 
-void getAvailableMem() {
+void getAvailableMem()
+{
   Serial << endl
-         << F("INFO: RAM: ") << system_get_free_heap_size() / 1024 << F("kB");
+         << F("INFO: RAM: ") <<
+#ifdef AFE_ESP32
+      esp_get_free_heap_size()
+#else
+      system_get_free_heap_size()
+#endif
+          / 1024
+         << F("kB");
 }
 
 #if AFE_FILE_SYSTEM == AFE_FS_SPIFFS
-void getFileSystemInfo() {
+void getFileSystemInfo()
+{
   FSInfo fileSystem;
   SPIFFS.info(fileSystem);
   Serial << endl
@@ -44,46 +56,65 @@ void getFileSystemInfo() {
 }
 #endif
 
-void getESPInformation() {
+void getESPInformation()
+{
 
 #ifndef AFE_ESP32 /* ESP82xx */
   getAvailableMem();
-  Serial << endl << F("INFO: ESP: ID ") << ESP.getFlashChipId();
-  Serial << endl << F("INFO: ESP: Real flash size: ");
-  if (ESP.getFlashChipRealSize() >= 1048576) {
+  Serial << endl
+         << F("INFO: ESP: ID ") << ESP.getFlashChipId();
+  Serial << endl
+         << F("INFO: ESP: Real flash size: ");
+  if (ESP.getFlashChipRealSize() >= 1048576)
+  {
     Serial << (ESP.getFlashChipRealSize() / 1048576) << F(" Mbits");
-  } else {
+  }
+  else
+  {
     Serial << (ESP.getFlashChipRealSize() / 1024) << F(" Kbits");
   }
 
-  Serial << endl << F("INFO: ESP: Flesh size: ");
-  if (ESP.getFlashChipSize() >= 1048576) {
+  Serial << endl
+         << F("INFO: ESP: Flesh size: ");
+  if (ESP.getFlashChipSize() >= 1048576)
+  {
     Serial << (ESP.getFlashChipSize() / 1048576) << F(" Mbits");
-  } else {
+  }
+  else
+  {
     Serial << (ESP.getFlashChipSize() / 1024) << F(" Kbits");
   }
 
   Serial << endl
          << F("INFO: ESP: Speed ") << (ESP.getFlashChipSpeed() / 1000000)
          << F(" MHz");
-  Serial << endl << F("INFO: ESP: Mode ") << ESP.getFlashChipMode() << endl;
+  Serial << endl
+         << F("INFO: ESP: Mode ") << ESP.getFlashChipMode() << endl;
 
 #else  /* ESP32 */
-  Serial << endl << F("INFO: ESP: Chip Model ") << ESP.getChipModel();
-  Serial << endl << F("INFO: ESP: Cores: ") << ESP.getChipCores();
+  Serial << endl
+         << F("INFO: ESP: Chip Model ") << ESP.getChipModel();
+  Serial << endl
+         << F("INFO: ESP: Cores: ") << ESP.getChipCores();
   Serial << endl
          << F("INFO: ESP: CPU Frequency: ") << ESP.getCpuFreqMHz() << F("Mhz");
-  Serial << endl << F("INFO: ESP: Flesh size: ");
-  if (ESP.getFlashChipSize() >= 1048576) {
+  Serial << endl
+         << F("INFO: ESP: Flesh size: ");
+  if (ESP.getFlashChipSize() >= 1048576)
+  {
     Serial << (ESP.getFlashChipSize() / 1048576) << F(" Mbits");
-  } else {
+  }
+  else
+  {
     Serial << (ESP.getFlashChipSize() / 1024) << F(" Kbits");
   }
   Serial << endl
          << F("INFO: ESP: Speed ") << (ESP.getFlashChipSpeed() / 1000000)
          << F(" MHz");
-  Serial << endl << F("INFO: ESP: Mode ") << ESP.getFlashChipMode() << endl;
-  Serial << endl << F("INFO: ESP: Firmware size: ") << ESP.getSketchSize();
+  Serial << endl
+         << F("INFO: ESP: Mode ") << ESP.getFlashChipMode() << endl;
+  Serial << endl
+         << F("INFO: ESP: Firmware size: ") << ESP.getSketchSize();
   Serial << endl
          << F("INFO: ESP: Firmware free space size: ")
          << ESP.getFreeSketchSpace();

@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_I2C
 
-#include <arduino.h>
+#include <Arduino.h>
 
 #include <AFE-Data-Access.h>
 #include <Wire.h>

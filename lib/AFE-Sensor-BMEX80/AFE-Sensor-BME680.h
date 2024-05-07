@@ -10,7 +10,7 @@
 #include <AFE-I2C-Structure.h>
 #include <EEPROM.h>
 #include <Wire.h>
-#include <arduino.h>
+#include <Arduino.h>
 #include <bsec.h>
 
 

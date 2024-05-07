@@ -1,7 +1,7 @@
 #ifndef _AFE_files_h
 #define _AFE_files_h
 
-#include <arduino.h>
+#include <Arduino.h> // Include the correct Arduino library
 
 /* ***************** FILESYSTEM *********************/
 #define AFE_FS_SPIFFS 0

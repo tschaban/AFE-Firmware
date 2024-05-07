@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct BINARY_SENSOR {
   char name[17];

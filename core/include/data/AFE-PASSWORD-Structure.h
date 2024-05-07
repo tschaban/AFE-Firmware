@@ -3,7 +3,7 @@
 #ifndef _AFE_PASSWORD_Structure_h
 #define _AFE_PASSWORD_Structure_h
 
-#include <arduino.h>
+#include <Arduino.h>
 
 struct PASSWORD {
   boolean protect;

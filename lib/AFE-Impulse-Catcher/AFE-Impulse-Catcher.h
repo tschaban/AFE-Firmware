@@ -7,7 +7,7 @@
 
 #if defined(AFE_CONFIG_HARDWARE_ANEMOMETER) || defined(AFE_CONFIG_HARDWARE_RAINMETER)
 
-#include <arduino.h>
+#include <Arduino.h>
 #include <AFE-Data-Access.h>
 #include <AFE-Device.h>
 

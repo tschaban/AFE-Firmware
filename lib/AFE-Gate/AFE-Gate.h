@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
-#include <arduino.h>
+#include <Arduino.h>
 
 #include <AFE-Contactron.h>
 #include <AFE-Data-Access.h>

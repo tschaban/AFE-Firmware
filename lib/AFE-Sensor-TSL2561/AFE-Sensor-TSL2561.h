@@ -6,7 +6,7 @@
 #include <AFE-Configuration.h>
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
 
-#include <arduino.h>
+#include <Arduino.h>
 
 #include <AFE-Data-Access.h>
 #include <AFE-I2C-Scanner.h>
