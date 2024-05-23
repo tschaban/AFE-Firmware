@@ -23,7 +23,10 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device,
 
   for (uint8_t i = 0; i < Device->configuration.noOfMCP23xxx; i++) {
 
+
 #ifdef AFE_ESP32
+
+
     if (configuration[i].wirePortId == AFE_CONFIG_HARDWARE_I2C_0) {
       I2CScanner.begin(_WirePort0);
     } else {
@@ -33,7 +36,10 @@ void AFEMCP23017Broker::begin(AFEDataAccess *Data, AFEDevice *Device,
     I2CScanner.begin(_WirePort0);
 #endif
 
+
+
     Data->getConfiguration(i, &configuration[i]);
+
 
     if (I2CScanner.scan(configuration[i].address)) {
 

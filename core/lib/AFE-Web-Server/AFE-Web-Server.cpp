@@ -1637,7 +1637,7 @@ void AFEWebServer::get(SWITCH &data) {
                            ? server.arg(F("f")).toInt()
                            : AFE_SWITCH_FUNCTIONALITY_NONE;
 
-  data.gpio = server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt() : 0;
+  data.gpio = server.arg(F("g")).length() > 0 ? server.arg(F("g")).toInt() : AFE_HARDWARE_ITEM_NOT_EXIST;
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   data.relayID = server.arg(F("r")).length() > 0 ? server.arg(F("r")).toInt()
                                                  : AFE_HARDWARE_ITEM_NOT_EXIST;

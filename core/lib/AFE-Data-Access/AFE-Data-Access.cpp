@@ -2296,7 +2296,10 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
-      configuration->gpio = root["gpio"].as<int>();
+    //  Serial << endl << "Reading file: root gpio: " << root["gpio"];
+
+      configuration->gpio = root["gpio"];
+
       configuration->type = root["type"];
       configuration->sensitiveness = root["sensitiveness"];
       configuration->functionality = root["functionality"];
@@ -5888,7 +5891,7 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
       configuration->gpio = root["gpio"].as<int>();
       configuration->ledNumbers = root["ledNumbers"].as<int>();
-      
+
       configuration->on.color.red = root["on"]["c"]["r"].as<int>();
       configuration->on.color.green = root["on"]["c"]["g"].as<int>();
       configuration->on.color.blue = root["on"]["c"]["b"].as<int>();
