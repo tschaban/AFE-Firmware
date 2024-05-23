@@ -1593,7 +1593,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ /* API: Domoticz */
   addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
-                 configuration->domoticz.idx);
+                 &configuration->domoticz.idx);
 #else  /* Home Assistant and Standard API */
   addAPIsSection(page, F(L_SWITCH_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
                  L_MQTT_TOPIC, configuration->mqtt.topic);
