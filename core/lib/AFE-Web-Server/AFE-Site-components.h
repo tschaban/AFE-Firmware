@@ -44,7 +44,7 @@ const char HTTP_MENU_SUBITEMS_HEADER[] PROGMEM =
 
 const char HTTP_MENU_SUBITEM[] PROGMEM =
     "<li class=\"itm\"><a href=\"/?o={{s.i}}&i={{i.D}}\">&#8227; "
-    "{{i.i}}: {{i.y}}</a></li>";
+    "{{i.i}}{{i.y}}</a></li>";
 
 #ifndef AFE_ESP32
 const uint8_t GPIOS[] PROGMEM = {0, 1, 2, 3, 4, 5, 9, 10, 12, 13, 14, 15, 16};

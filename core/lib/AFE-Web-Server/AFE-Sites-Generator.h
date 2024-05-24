@@ -2,6 +2,7 @@
 #define _AFE_Sites_Generator_h
 
 #include <AFE-Firmware.h>
+#include <AFE-Hardware.h>
 #include <AFE-Site-components.h>
 #include <Arduino.h>
 
@@ -41,16 +42,13 @@
 #include <en_EN.h>
 #endif
 
-class AFESitesGenerator {
+class AFESitesGenerator
+{
 
 private:
   AFEFirmware *Firmware;
+  AFEHardware *Hardware;
   String _HtmlResponse;
-
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  AFEWireContainer *WirePort;
-  void begin(AFEFirmware *);
-#endif // AFE_CONFIG_HARDWARE_I2C
 
   void generateHeader(String &page, uint16_t redirect);
 
@@ -90,20 +88,20 @@ private:
   void closeMessageSection(String &page);
 
   /**
- * @brief Generates HTML <input> tag
- *
- * @param  item             return string with generated tag
- * @param  type             type of the input
- * @param  name             name if the input itme
- * @param  label            desc
- * @param  value            value of the input
- * @param  size             size of the input
- * @param  min              minimal value if a number
- * @param  max              maximum value if a number
- * @param  step             step if a number value
- * @param  hint             hint text
- * @param  readonly         if true then input is readonly
- */
+   * @brief Generates HTML <input> tag
+   *
+   * @param  item             return string with generated tag
+   * @param  type             type of the input
+   * @param  name             name if the input itme
+   * @param  label            desc
+   * @param  value            value of the input
+   * @param  size             size of the input
+   * @param  min              minimal value if a number
+   * @param  max              maximum value if a number
+   * @param  step             step if a number value
+   * @param  hint             hint text
+   * @param  readonly         if true then input is readonly
+   */
   void addInputFormItem(String &item, const char *type, const char *name,
                         const char *label, const char *value,
                         const char *size = AFE_FORM_ITEM_SKIP_PROPERTY,
@@ -146,11 +144,13 @@ private:
   void addMenuItemExternal(String &item, const __FlashStringHelper *title,
                            const __FlashStringHelper *url);
   void addMenuHeaderItem(String &item, const __FlashStringHelper *title);
-  void addMenuSubItem(String &item, const char *title, uint8_t numberOfItems,
+  void addMenuSubItem(String &item, const char *title, uint8_t itemId,
+                      uint8_t siteId, boolean realTitle = false);
+  void addMenuSubItems(String &item, const char *title, uint8_t numberOfItems,
                       uint8_t siteId);
 
   /* Item: HTML <select> populated with GPIOs
-  */
+   */
   void addListOfGPIOs(String &item, const __FlashStringHelper *field,
                       uint8_t selected, const char *title = "GPIO",
                       boolean generatedADCGpios = false);
@@ -250,13 +250,7 @@ public:
    * @brief Construct a new AFESitesGenerator object
    *
    */
-  AFESitesGenerator();
-
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  void begin(AFEFirmware *, AFEWireContainer *);
-#else
-  void begin(AFEFirmware *);
-#endif // AFE_CONFIG_HARDWARE_I2C
+  AFESitesGenerator(AFEFirmware *_Firmware, AFEHardware *_Hardware);
 
   /**
    * @brief Method generates site header with menu. When redirect param is diff
@@ -281,10 +275,10 @@ public:
   void generateFooter(String &page, boolean extended = false);
 
   /**
- * @brief replace all {{attributes}}
- *
- * @param  page             site with replaced attributes
- */
+   * @brief replace all {{attributes}}
+   *
+   * @param  page             site with replaced attributes
+   */
   void setAttributes(String *page);
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
@@ -337,7 +331,7 @@ public:
    *
    * @param  page             return string with the site
    */
-  void siteLogs(String &page,uint8_t action);
+  void siteLogs(String &page, uint8_t action);
 
   /**
    * @brief All following methods generates configuration sections

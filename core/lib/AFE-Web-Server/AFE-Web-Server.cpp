@@ -9,11 +9,6 @@ AFEWebServer::AFEWebServer(AFEFirmware *_Firmware, AFEHardware *_Hardware) {
 
 void AFEWebServer::begin() {
   server.begin(80);
-#ifdef AFE_CONFIG_HARDWARE_I2C
-  Site.begin(Firmware, Hardware->WirePort);
-#else
-  Site.begin(Firmware);
-#endif // AFE_CONFIG_HARDWARE_I2C
 }
 
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
@@ -21,9 +16,9 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 
   /*
     if (siteConfig->twoColumns) {
-      Site.generateMenu(page, siteConfig->rebootTime);
+      Site->generateMenu(page, siteConfig->rebootTime);
     } else {
-      Site.generateEmptyMenu(page, siteConfig->rebootTime);
+      Site->generateEmptyMenu(page, siteConfig->rebootTime);
     }
   */
   if (siteConfig->form) {
@@ -40,213 +35,213 @@ String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
 
   switch (siteConfig->ID) {
   case AFE_CONFIG_SITE_INDEX:
-    Site.siteIndex(page, siteConfig->deviceID == -1 ? true : false);
+    Site->siteIndex(page, siteConfig->deviceID == -1 ? true : false);
     break;
   case AFE_CONFIG_SITE_INDEX_MONITOR:
-    Site.siteFirmware(page, true);
+    Site->siteFirmware(page, true);
     break;
   case AFE_CONFIG_SITE_LOGS:
-    Site.siteLogs(page, siteConfig->deviceID);
+    Site->siteLogs(page, siteConfig->deviceID);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME:
-    Site.siteNetwork(page);
+    Site->siteNetwork(page);
     break;
   case AFE_CONFIG_SITE_FIRST_TIME_CONNECTING:
-    Site.siteConnecting(page);
+    Site->siteConnecting(page);
     break;
   case AFE_CONFIG_SITE_DEVICE:
-    Site.siteDevice(page);
+    Site->siteDevice(page);
     break;
   case AFE_CONFIG_SITE_NETWORK:
-    Site.siteNetwork(page);
+    Site->siteNetwork(page);
     break;
   case AFE_CONFIG_SITE_MQTT:
-    Site.siteMQTTBroker(page);
+    Site->siteMQTTBroker(page);
     break;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   case AFE_CONFIG_SITE_DOMOTICZ:
-    Site.siteDomoticzServer(page);
+    Site->siteDomoticzServer(page);
     break;
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
   case AFE_CONFIG_SITE_HOME_ASSISTANT_INTEGRATION:
-    Site.siteHomeAssistantDiscoveryConfiguration(page);
+    Site->siteHomeAssistantDiscoveryConfiguration(page);
     break;
 #endif
 
   case AFE_CONFIG_SITE_PASSWORD:
-    Site.sitePassword(page);
+    Site->sitePassword(page);
     break;
   case AFE_CONFIG_SITE_PRO_VERSION:
-    Site.siteProKey(page);
+    Site->siteProKey(page);
     break;
   case AFE_CONFIG_SITE_EXIT:
-    Site.siteExit(page, siteConfig->rebootMode);
+    Site->siteExit(page, siteConfig->rebootMode);
     break;
   case AFE_CONFIG_SITE_RESET:
-    Site.siteReset(page);
+    Site->siteReset(page);
     break;
   case AFE_CONFIG_SITE_POST_RESET:
-    Site.sitePostReset(page);
+    Site->sitePostReset(page);
     break;
   case AFE_CONFIG_SITE_FIRMWARE:
-    Site.siteFirmware(page);
+    Site->siteFirmware(page);
     break;
 
 #ifndef AFE_CONFIG_OTA_NOT_UPGRADABLE
   case AFE_CONFIG_SITE_UPGRADE:
-    Site.siteUpgrade(page);
+    Site->siteUpgrade(page);
     break;
   case AFE_CONFIG_SITE_POST_UPGRADE:
-    Site.sitePostUpgrade(page, upgradeSuccess);
+    Site->sitePostUpgrade(page, upgradeSuccess);
     break;
   case AFE_CONFIG_SITE_WAN_UPGRADE:
-    Site.siteWANUpgrade(page, F(L_UPGRADE_IN_PROGRESS));
+    Site->siteWANUpgrade(page, F(L_UPGRADE_IN_PROGRESS));
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_RELAY
   case AFE_CONFIG_SITE_RELAY:
-    Site.siteRelay(page, siteConfig->deviceID);
+    Site->siteRelay(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
   case AFE_CONFIG_SITE_SWITCH:
-    Site.siteSwitch(page, siteConfig->deviceID);
+    Site->siteSwitch(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
   case AFE_CONFIG_SITE_ANALOG_INPUT:
 #ifdef AFE_ESP32
-    Site.siteADCInput(page, siteConfig->deviceID);
+    Site->siteADCInput(page, siteConfig->deviceID);
 #else  // ESP8266
-    Site.siteADCInput(page);
+    Site->siteADCInput(page);
 #endif // AFE_ESP32
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
   case AFE_CONFIG_SITE_CONTACTRON:
-    Site.siteContactron(page, siteConfig->deviceID);
+    Site->siteContactron(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_GATE
   case AFE_CONFIG_SITE_GATE:
-    Site.siteGate(page, siteConfig->deviceID);
+    Site->siteGate(page, siteConfig->deviceID);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_UART
   case AFE_CONFIG_SITE_UART:
-    Site.siteUARTBUS(page);
+    Site->siteUARTBUS(page);
     break;
 #endif
 #ifdef AFE_CONFIG_HARDWARE_I2C
   case AFE_CONFIG_SITE_I2C:
 #ifdef AFE_ESP32
-    Site.siteI2CBUS(page, siteConfig->deviceID);
+    Site->siteI2CBUS(page, siteConfig->deviceID);
 #else
-    Site.siteI2CBUS(page);
+    Site->siteI2CBUS(page);
 #endif
     break;
 #endif // AFE_CONFIG_HARDWARE_I2C
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
   case AFE_CONFIG_SITE_BMEX80:
-    Site.siteBMEX80Sensor(page, siteConfig->deviceID);
+    Site->siteBMEX80Sensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_BMEX80
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
   case AFE_CONFIG_SITE_HPMA115S0:
-    Site.siteHPMA115S0Sensor(page, siteConfig->deviceID);
+    Site->siteHPMA115S0Sensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 #ifdef AFE_CONFIG_HARDWARE_BH1750
   case AFE_CONFIG_SITE_BH1750:
-    Site.siteBH1750Sensor(page, siteConfig->deviceID);
+    Site->siteBH1750Sensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_BH1750
 #ifdef AFE_CONFIG_HARDWARE_AS3935
   case AFE_CONFIG_SITE_AS3935:
-    Site.siteAS3935Sensor(page, siteConfig->deviceID);
+    Site->siteAS3935Sensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_AS3935
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
   case AFE_CONFIG_SITE_DS18B20:
-    Site.siteDS18B20Sensor(page, siteConfig->deviceID);
+    Site->siteDS18B20Sensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 #ifdef AFE_CONFIG_HARDWARE_DHT
   case AFE_CONFIG_SITE_DHT:
-    Site.siteDHTSensor(page, siteConfig->deviceID);
+    Site->siteDHTSensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_DHT
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
   case AFE_CONFIG_SITE_ANEMOMETER_SENSOR:
-    Site.siteAnemometerSensor(page);
+    Site->siteAnemometerSensor(page);
     break;
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
   case AFE_CONFIG_SITE_RAINMETER_SENSOR:
-    Site.siteRainmeterSensor(page);
+    Site->siteRainmeterSensor(page);
     break;
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 #ifdef AFE_CONFIG_HARDWARE_LED
   case AFE_CONFIG_SITE_LED:
-    Site.siteLED(page, siteConfig->deviceID);
+    Site->siteLED(page, siteConfig->deviceID);
     break;
   case AFE_CONFIG_SITE_SYSTEM_LED:
-    Site.siteSystemLED(page);
+    Site->siteSystemLED(page);
     break;
 #endif // AFE_CONFIG_HARDWARE_LED
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
   case AFE_CONFIG_SITE_REGULATOR:
-    Site.siteRegulator(page, siteConfig->deviceID);
+    Site->siteRegulator(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_FUNCTIONALITY_REGULATOR
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
   case AFE_CONFIG_SITE_THERMAL_PROTECTOR:
-    Site.siteThermalProtector(page, siteConfig->deviceID);
+    Site->siteThermalProtector(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
   case AFE_CONFIG_SITE_BINARY_SENSOR:
-    Site.siteBinarySensor(page, siteConfig->deviceID);
+    Site->siteBinarySensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_BINARY_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
   case AFE_CONFIG_SITE_PN532_SENSOR:
-    Site.sitePN532Sensor(page, siteConfig->deviceID);
+    Site->sitePN532Sensor(page, siteConfig->deviceID);
     break;
   case AFE_CONFIG_SITE_PN532_SENSOR_ADMIN:
-    Site.sitePN532SensorAdmin(page, siteConfig->deviceID);
+    Site->sitePN532SensorAdmin(page, siteConfig->deviceID);
     break;
   case AFE_CONFIG_SITE_MIFARE_CARDS:
-    Site.siteMiFareCard(page, siteConfig->deviceID);
+    Site->siteMiFareCard(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_PN532_SENSOR
 #ifdef AFE_CONFIG_HARDWARE_CLED
   case AFE_CONFIG_SITE_CLED:
-    Site.siteCLED(page, siteConfig->deviceID);
+    Site->siteCLED(page, siteConfig->deviceID);
     break;
   case AFE_CONFIG_SITE_CLED_EFFECT_BLINKING:
-    Site.siteCLEDEffectBlinking(page, siteConfig->deviceID);
+    Site->siteCLEDEffectBlinking(page, siteConfig->deviceID);
     break;
   case AFE_CONFIG_SITE_CLED_EFFECT_WAVE:
-    Site.siteCLEDEffectWave(page, siteConfig->deviceID);
+    Site->siteCLEDEffectWave(page, siteConfig->deviceID);
     break;
   case AFE_CONFIG_SITE_CLED_EFFECT_FADE_IN_OUT:
-    Site.siteCLEDEffectFadeInOut(page, siteConfig->deviceID);
+    Site->siteCLEDEffectFadeInOut(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_CLED
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
   case AFE_CONFIG_SITE_TSL2561:
-    Site.siteTSL2561Sensor(page, siteConfig->deviceID);
+    Site->siteTSL2561Sensor(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   case AFE_CONFIG_SITE_MCP23XXX:
-    Site.siteMCP23XXX(page, siteConfig->deviceID);
+    Site->siteMCP23XXX(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 #ifdef AFE_CONFIG_HARDWARE_FS3000
   case AFE_CONFIG_SITE_FS3000:
-    Site.siteFS3000(page, siteConfig->deviceID);
+    Site->siteFS3000(page, siteConfig->deviceID);
     break;
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
   }
@@ -697,11 +692,11 @@ boolean AFEWebServer::generate(boolean upload) {
       server.setContentLength(CONTENT_LENGTH_UNKNOWN);
 
       if (siteConfig.twoColumns) {
-        Site.generateMenu(page, siteConfig.rebootTime);
+        Site->generateMenu(page, siteConfig.rebootTime);
       } else {
-        Site.generateEmptyMenu(page, siteConfig.rebootTime);
+        Site->generateEmptyMenu(page, siteConfig.rebootTime);
       }
-      Site.setAttributes(&page);
+      Site->setAttributes(&page);
       server.send(200, F("text/html"), page);
 
 #ifdef DEBUG
@@ -712,7 +707,7 @@ boolean AFEWebServer::generate(boolean upload) {
       page = "";
 
       generateSite(&siteConfig, page);
-      Site.setAttributes(&page);
+      Site->setAttributes(&page);
       server.sendContent(page);
 
 #ifdef DEBUG
@@ -721,12 +716,12 @@ boolean AFEWebServer::generate(boolean upload) {
 #endif
 
       page = "";
-      Site.generateFooter(
+      Site->generateFooter(
           page, (Firmware->Device->getMode() == AFE_MODE_NORMAL ||
                  Firmware->Device->getMode() == AFE_MODE_CONFIGURATION)
                     ? true
                     : false);
-      Site.setAttributes(&page);
+      Site->setAttributes(&page);
       server.sendContent(page);
 
 #ifdef DEBUG
