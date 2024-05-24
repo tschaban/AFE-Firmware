@@ -1499,10 +1499,10 @@ void AFESitesGenerator::siteThermalProtector(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
 void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
-  SWITCH configuration;
+  SWITCH *configuration = new SWITCH;
   char text[25];
 
-  if (!Firmware->API->Flash->getConfiguration(id, &configuration)) {
+  if (!Firmware->API->Flash->getConfiguration(id, configuration)) {
     addFileNotFound(page);
   }
 
@@ -1515,27 +1515,27 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
   openSection(page, text, F(""));
 
 #ifndef AFE_CONFIG_HARDWARE_MCP23XXX
-  addListOfGPIOs(page, F("g"), configuration.gpio);
+  addListOfGPIOs(page, F("g"), configuration->gpio);
 #endif
 
   addSelectFormItemOpen(page, F("f"), F(L_SWITCH_FUNCTIONALITY));
-  addSelectOptionFormItem(page, L_NONE, "0", configuration.functionality ==
+  addSelectOptionFormItem(page, L_NONE, "0", configuration->functionality ==
                                                  AFE_SWITCH_FUNCTIONALITY_NONE);
   addSelectOptionFormItem(page, L_SWITCH_SYSTEM_BUTTON, "1",
-                          configuration.functionality ==
+                          configuration->functionality ==
                               AFE_SWITCH_FUNCTIONALITY_MULTI);
 
 #if defined(AFE_CONFIG_HARDWARE_RELAY) || defined(AFE_CONFIG_HARDWARE_GATE)
 
   addSelectOptionFormItem(page, L_SWITCH_CONTROL_RELAY, "2",
-                          configuration.functionality ==
+                          configuration->functionality ==
                               AFE_SWITCH_FUNCTIONALITY_RELAY);
 #endif // defined(AFE_CONFIG_HARDWARE_RELAY) ||
        // defined(AFE_CONFIG_HARDWARE_GATE)
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
   addSelectOptionFormItem(page, L_SWITCH_CONTROL_RGB_LED, "3",
-                          configuration.functionality ==
+                          configuration->functionality ==
                               AFE_SWITCH_FUNCTIONALITY_RGBLED);
 #endif // AFE_CONFIG_HARDWARE_CLED
 
@@ -1545,7 +1545,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 
   addSelectFormItemOpen(page, F("r"), F(L_SWITCH_RELAY_CONTROLLED));
   addSelectOptionFormItem(page, L_NONE, "255",
-                          configuration.relayID == AFE_HARDWARE_ITEM_NOT_EXIST);
+                          configuration->relayID == AFE_HARDWARE_ITEM_NOT_EXIST);
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
   uint8_t relayIsForGate;
@@ -1555,7 +1555,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
     page += F("<option value=\"");
     page += i;
     page += F("\"");
-    page += configuration.relayID == i ? F(" selected=\"selected\"") : F("");
+    page += configuration->relayID == i ? F(" selected=\"selected\"") : F("");
     page += F(">");
 #ifdef AFE_CONFIG_HARDWARE_GATE
     relayIsForGate = false;
@@ -1589,7 +1589,7 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 #ifdef AFE_CONFIG_HARDWARE_CLED
 
   addSelectFormItemOpen(page, F("l"), F(L_SWITCH_RGB_LED_CONTROLLED));
-  addSelectOptionFormItem(page, L_NONE, "255", configuration.rgbLedID ==
+  addSelectOptionFormItem(page, L_NONE, "255", configuration->rgbLedID ==
                                                    AFE_HARDWARE_ITEM_NOT_EXIST);
 
   CLED rgbLedConfiguration;
@@ -1610,14 +1610,14 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 
   addSelectFormItemOpen(page, F("m"), F(L_SWITCH_TYPE));
   addSelectOptionFormItem(page, L_SWITCH_MONOSTABLE, "0",
-                          configuration.type == 0);
+                          configuration->type == 0);
   addSelectOptionFormItem(page, L_SWITCH_BISTABLE, "1",
-                          configuration.type == 1);
+                          configuration->type == 1);
   addSelectFormItemClose(page);
 
   addInformationItem(page, F(L_SWITCH_SENSITIVENESS_HINT));
   char _number[4];
-  sprintf(_number, "%d", configuration.sensitiveness);
+  sprintf(_number, "%d", configuration->sensitiveness);
 
   addInputFormItem(page, AFE_FORM_ITEM_TYPE_NUMBER, "s", L_SENSITIVENESS,
                    _number, AFE_FORM_ITEM_SKIP_PROPERTY, "0", "999", "1",
@@ -1626,21 +1626,21 @@ void AFESitesGenerator::siteSwitch(String &page, uint8_t id) {
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
   openSection(page, F(L_MCP23017_CONNECTION), F(L_MCP23017_SWITCH_CONNECTION));
-  addListOfGPIOs(page, F("g"), configuration.gpio);
+  addListOfGPIOs(page, F("g"), configuration->gpio);
   addInformationItem(page, F(L_MCP23017_CONNECTION_VIA_MCP));
-  addMCP23XXXSelection(page, "a", configuration.mcp23017.id);
+  addMCP23XXXSelection(page, "a", configuration->mcp23017.id);
 
-  addListOfMCP23XXXGPIOs(page, "mg", configuration.mcp23017.gpio);
+  addListOfMCP23XXXGPIOs(page, "mg", configuration->mcp23017.gpio);
 
   closeSection(page);
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ /* API: Domoticz */
   addAPIsSection(page, F("Domoticz"), F(L_DOMOTICZ_NO_IF_IDX_0), "IDX",
-                 &configuration.domoticz.idx);
+                 configuration->domoticz.idx);
 #else  /* Home Assistant and Standard API */
   addAPIsSection(page, F(L_SWITCH_MQTT_TOPIC), F(L_MQTT_TOPIC_EMPTY),
-                 L_MQTT_TOPIC, configuration.mqtt.topic);
+                 L_MQTT_TOPIC, configuration->mqtt.topic);
 #endif /* End of APIs section */
 }
 #endif // AFE_CONFIG_HARDWARE_SWITCH
