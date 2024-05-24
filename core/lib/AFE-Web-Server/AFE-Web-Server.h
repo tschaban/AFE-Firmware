@@ -67,12 +67,13 @@ private:
    */
   unsigned long howLongInConfigMode = 0;
 
-  AFESitesGenerator Site;
+  AFESitesGenerator *Site = new AFESitesGenerator(Firmware,Hardware);
+
 
   boolean upgradeSuccess = false;
 
   /**
-   * @brief Method gets url Option parameter value
+   * @brief Method gets url Option parameter va
    *
    * @return boolean
    */

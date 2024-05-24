@@ -3253,7 +3253,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
 
 #ifdef DEBUG
   else {
-    printFileOpeningError(F(AFE_FILE_REGULATOR_CONFIGURATION), id);
+   // printFileOpeningError(F(AFE_FILE_REGULATOR_CONFIGURATION), id); @TODO Tx 3.8.0 this is not consistant with previous ones
   }
 #endif
 }
@@ -3525,7 +3525,7 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
 
 #ifdef DEBUG
   else {
-    printFileOpeningError(F(AFE_FILE_HPMA114S0_CONFIGURATION), id);
+   // printFileOpeningError(F(AFE_FILE_HPMA114S0_CONFIGURATION), id); @TODO Tx 3.8.0 this is not consistant with previous ones
   }
 #endif
 }
