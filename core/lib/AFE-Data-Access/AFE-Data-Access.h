@@ -10,13 +10,13 @@
 #include <Arduino.h>
 
 #ifdef AFE_ESP32
-#include <LittleFS.h>
+#include <LITTLEFS.h>
 #include <WiFi.h>
 #else /* ESP8266 */
 #include <ESP8266WiFi.h>
 #include <FS.h>
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-#include <LittleFS.h>
+#include <LITTLEFS.h>
 #endif
 #endif // ESP32/ESP8266
 

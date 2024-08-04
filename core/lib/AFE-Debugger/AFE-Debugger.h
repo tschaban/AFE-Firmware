@@ -3,13 +3,15 @@
 #ifndef _AFE_Debugger_h
 #define _AFE_Debugger_h
 
+/*
+
 #ifdef DEBUG
 
 #include <Streaming.h>
 
 #define DEBUG_INTERVAL 60
 
-/* Type for messages */
+// Type for messages 
 #define AFE_DEBUG_TYPE_LINE 0
 #define AFE_DEBUG_TYPE_BULLET_POINT 1
 #define AFE_DEBUG_TYPE_INFORMATION 7
@@ -50,4 +52,6 @@ public:
     void printValue(unsigned long number, const __FlashStringHelper *text, uint8_t newLineAfter = 0);
 };
 #endif
+
+*/
 #endif

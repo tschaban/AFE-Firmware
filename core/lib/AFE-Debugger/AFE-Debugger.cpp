@@ -1,5 +1,5 @@
 #include "AFE-Debugger.h"
-
+/*
 AFEDebugger::AFEDebugger(){};
 
 void AFEDebugger::print(const char *text, const __FlashStringHelper *messageCategory, uint8_t type, uint8_t newLineBefore, uint8_t newLineAfter, uint8_t intent)
@@ -116,3 +116,5 @@ void AFEDebugger::printLine(const char *text, uint8_t newLineBefore, uint8_t new
 void AFEDebugger::printLine(const __FlashStringHelper *text, uint8_t newLineBefore, uint8_t newLineAfter) {
     print(text, F(""), AFE_DEBUG_TYPE_LINE, newLineBefore, newLineAfter,0);
 }
+
+*/
