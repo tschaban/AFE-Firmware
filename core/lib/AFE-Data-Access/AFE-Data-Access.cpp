@@ -353,6 +353,11 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
   if (openFile(configFile, AFE_OPEN_FILE_READING,
                F(AFE_FILE_PRO_VERSION_CONFIGURATION), AFE_NONE, false)) {
 
+
+#ifdef DEBUG
+    printFileContentInformation();
+#endif
+
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
@@ -361,7 +366,6 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
 
     if (root.success()) {
 #ifdef DEBUG
-      printFileContentInformation();
       root.printTo(Serial);
 #endif
       configuration->valid = root["valid"];
@@ -387,17 +391,20 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
 void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
 
   File configFile;
-  if (openFile(configFile, AFE_OPEN_FILE_READING,
+  if (openFile(configFile, AFE_OPEN_FILE_WRITING,
                F(AFE_FILE_PRO_VERSION_CONFIGURATION))) {
+
+#ifdef DEBUG
+    printFileWritingInformation();
+#endif
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PRO_VERSION> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["valid"] = configuration->valid;
     root["serial"] = configuration->serial;
-
     root.printTo(configFile);
+
 #ifdef DEBUG
-    printFileWritingInformation();
     root.printTo(Serial);
 #endif
     configFile.close();
@@ -3741,15 +3748,18 @@ void AFEDataAccess::saveConfiguration(I2CPORT *configuration)
   File configFile;
 #ifdef AFE_ESP32
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_I2C_CONFIGURATION),
-               id, false)) {
+               id)) {
 #else
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_I2C_CONFIGURATION),
-               AFE_NONE, false)) {
+               AFE_NONE)) {
 #endif
 
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
+
+
+
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_I2C> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
@@ -6099,7 +6109,7 @@ void AFEDataAccess::createFS3000SensorConfigurationFile() {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_FS3000; i++) {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_FS3000_CONFIGURATION), i);
 #endif
@@ -6397,6 +6407,10 @@ boolean AFEDataAccess::setDefaultConfiguration() {
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
     createMCP23XXXConfigurationFile();
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
+
+#ifdef AFE_CONFIG_HARDWARE_FS3000
+  createFS3000SensorConfigurationFile();
+#endif
 
     _ret = true;
   }

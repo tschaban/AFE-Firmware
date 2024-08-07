@@ -5165,7 +5165,7 @@ void AFESitesGenerator::addMenuSubItem(String &item, const char *title,
   }
   else
   {
-    item.concat(F(": "));
+  //  item.concat(F(": "));
     item.replace(F("{{i.y}}"), String(itemId + 1));
   }
   item.replace(F("{{s.i}}"), String(siteId));

@@ -115,11 +115,11 @@ int AFEJSONRPC::sent(String &response, const char *method, const char *params) {
       */
       if (strlen(Pro->serial) > 0) {
         http->addHeader("afe-key", Pro->serial);
-        /*
+        
         #ifdef DEBUG
                 Serial << endl << F(" : afe-key: ") << Pro->serial;
         #endif
-        */
+        
       }
       sprintf(_text, "%d", AFE_FIRMWARE_TYPE);
       http->addHeader("afe-type", _text);
