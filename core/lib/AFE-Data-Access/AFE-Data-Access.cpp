@@ -369,7 +369,7 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
       root.printTo(Serial);
 #endif
       configuration->valid = root["valid"];
-      sprintf(configuration->serial, root["serial"]);
+      strncpy(configuration->serial, root["serial"], sizeof(configuration->serial));
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_PRO_VERSION,
                           jsonBuffer.size());
@@ -444,7 +444,7 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
       root.printTo(Serial);
 #endif
       configuration->protect = root["protect"];
-      sprintf(configuration->password, root["password"]);
+      strncpy(configuration->password, root["password"], sizeof(configuration->password));
 
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_PASSWORD, jsonBuffer.size());
@@ -528,7 +528,7 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
       root.printTo(Serial);
 #endif
 
-      sprintf(configuration->name, root["name"]);
+      strncpy(configuration->name, root["name"], sizeof(configuration->name));
       configuration->timeToAutoLogOff =
           root["timeToAutoLogOff"] | AFE_AUTOLOGOFF_DEFAULT_TIME;
       configuration->api.http = root["api"]["http"];
@@ -997,7 +997,7 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
 #endif
       configuration->type = root["type"].as<int>();
       configuration->api = root["api"] | AFE_HARDWARE_ITEM_NOT_EXIST;
-      sprintf(configuration->installed_version, root["version"]);
+      strncpy(configuration->installed_version, root["version"], sizeof(configuration->installed_version));
 
       JsonVariant exists = root["latest_version"];
       sprintf(configuration->latest_version,
@@ -2023,8 +2023,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #else
   RelayConfiguration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
-  RelayConfiguration.state.MQTTConnected =
-      AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
+  RelayConfiguration.state.MQTTConnected = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
 
 #if !(defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                \
       defined(AFE_DEVICE_iECS_GATE_DRIVERv3))
@@ -2246,6 +2245,7 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
+
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH

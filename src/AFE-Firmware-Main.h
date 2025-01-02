@@ -1,30 +1,29 @@
 /************************************************************************
  * AFE Firmware for devices based on ESP8266/ESP8285/ESP32 chips
- * This code combains AFE Firmware versions:
+ * This code combines AFE Firmware versions:
  *  - T0 (Basic version: relay)
  *  - T1 (DS18B20)
  *  - T2 (DHTxx)
  *  - T3 (PIRs)
  *  - T4 (With expander MCP23017)
  *  - T5 Gate
- *  - T6 Wheater station
+ *  - T6 Weather station
  *  - T7 RGB LED Controller
  *
  * More info: https://afe.smartnydom.pl
  * LICENSE: https://github.com/tschaban/AFE-Firmware/blob/master/LICENSE
-**************************************************************************/
 
-/**
+
  * Work LOG T4 @TODO
  * - lokalizacje
- * - to set fOr ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200,
+ * - to set for ESP32 size of buffer for MCP INFO: JSON: Buffer size: 200,
  actual
  * JSON size: 40
  * - ESP32
  *
 
+**************************************************************************/
 
- */
 
 #include <AFE-Configuration.h>
 

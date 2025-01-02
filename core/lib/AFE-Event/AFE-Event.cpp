@@ -25,11 +25,11 @@ void AFEEvent::begin(AFEFirmware *Firmware, AFEHardware *Hardware) {
 
 void AFEEvent::listener(void) {
   /* Events triggered every 1m  */
-  if (millis() - _Firmware->timer->miliseconds >= AFE_TIMER_ONE_MINUTE) {
+  if (millis() - _Firmware->timer->milliseconds >= AFE_TIMER_ONE_MINUTE) {
 #ifdef DEBUG
     _Firmware->Debugger->printInformation(F("Trigger: 1m"), F("EVENT"));
 #endif
-    _Firmware->timer->miliseconds = millis();
+    _Firmware->timer->milliseconds = millis();
     _Firmware->timer->minutes++;
 
 /**

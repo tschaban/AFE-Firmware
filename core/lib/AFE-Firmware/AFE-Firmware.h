@@ -16,7 +16,7 @@ class AFEFirmware //: public AFECoreHardware
 {
 
 private:
-  unsigned long miliseconds = 0;
+  unsigned long milliseconds = 0;
   unsigned long minutes = 0;
   /**
    * @brief Checking if the device is launched for a first time. If so it loads
@@ -42,7 +42,7 @@ public:
   };
 
   struct TIMER_OBJECT {
-    unsigned long miliseconds;
+    unsigned long milliseconds;
     uint8_t minutes;
     uint8_t hours;
     uint8_t days;
@@ -50,7 +50,7 @@ public:
     // time_t currentTime;
   };
 
-  TIMER_OBJECT *timer = new TIMER_OBJECT;
+  TIMER_OBJECT *timer = new TIMER_OBJECT{0, 0, 0, 0, 0};
 
   GLOBAL_API_OBJECTS *API = new GLOBAL_API_OBJECTS;
   GLOBAL_CONFIGURATION_OBJECTS *Configuration =

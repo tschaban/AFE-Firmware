@@ -4,7 +4,7 @@ AFEFirmware::AFEFirmware(){};
 
 void AFEFirmware::begin() {
 
-  timer->miliseconds = millis();
+  timer->milliseconds = millis();
   timer->minutes = 0;
   timer->hours = 0;
   timer->days = 0;
