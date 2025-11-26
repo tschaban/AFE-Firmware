@@ -88,7 +88,7 @@ const char HTTP_ITEM_SELECT_OPEN[] PROGMEM =
     "<div class=\"cf\"><label>{{i.l}}</label><select "
     "name=\"{{i.n}}\">";
 
-const char HTTP_ITEM_SELECT_OPTION[] PROGMEM =
+const char HTTP_ITEM_SELECT_OPTION[] PROGMEM = 
     "<option value=\"{{i.v}}\" "
     "{{i.s}}>{{i.l}}</option>";
 

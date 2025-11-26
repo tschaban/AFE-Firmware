@@ -10,7 +10,7 @@ AFEWebServer::AFEWebServer(AFEFirmware *_Firmware, AFEHardware *_Hardware) {
 void AFEWebServer::begin() {
   server.begin(80);
 }
-
+ 
 String AFEWebServer::generateSite(AFE_SITE_PARAMETERS *siteConfig,
                                   String &page) {
 

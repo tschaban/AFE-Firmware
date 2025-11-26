@@ -13,7 +13,7 @@ void initializeHTTPServer(void);
 
 /* Method handles favicon.ico request */
 void handleFavicon(void) {}
-
+ 
 /* Method handles all HTTP request */
 void handleHTTPRequests(void) {
   if (!HTTPServer->generate()) {
