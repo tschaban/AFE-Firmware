@@ -29,8 +29,10 @@ void debugListener() {
 }
 
 void getAvailableMem() {
+  #ifndef AFE_ESP32 /* ESP82xx */
   Serial << endl
          << F("INFO: RAM: ") << system_get_free_heap_size() / 1024 << F("kB");
+         #endif
 }
 
 #if AFE_FILE_SYSTEM == AFE_FS_SPIFFS

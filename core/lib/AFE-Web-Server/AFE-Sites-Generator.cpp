@@ -4234,12 +4234,13 @@ void AFESitesGenerator::setAttributes(String *page) {
 
   page->replace(F("{{s.lang}}"), F(L_LANGUAGE_SHORT));
 
+  #ifndef AFE_ESP32
   char _ramText[7];
-  sprintf(_ramText, "%-.1f",
-          100 -
-              (float)((float)system_get_free_heap_size() / (float)AFE_MAX_RAM) *
-                  100);
+  sprintf(_ramText, "%-.1f",100 -(float)((float)system_get_free_heap_size() / (float)AFE_MAX_RAM) * 100);
   page->replace(F("{{f.r}}"), _ramText);
+  #else
+  page->replace(F("{{f.r}}"), "?");
+  #endif
 }
 
 void AFESitesGenerator::openSection(String &page, const char *title,

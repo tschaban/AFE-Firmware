@@ -1,3 +1,3 @@
-cd "C:\Users\Adrian\Development\AFE-Firmware\tools"
+cd "H:\projekty\AFE-Firmware\tools"
 cls
-php "C:\Users\Adrian\Development\AFE-Firmware\tools\main.php"
+php "H:\projekty\AFE-Firmware\tools\main.php"

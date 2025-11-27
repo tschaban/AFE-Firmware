@@ -41,7 +41,7 @@ boolean _success = false;
  *
  */
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  _success = LITTLEFS.begin();
+  _success = LittleFS.begin();
 #else
   _success = SPIFFS.begin();
 #endif
