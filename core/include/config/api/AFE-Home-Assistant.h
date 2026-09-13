@@ -224,7 +224,7 @@
 
 const char HA_MQTT_DISCOVERY_JSON_BODY[] PROGMEM =
     "{\"device\":{\"ids\":\"{{d.i}}\",\"hw_version\":\"{{d.c}}\",\"sw\":\"{{d.s}}\",\"mf\":\"{{d.m}}\","
-     "\"name\":\"{{d.n}}\",\"via_device\":\"{{d.i}}\",\"mdl\":\"{{d.h}}\",\"configuration_url\":\"http://{{d.u}}\"},"
+     "\"name\":\"{{d.n}}\",\"mdl\":\"{{d.h}}\",\"configuration_url\":\"http://{{d.u}}\"},"
     "\"uniq_id\":\"{{i.i}}\",\"name\":\"{{i.n}}\"{{ret}}{{b.a}}{{bst}}{{"
     "bsp}}{{bct}}{{bcp}}{{sen}}{{bdo}}{{rgb}}{{opt}}{{bdc}}{{bec}},\"enabled_by_default\":true}";
 
@@ -429,7 +429,6 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
     "sw_version": "AFE Firmware T5-3.6.0.B5",
     "manufacturer": "Espressif Systems",
     "name": "T5-ESP32",
-    "via_device": "9424B9d-7Ed6D67e",
     "model": "ESP32 30Pins",
     "hw_version": "ESP8266"
   },
@@ -461,7 +460,6 @@ const char HA_MQTT_DISCOVERY_JSON_OPTIMISTIC[] PROGMEM = ",\"opt\":true";
     "sw_version": "AFE Firmware T5-3.6.0.B5",
     "manufacturer": "Espressif Systems",
     "name": "T5-ESP32",
-    "via_device": "9424B9d-7Ed6D67e",
     "model": "ESP32 30Pins",
     "hw_version": "ESP8266",
     "configuration_url": "http://192.168.2.55"

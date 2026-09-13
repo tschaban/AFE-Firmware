@@ -48,11 +48,6 @@ $targetHardware[$index][0] = "esp32";
 $targetHardware[$index][1] = 31;
 $targetHardware[$index][2] = "38pins";
 
-
-$folderStructure[0] = $targetFolder;
-$folderStructure[1] = $targetFolder."/".$targetLanguage;
-$folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
-
 // Standard API
 
 /* ESP8266 1MB */

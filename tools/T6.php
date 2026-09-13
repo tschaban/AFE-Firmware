@@ -70,12 +70,6 @@ $targetHardware[$index][0] = "esp8266";
 $targetHardware[$index][1] = 17; 
 $targetHardware[$index][2] = "e2";
 
-
-
-$folderStructure[0] = $targetFolder;
-$folderStructure[1] = $targetFolder."/".$targetLanguage;
-$folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
-
 // Standard API ESP8266 4MB
 
 $index = 0;

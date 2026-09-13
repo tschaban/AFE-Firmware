@@ -57,15 +57,9 @@ $targetHardware[5][0] = "esp8266";
 $targetHardware[5][1] = 10; 
 $targetHardware[5][2] = "e2";
 
-
-
-$folderStructure[0] = $targetFolder;
-$folderStructure[1] = $targetFolder."/".$targetLanguage;
-$folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
-
 // Standard API ESP8266 4MB
 
-$index;
+$index = 0;
 $sourceFolder[$index]["file"] = "C:/Users/Adrian/Development/AFE-Firmware/.pio/build/AFE_T1_8266_4m-generic/firmware.bin";
 $sourceFolder[$index]["chip"] = 8266;
 $sourceFolder[$index]["size"] = 4;

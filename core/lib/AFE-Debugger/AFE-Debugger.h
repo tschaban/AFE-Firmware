@@ -11,7 +11,7 @@
 
 #define DEBUG_INTERVAL 60
 
-// Type for messages 
+// Type for messages
 #define AFE_DEBUG_TYPE_LINE 0
 #define AFE_DEBUG_TYPE_BULLET_POINT 1
 #define AFE_DEBUG_TYPE_INFORMATION 7

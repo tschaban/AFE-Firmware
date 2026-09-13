@@ -113,11 +113,6 @@ $targetHardware[$index][0] = "custom";
 $targetHardware[$index][1] = 13; // ESP32-38p;
 $targetHardware[$index][2] = "e2";
 
-
-$folderStructure[0] = $targetFolder;
-$folderStructure[1] = $targetFolder."/".$targetLanguage;
-$folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
-
 // Standard API
 
 $index=0;

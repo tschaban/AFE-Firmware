@@ -1,3 +1,3 @@
-cd "C:\Users\Adrian\Development\AFE-Firmware\tools"
+cd /d "%~dp0"
 cls
-php "C:\Users\Adrian\Development\AFE-Firmware\tools\main.php"
+php "main.php"

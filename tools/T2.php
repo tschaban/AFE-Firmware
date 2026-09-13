@@ -51,11 +51,6 @@ $targetHardware[4][0] = "esp8266";
 $targetHardware[4][1] = 15; 
 $targetHardware[4][2] = "e1";
 
-
-$folderStructure[0] = $targetFolder;
-$folderStructure[1] = $targetFolder."/".$targetLanguage;
-$folderStructure[2] = $folderStructure[1]."/".$targetLanguage;
-
 // Standard API ESP8266 4MB
 
 $index=0;
