@@ -1,19 +1,18 @@
 #ifndef _AFE_Configuration_T_h
 #define _AFE_Configuration_T_h
 
-#define AFE_FIRMWARE_VERSION "3.8.0.B0"
+#define AFE_FIRMWARE_VERSION "3.7.2.B4"
 #define AFE_FIRMWARE_TYPE 5
 
 /**
  * @brief Hardware
- * 
+ *
  */
 
 /* For all, E1, E2 */
 #define AFE_CONFIG_HARDWARE_SWITCH
 #define AFE_CONFIG_HARDWARE_LED
 #define AFE_CONFIG_FUNCTIONALITY_ADC
-
 
 /* For ESP32 so E1, E2 */
 #ifdef AFE_ESP32
@@ -26,12 +25,12 @@
 
 #elif AFE_T5_CUSTOM_E2 /* Hardware: E2 */
 #define AFE_CONFIG_HARDWARE_DS18B20
-#endif 
+#endif
 
 #endif // End of custom versions for ESP32
 
 /* For 4MB, incl E1, E2 */
-#ifdef AFE_ESP_FLASH_4MB 
+#ifdef AFE_ESP_FLASH_4MB
 
 #define AFE_CONFIG_HARDWARE_I2C
 #define AFE_CONFIG_HARDWARE_BMEX80
@@ -42,10 +41,9 @@
 
 #endif // AFE_ESP_FLASH_4M
 
-
 /**
  * @brief Max number of hardware items per AFE version
- * 
+ *
  */
 
 /* For all, E1, E2 */
@@ -53,13 +51,11 @@
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS 4
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES 2
 
-
 #ifdef AFE_T5_CUSTOM_E1 /* For version E1 */
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532 1
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS 10
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS 2
 #endif
-
 
 #ifdef AFE_T5_CUSTOM_E2 /* For version E2 */
 
@@ -76,7 +72,6 @@
 
 #endif
 
-
 // Sensors only available in 4MB Flash
 #ifdef AFE_ESP_FLASH_4MB
 
@@ -89,13 +84,11 @@
 /* Number of I2C depending on ESP type*/
 #ifdef AFE_ESP32
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_I2C 2
-#else // ESP8266 
+#else // ESP8266
 #define AFE_CONFIG_HARDWARE_MAX_NUMBER_I2C 1
 #endif // ESP32 || ESP8266
 
 #endif // end 4mb
-
-
 
 /* Max number of hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_iECS_GATE_DRIVERv2)
@@ -134,14 +127,12 @@
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_DHT AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT
 #endif
 
-
 #ifdef AFE_T5_CUSTOM_E1
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_CLED_STRIPS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_PN532_SENSORS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS
 #define AFE_CONFIG_HARDWARE_NUMBER_OF_MIFARE_CARDS_NONE_PRO_VERSION 4
 #endif // AFE_T5_CUSTOM_E1
-
 
 /* Default values for hardware items per specyfic hardware device */
 #if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
@@ -159,7 +150,6 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES 0
 #endif
 
-
 #ifdef AFE_ESP_FLASH_4MB
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BMEX80 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BH1750 0
@@ -167,8 +157,7 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_I2C 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_BINARY_SENSORS 0
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DHT 0
-#endif  
-
+#endif
 
 #ifdef AFE_T5_CUSTOM_E1
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_CLED_STRIPS 0
@@ -176,11 +165,9 @@
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_MIFARE_CARDS 0
 #endif // AFE_T5_CUSTOM_E1
 
-
 #ifdef AFE_T5_CUSTOM_E2
 #define AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_DS18B20 0
 #endif // AFE_T5_CUSTOM_E1
-
 
 /* Functionalities */
 #define AFE_CONFIG_FUNCTIONALITY_RELAY
