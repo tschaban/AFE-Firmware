@@ -8,7 +8,8 @@ AFEDataAccess::AFEDataAccess() {}
  *
  * @return boolean
  */
-boolean AFEDataAccess::formatFileSystem() {
+boolean AFEDataAccess::formatFileSystem()
+{
 #ifdef DEBUG
   Debugger->printInformation(F("Formatig File System"), F("FS"), 2);
 #endif
@@ -25,7 +26,8 @@ boolean AFEDataAccess::formatFileSystem() {
  * @param  path             full path to the file: folder and file name
  * @return boolean
  */
-boolean AFEDataAccess::fileExist(const char *path) {
+boolean AFEDataAccess::fileExist(const char *path)
+{
   boolean _ret = false;
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
@@ -42,7 +44,8 @@ boolean AFEDataAccess::fileExist(const char *path) {
   return _ret;
 }
 
-boolean AFEDataAccess::createFile(const char *path) {
+boolean AFEDataAccess::createFile(const char *path)
+{
   boolean _ret = false;
 #ifdef DEBUG
   Debugger->printBulletPoint(F("Created: "));
@@ -54,7 +57,8 @@ boolean AFEDataAccess::createFile(const char *path) {
   File createFile = SPIFFS.open(path, AFE_OPEN_FILE_WRITING);
 #endif
 
-  if (createFile) {
+  if (createFile)
+  {
     _ret = true;
     createFile.close();
   }
@@ -67,7 +71,8 @@ boolean AFEDataAccess::createFile(const char *path) {
 }
 
 boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
-                                const char *path, boolean createIfNotExists) {
+                                const char *path, boolean createIfNotExists)
+{
 
 #ifdef DEBUG
   Debugger->printHeader(1, 0, 72, AFE_DEBUG_HEADER_TYPE_DASH);
@@ -82,11 +87,13 @@ boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
 
   _status = fileExist(path);
 
-  if (!_status && createIfNotExists) {
+  if (!_status && createIfNotExists)
+  {
     _status = createFile(path);
   }
 
-  if (_status) {
+  if (_status)
+  {
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
     openedFile = LITTLEFS.open(path, mode);
 #else
@@ -106,12 +113,16 @@ boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
 
 boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
                                 const __FlashStringHelper *path, uint8_t id,
-                                boolean createIfNotExists) {
+                                boolean createIfNotExists)
+{
 
   char fileName[strlen_P((PGM_P)path) + 1];
-  if (id == AFE_NONE) {
+  if (id == AFE_NONE)
+  {
     sprintf(fileName, (PGM_P)path);
-  } else {
+  }
+  else
+  {
     sprintf(fileName, (PGM_P)path, id);
   }
 
@@ -126,7 +137,8 @@ boolean AFEDataAccess::openFile(File &openedFile, const char *mode,
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
 boolean AFEDataAccess::checkIfFolderExists(const char *dir,
-                                           boolean createdIfNotExsts) {
+                                           boolean createdIfNotExsts)
+{
 
 #ifdef DEBUG
   Debugger->printBulletPoint(F("Checkig if folder "));
@@ -135,7 +147,8 @@ boolean AFEDataAccess::checkIfFolderExists(const char *dir,
 
   boolean _ret = LITTLEFS.exists(dir);
 
-  if (!_ret && createdIfNotExsts) {
+  if (!_ret && createdIfNotExsts)
+  {
     _ret = LITTLEFS.mkdir(dir);
   }
 
@@ -147,28 +160,40 @@ boolean AFEDataAccess::checkIfFolderExists(const char *dir,
 }
 #endif
 
-void AFEDataAccess::getLogFileName(char *fileName) {
+void AFEDataAccess::getLogFileName(char *fileName)
+{
   time_t t = now();
-  if (year(t) < 2000) {
+  if (year(t) < 2000)
+  {
     sprintf(fileName, (PGM_P)F(AFE_FILE_BOOT_LOG));
-  } else {
+  }
+  else
+  {
     sprintf(fileName, (PGM_P)F(AFE_FILE_LOGS), year(t), month(t), day(t));
   }
 }
 
-void AFEDataAccess::addLog(const char *log) {
+void AFEDataAccess::addLog(const char *log)
+{
+#ifndef DEBUG /* Logs are only saved for AFE Firmware when DEBUG is enabled */
+  return;
+#endif
   char fileName[strlen_P((PGM_P)F(AFE_FILE_LOGS)) + 1];
   getLogFileName(fileName);
   File configFile;
-  if (openFile(configFile, AFE_OPEN_FILE_APPEND, fileName)) {
+  if (openFile(configFile, AFE_OPEN_FILE_APPEND, fileName))
+  {
 
-    if (configFile.size() > AFE_LOG_FILE_MAX_SIZE) {
+    if (configFile.size() > AFE_LOG_FILE_MAX_SIZE)
+    {
       configFile.close();
       openFile(configFile, AFE_OPEN_FILE_WRITING, fileName);
       configFile.close();
       addLog(F("log:tuncated:exceededSize"));
       addLog(log);
-    } else {
+    }
+    else
+    {
 
       char _timestamp[20]; // 1970.01.01 01:01:01
       time_t t = now();
@@ -191,26 +216,30 @@ void AFEDataAccess::addLog(const char *log) {
 #endif
 }
 
-void AFEDataAccess::addLog(const __FlashStringHelper *log) {
+void AFEDataAccess::addLog(const __FlashStringHelper *log)
+{
   char _log[strlen_P((PGM_P)log) + 1];
   sprintf(_log, (PGM_P)log);
   addLog(_log);
 }
 
 void AFEDataAccess::addLog(const __FlashStringHelper *log, uint16_t number,
-                           uint8_t intSize) {
+                           uint8_t intSize)
+{
   char _log[strlen_P((PGM_P)log) + 1 + intSize];
   sprintf(_log, (PGM_P)log, number);
   addLog(_log);
 }
 
-void AFEDataAccess::addLog(const __FlashStringHelper *log, const char *text) {
+void AFEDataAccess::addLog(const __FlashStringHelper *log, const char *text)
+{
   char _log[strlen_P((PGM_P)log) + 1 + strlen(text)];
   sprintf(_log, (PGM_P)log, text);
   addLog(_log);
 }
 
-boolean AFEDataAccess::readLogs(String &logs) {
+boolean AFEDataAccess::readLogs(String &logs)
+{
 
   char fileName[strlen_P((PGM_P)F(AFE_FILE_LOGS)) + 1];
   getLogFileName(fileName);
@@ -218,26 +247,32 @@ boolean AFEDataAccess::readLogs(String &logs) {
 
   boolean _ret = false;
 
-  if (openFile(configFile, AFE_OPEN_FILE_READING, fileName)) {
+  if (openFile(configFile, AFE_OPEN_FILE_READING, fileName))
+  {
 
 #ifdef DEBUG
     Debugger->printBulletPoint(F("File size: "));
     Serial << configFile.size();
 #endif
-    if (configFile.size() >= AFE_LOG_FILE_MAX_SIZE_FOR_DISPLAY) {
+    if (configFile.size() >= AFE_LOG_FILE_MAX_SIZE_FOR_DISPLAY)
+    {
 #ifdef DEBUG
       Debugger->printBulletPoint(
           F("Warn: File exedeed it's max size to be displayed"));
 #endif
       logs.concat(F("Log can't be displayed. Too large"));
       configFile.close();
-    } else if (configFile.size() > 0) {
+    }
+    else if (configFile.size() > 0)
+    {
       logs = configFile.readString();
       _ret = true;
 #ifdef DEBUG
       Debugger->printBulletPoint(F("Content: "));
       Serial << logs;
-    } else {
+    }
+    else
+    {
       Debugger->printBulletPoint(F("Log: Empty"));
 #endif
     }
@@ -250,7 +285,8 @@ boolean AFEDataAccess::readLogs(String &logs) {
   return _ret;
 }
 
-void AFEDataAccess::cleanLogsFile() {
+void AFEDataAccess::cleanLogsFile()
+{
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
   File logDir = LITTLEFS.open("/log");
 #else
@@ -258,10 +294,13 @@ void AFEDataAccess::cleanLogsFile() {
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  if (logDir.isDirectory()) {
-    while (logDir.openNextFile()) {
+  if (logDir.isDirectory())
+  {
+    while (logDir.openNextFile())
+    {
 #else
-  while (logDir.next()) {
+  while (logDir.next())
+  {
 #endif
 
 #ifdef DEBUG
@@ -291,16 +330,19 @@ void AFEDataAccess::cleanLogsFile() {
  *
  * @param  message          read string
  */
-void AFEDataAccess::getWelcomeMessage(String &message) {
+void AFEDataAccess::getWelcomeMessage(String &message)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_WELCOME_MESSAGE))) {
+               F(AFE_FILE_WELCOME_MESSAGE)))
+  {
 
 #ifdef DEBUG
     Debugger->printBulletPoint(F("Reading: "));
 #endif
 
-    if (configFile.size() > 0) {
+    if (configFile.size() > 0)
+    {
       message = configFile.readString();
 
 #ifdef DEBUG
@@ -308,7 +350,9 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
       Debugger->printBulletPoint(F("Content: "));
       Serial << message;
 #endif
-    } else {
+    }
+    else
+    {
       message = "";
 #ifdef DEBUG
       Debugger->printValue(F("Empty"));
@@ -329,10 +373,12 @@ void AFEDataAccess::getWelcomeMessage(String &message) {
  *
  * @param  message          string to be saved
  */
-void AFEDataAccess::saveWelecomeMessage(const char *message) {
+void AFEDataAccess::saveWelecomeMessage(const char *message)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_WELCOME_MESSAGE))) {
+               F(AFE_FILE_WELCOME_MESSAGE)))
+  {
 
 #ifdef DEBUG
     Debugger->printBulletPoint(F("Writting: "));
@@ -347,12 +393,13 @@ void AFEDataAccess::saveWelecomeMessage(const char *message) {
 #endif
 }
 
-void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
+void AFEDataAccess::getConfiguration(PRO_VERSION *configuration)
+{
 
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_PRO_VERSION_CONFIGURATION), AFE_NONE, false)) {
-
+               F(AFE_FILE_PRO_VERSION_CONFIGURATION), AFE_NONE, false))
+  {
 
 #ifdef DEBUG
     printFileContentInformation();
@@ -364,7 +411,8 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PRO_VERSION> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -376,7 +424,8 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -388,11 +437,13 @@ void AFEDataAccess::getConfiguration(PRO_VERSION *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
+void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration)
+{
 
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_PRO_VERSION_CONFIGURATION))) {
+               F(AFE_FILE_PRO_VERSION_CONFIGURATION)))
+  {
 
 #ifdef DEBUG
     printFileWritingInformation();
@@ -419,7 +470,8 @@ void AFEDataAccess::saveConfiguration(PRO_VERSION *configuration) {
 #endif
 }
 
-void AFEDataAccess::createProVersionConfigurationFile() {
+void AFEDataAccess::createProVersionConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_PRO_VERSION_CONFIGURATION));
 #endif
@@ -429,17 +481,20 @@ void AFEDataAccess::createProVersionConfigurationFile() {
   saveConfiguration(&ProConfiguration);
 }
 
-void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
+void AFEDataAccess::getConfiguration(PASSWORD *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_PASSWORD_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_PASSWORD_CONFIGURATION), AFE_NONE, false))
+  {
 
     size_t size = configFile.size();
     std::unique_ptr<char[]> buf(new char[size]);
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PASSWORD> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -451,7 +506,8 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -462,10 +518,12 @@ void AFEDataAccess::getConfiguration(PASSWORD *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
+void AFEDataAccess::saveConfiguration(PASSWORD *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_PASSWORD_CONFIGURATION))) {
+               F(AFE_FILE_PASSWORD_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -489,7 +547,8 @@ void AFEDataAccess::saveConfiguration(PASSWORD *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createPasswordConfigurationFile() {
+void AFEDataAccess::createPasswordConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_PASSWORD_CONFIGURATION));
 #endif
@@ -499,7 +558,8 @@ void AFEDataAccess::createPasswordConfigurationFile() {
   saveConfiguration(&PasswordConfiguration);
 }
 
-void AFEDataAccess::getDeviceID(char *id, boolean extended) {
+void AFEDataAccess::getDeviceID(char *id, boolean extended)
+{
   byte m[6];
   WiFi.macAddress(m);
   sprintf(id, "%s%X%x%X%x-%X%x%X%x",
@@ -507,13 +567,15 @@ void AFEDataAccess::getDeviceID(char *id, boolean extended) {
           m[5], m[1], m[4], m[2], m[3], m[3], m[2]);
 }
 
-void AFEDataAccess::getConfiguration(DEVICE *configuration) {
+void AFEDataAccess::getConfiguration(DEVICE *configuration)
+{
 
   JsonVariant exists;
 
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_DEVICE_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_DEVICE_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -523,7 +585,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -540,7 +603,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
           exists.success() ? root["api"]["domoticz"] : false;
 
       /* HTTP API must be ON when Domoticz is ON */
-      if (configuration->api.domoticz && !configuration->api.http) {
+      if (configuration->api.domoticz && !configuration->api.http)
+      {
         configuration->api.http = true;
       }
 #endif
@@ -683,7 +747,8 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -695,10 +760,12 @@ void AFEDataAccess::getConfiguration(DEVICE *configuration) {
 #endif
 }
 
-void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
+void AFEDataAccess::saveConfiguration(DEVICE *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_DEVICE_CONFIGURATION))) {
+               F(AFE_FILE_DEVICE_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -828,21 +895,25 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
  *
  */
 #ifdef AFE_CONFIG_HARDWARE_GATE
-  if (configuration->noOfGates < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES) {
+  if (configuration->noOfGates < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES)
+  {
     GATE _Gate;
     for (uint8_t i = configuration->noOfGates;
-         i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++) {
+         i < AFE_CONFIG_HARDWARE_NUMBER_OF_GATES; i++)
+    {
 #ifdef DEBUG
 
       Debugger->printInformation(F("Update of Gate configuration"), F("FS"))
 #endif
           getConfiguration(i, &_Gate);
-      if (_Gate.relayId != AFE_HARDWARE_ITEM_NOT_EXIST) {
+      if (_Gate.relayId != AFE_HARDWARE_ITEM_NOT_EXIST)
+      {
         _Gate.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
         saveConfiguration(i, &_Gate);
       }
 #ifdef DEBUG
-      else {
+      else
+      {
         Serial << F(": NOT required");
       }
 #endif
@@ -853,7 +924,8 @@ void AFEDataAccess::saveConfiguration(DEVICE *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createDeviceConfigurationFile() {
+void AFEDataAccess::createDeviceConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_DEVICE_CONFIGURATION));
 #endif
@@ -978,10 +1050,12 @@ void AFEDataAccess::createDeviceConfigurationFile() {
   saveConfiguration(&configuration);
 }
 
-void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
+void AFEDataAccess::getConfiguration(FIRMWARE *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_FIRMWARE_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_FIRMWARE_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -991,7 +1065,8 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_FIRMWARE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1004,7 +1079,8 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
               (exists.success() ? root["latest_version"] : root["version"]));
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -1018,10 +1094,12 @@ void AFEDataAccess::getConfiguration(FIRMWARE *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
+void AFEDataAccess::saveConfiguration(FIRMWARE *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_FIRMWARE_CONFIGURATION))) {
+               F(AFE_FILE_FIRMWARE_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1046,7 +1124,8 @@ void AFEDataAccess::saveConfiguration(FIRMWARE *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createFirmwareConfigurationFile() {
+void AFEDataAccess::createFirmwareConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_FIRMWARE_CONFIGURATION));
 #endif
@@ -1060,32 +1139,37 @@ void AFEDataAccess::createFirmwareConfigurationFile() {
   saveConfiguration(&firmwareConfiguration);
 }
 
-void AFEDataAccess::saveFirmwareVersion(const char *version) {
+void AFEDataAccess::saveFirmwareVersion(const char *version)
+{
   FIRMWARE configuration;
   getConfiguration(&configuration);
   sprintf(configuration.installed_version, version);
   saveConfiguration(&configuration);
 }
 
-void AFEDataAccess::saveLatestFirmwareVersion(const char *version) {
+void AFEDataAccess::saveLatestFirmwareVersion(const char *version)
+{
   FIRMWARE configuration;
   getConfiguration(&configuration);
   sprintf(configuration.latest_version, version);
   saveConfiguration(&configuration);
 }
 
-void AFEDataAccess::saveFirmwareAPIVersion() {
+void AFEDataAccess::saveFirmwareAPIVersion()
+{
   FIRMWARE configuration;
   getConfiguration(&configuration);
   configuration.api = AFE_FIRMWARE_API;
   saveConfiguration(&configuration);
 }
 
-uint8_t AFEDataAccess::getDeviceMode() {
+uint8_t AFEDataAccess::getDeviceMode()
+{
   uint8_t mode = AFE_MODE_FIRST_TIME_LAUNCH;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_DEVICE_MODE),
-               AFE_NONE, false)) {
+               AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1095,7 +1179,8 @@ uint8_t AFEDataAccess::getDeviceMode() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DEVICE_MODE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1106,7 +1191,8 @@ uint8_t AFEDataAccess::getDeviceMode() {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -1119,9 +1205,11 @@ uint8_t AFEDataAccess::getDeviceMode() {
 #endif
   return mode;
 }
-void AFEDataAccess::saveDeviceMode(uint8_t mode) {
+void AFEDataAccess::saveDeviceMode(uint8_t mode)
+{
   File configFile;
-  if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_DEVICE_MODE))) {
+  if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_DEVICE_MODE)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1146,10 +1234,12 @@ void AFEDataAccess::saveDeviceMode(uint8_t mode) {
 #endif
 }
 
-void AFEDataAccess::getConfiguration(NETWORK *configuration) {
+void AFEDataAccess::getConfiguration(NETWORK *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_NETWORK_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_NETWORK_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1165,7 +1255,8 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_NETWORK> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1232,10 +1323,10 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_NETWORK, jsonBuffer.size());
 #endif
-
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -1247,10 +1338,12 @@ void AFEDataAccess::getConfiguration(NETWORK *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
+void AFEDataAccess::saveConfiguration(NETWORK *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_NETWORK_CONFIGURATION))) {
+               F(AFE_FILE_NETWORK_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1274,44 +1367,44 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
             configuration->secondary.dns1, configuration->secondary.dns2,
             configuration->mDNSActive);
 
-/*
-    StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_NETWORK> jsonBuffer;
-    JsonObject &root = jsonBuffer.createObject();
+    /*
+        StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_NETWORK> jsonBuffer;
+        JsonObject &root = jsonBuffer.createObject();
 
-#if !defined(ESP32)
-    root["outputPower"] = configuration->outputPower;
-    root["radioMode"] = configuration->radioMode;
-#endif
+    #if !defined(ESP32)
+        root["outputPower"] = configuration->outputPower;
+        root["radioMode"] = configuration->radioMode;
+    #endif
 
-    root["noConnectionAttempts"] = configuration->noConnectionAttempts;
-    root["waitTimeConnections"] = configuration->waitTimeConnections;
-    root["waitTimeSeries"] = configuration->waitTimeSeries;
-    root["noFailuresToSwitchNetwork"] =
-        configuration->noFailuresToSwitchNetwork;
+        root["noConnectionAttempts"] = configuration->noConnectionAttempts;
+        root["waitTimeConnections"] = configuration->waitTimeConnections;
+        root["waitTimeSeries"] = configuration->waitTimeSeries;
+        root["noFailuresToSwitchNetwork"] =
+            configuration->noFailuresToSwitchNetwork;
 
-    root["ssid"] = configuration->primary.ssid;
-    root["password"] = configuration->primary.password;
-    root["isDHCP"] = configuration->primary.isDHCP;
-    root["ip"] = configuration->primary.ip;
-    root["gateway"] = configuration->primary.gateway;
-    root["subnet"] = configuration->primary.subnet;
-    root["dns1"] = configuration->primary.dns1;
-    root["dns2"] = configuration->primary.dns2;
-
-
-    root["ssidBackup"] = configuration->secondary.ssid;
-    root["passwordBackup"] = configuration->secondary.password;
-    root["isDHCPBackup"] = configuration->secondary.isDHCP;
-    root["ipBackup"] = configuration->secondary.ip;
-    root["gatewayBackup"] = configuration->secondary.gateway;
-    root["subnetBackup"] = configuration->secondary.subnet;
-    root["dns1Backup"] = configuration->secondary.dns1;
-    root["dns2Backup"] = configuration->secondary.dns2;
-
-    root.printTo(configFile);
+        root["ssid"] = configuration->primary.ssid;
+        root["password"] = configuration->primary.password;
+        root["isDHCP"] = configuration->primary.isDHCP;
+        root["ip"] = configuration->primary.ip;
+        root["gateway"] = configuration->primary.gateway;
+        root["subnet"] = configuration->primary.subnet;
+        root["dns1"] = configuration->primary.dns1;
+        root["dns2"] = configuration->primary.dns2;
 
 
-   */
+        root["ssidBackup"] = configuration->secondary.ssid;
+        root["passwordBackup"] = configuration->secondary.password;
+        root["isDHCPBackup"] = configuration->secondary.isDHCP;
+        root["ipBackup"] = configuration->secondary.ip;
+        root["gatewayBackup"] = configuration->secondary.gateway;
+        root["subnetBackup"] = configuration->secondary.subnet;
+        root["dns1Backup"] = configuration->secondary.dns1;
+        root["dns2Backup"] = configuration->secondary.dns2;
+
+        root.printTo(configFile);
+
+
+       */
 
 #ifdef DEBUG
     Serial << fileContent;
@@ -1329,7 +1422,8 @@ void AFEDataAccess::saveConfiguration(NETWORK *configuration) {
 #endif
 }
 
-void AFEDataAccess::createNetworkConfigurationFile() {
+void AFEDataAccess::createNetworkConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_NETWORK_CONFIGURATION));
 #endif
@@ -1370,10 +1464,12 @@ void AFEDataAccess::createNetworkConfigurationFile() {
   saveConfiguration(configuration);
 }
 
-void AFEDataAccess::getConfiguration(MQTT *configuration) {
+void AFEDataAccess::getConfiguration(MQTT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_MQTT_BROKER_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_MQTT_BROKER_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1385,7 +1481,8 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MQTT_BROKER> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1401,9 +1498,12 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
       sprintf(configuration->lwt.topic, root["lwt"] | "");
 
       exists = root["s"];
-      if (exists.success()) {
+      if (exists.success())
+      {
         sprintf(configuration->status.topic, root["s"]);
-      } else {
+      }
+      else
+      {
         char _deviceId[AFE_CONFIG_DEVICE_ID_SIZE];
         getDeviceID(_deviceId);
         sprintf(configuration->status.topic,
@@ -1428,7 +1528,8 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
     }
 
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -1440,10 +1541,12 @@ void AFEDataAccess::getConfiguration(MQTT *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(MQTT *configuration) {
+void AFEDataAccess::saveConfiguration(MQTT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_MQTT_BROKER_CONFIGURATION))) {
+               F(AFE_FILE_MQTT_BROKER_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1481,7 +1584,8 @@ void AFEDataAccess::saveConfiguration(MQTT *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createMQTTConfigurationFile() {
+void AFEDataAccess::createMQTTConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_MQTT_BROKER_CONFIGURATION));
 #endif
@@ -1510,10 +1614,12 @@ void AFEDataAccess::createMQTTConfigurationFile() {
 }
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
+void AFEDataAccess::getConfiguration(DOMOTICZ *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_DOMOTICZ_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_DOMOTICZ_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1523,7 +1629,8 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DOMOTICZ> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1539,7 +1646,8 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -1551,10 +1659,12 @@ void AFEDataAccess::getConfiguration(DOMOTICZ *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
+void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_DOMOTICZ_CONFIGURATION))) {
+               F(AFE_FILE_DOMOTICZ_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1580,7 +1690,8 @@ void AFEDataAccess::saveConfiguration(DOMOTICZ *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createDomoticzConfigurationFile() {
+void AFEDataAccess::createDomoticzConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_DOMOTICZ_CONFIGURATION));
 #endif
@@ -1593,11 +1704,13 @@ void AFEDataAccess::createDomoticzConfigurationFile() {
   saveConfiguration(&DomoticzConfiguration);
 }
 #elif AFE_FIRMWARE_API == AFE_FIRMWARE_API_HOME_ASSISTANT
-boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
+boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1607,7 +1720,8 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1625,7 +1739,9 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_HOME_ASSISTANT,
                           jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
@@ -1633,7 +1749,9 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -1641,10 +1759,12 @@ boolean AFEDataAccess::getConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
 #endif
   return _ret;
 }
-void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
+void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION))) {
+               F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1670,7 +1790,8 @@ void AFEDataAccess::saveConfiguration(HOME_ASSISTANT_CONFIG *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createHomeAssistantConfigurationFile() {
+void AFEDataAccess::createHomeAssistantConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_HOME_ASSISTANT_CONFIGURATION));
 #endif
@@ -1687,10 +1808,12 @@ void AFEDataAccess::createHomeAssistantConfigurationFile() {
 #endif // AFE_FIRMWARE_API
 
 #ifdef AFE_CONFIG_HARDWARE_LED
-void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_LED_CONFIGURATION),
-               id, false)) {
+               id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1700,7 +1823,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_LED> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1717,7 +1841,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -1730,10 +1855,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, LED *configuration) {
 #endif
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_LED_CONFIGURATION),
-               id, true)) {
+               id, true))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1764,7 +1891,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, LED *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createLEDConfigurationFile() {
+void AFEDataAccess::createLEDConfigurationFile()
+{
   LED LEDConfiguration;
   uint8_t index = 0;
 
@@ -1815,7 +1943,8 @@ void AFEDataAccess::createLEDConfigurationFile() {
   LEDConfiguration.mcp23017.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
-  for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++) {
+  for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_LEDS; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_LED_CONFIGURATION), i);
 #endif
@@ -1823,11 +1952,13 @@ void AFEDataAccess::createLEDConfigurationFile() {
   }
 }
 
-uint8_t AFEDataAccess::getSystemLedID() {
+uint8_t AFEDataAccess::getSystemLedID()
+{
   uint8_t id = 0;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_SYSTEM_LED_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_SYSTEM_LED_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1837,7 +1968,8 @@ uint8_t AFEDataAccess::getSystemLedID() {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_SYSTEM_LED> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1848,7 +1980,8 @@ uint8_t AFEDataAccess::getSystemLedID() {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -1861,10 +1994,12 @@ uint8_t AFEDataAccess::getSystemLedID() {
 #endif
   return id;
 }
-void AFEDataAccess::saveSystemLedID(uint8_t id) {
+void AFEDataAccess::saveSystemLedID(uint8_t id)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_SYSTEM_LED_CONFIGURATION), id)) {
+               F(AFE_FILE_SYSTEM_LED_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -1887,7 +2022,8 @@ void AFEDataAccess::saveSystemLedID(uint8_t id) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createSystemLedIDConfigurationFile() {
+void AFEDataAccess::createSystemLedIDConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_SYSTEM_LED_CONFIGURATION));
 
@@ -1898,11 +2034,13 @@ void AFEDataAccess::createSystemLedIDConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_RELAY
 
-boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
+boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration)
+{
   boolean _ret = false;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_RELAY_CONFIGURATION), id, false)) {
+               F(AFE_FILE_RELAY_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -1913,7 +2051,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -1950,7 +2089,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
       _ret = true;
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -1963,10 +2103,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, RELAY *configuration) {
 #endif
   return _ret;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_RELAY_CONFIGURATION), id)) {
+               F(AFE_FILE_RELAY_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2009,7 +2151,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, RELAY *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createRelayConfigurationFile() {
+void AFEDataAccess::createRelayConfigurationFile()
+{
 
   RELAY RelayConfiguration;
   uint8_t index = 0;
@@ -2025,7 +2168,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
   RelayConfiguration.state.MQTTConnected = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_STATE_MQTT_CONNECTED;
 
-#if !(defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                \
+#if !(defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || \
       defined(AFE_DEVICE_iECS_GATE_DRIVERv3))
   RelayConfiguration.timeToOff = AFE_CONFIG_HARDWARE_RELAY_DEFAULT_TIME_TO_OFF;
   RelayConfiguration.state.powerOn =
@@ -2140,7 +2283,7 @@ void AFEDataAccess::createRelayConfigurationFile() {
 #endif
   saveConfiguration(0, &RelayConfiguration);
   index = AFE_CONFIG_HARDWARE_NUMBER_OF_RELAYS;
-#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                \
+#elif defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || \
     defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
   RelayConfiguration.gpio = AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_GPIO;
   sprintf(RelayConfiguration.name, AFE_CONFIG_HARDWARE_RELAY_0_DEFAULT_NAME);
@@ -2166,7 +2309,8 @@ void AFEDataAccess::createRelayConfigurationFile() {
 
   /* Adding config files for remaining relays */
   RelayConfiguration.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
-  for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++) {
+  for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_RELAYS; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_RELAY_CONFIGURATION), i);
 #endif
@@ -2180,11 +2324,13 @@ void AFEDataAccess::createRelayConfigurationFile() {
 }
 
 /* Relay state methods*/
-boolean AFEDataAccess::getRelayState(uint8_t id) {
+boolean AFEDataAccess::getRelayState(uint8_t id)
+{
   boolean state = false;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_RELAY_STATE_CONFIGURATION), id, false)) {
+               F(AFE_FILE_RELAY_STATE_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -2194,7 +2340,8 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RELAY_STATE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2206,7 +2353,8 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -2218,10 +2366,12 @@ boolean AFEDataAccess::getRelayState(uint8_t id) {
 #endif
   return state;
 }
-void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
+void AFEDataAccess::saveRelayState(uint8_t id, boolean state)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_RELAY_STATE_CONFIGURATION), id)) {
+               F(AFE_FILE_RELAY_STATE_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2249,11 +2399,13 @@ void AFEDataAccess::saveRelayState(uint8_t id, boolean state) {
 #endif // AFE_CONFIG_HARDWARE_RELAY
 
 #ifdef AFE_CONFIG_HARDWARE_SWITCH
-boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
+boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration)
+{
   boolean _ret = false;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_SWITCH_CONFIGURATION), id, false)) {
+               F(AFE_FILE_SWITCH_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -2263,7 +2415,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_SWITCH> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2299,7 +2452,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
       _ret = true;
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -2312,10 +2466,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, SWITCH *configuration) {
   return _ret;
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_SWITCH_CONFIGURATION), id)) {
+               F(AFE_FILE_SWITCH_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2361,7 +2517,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, SWITCH *configuration) {
 #endif
 }
 
-void AFEDataAccess::createSwitchConfigurationFile() {
+void AFEDataAccess::createSwitchConfigurationFile()
+{
   SWITCH SwitchConfiguration;
   uint8_t index = 0;
 
@@ -2480,13 +2637,15 @@ void AFEDataAccess::createSwitchConfigurationFile() {
 #else
   index = 1; // First switch created already
 #endif
-  if (index < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES) {
+  if (index < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES)
+  {
     SwitchConfiguration.gpio = AFE_HARDWARE_ITEM_NOT_EXIST;
     SwitchConfiguration.type = AFE_HARDWARE_SWITCH_X_DEFAULT_TYPE;
     SwitchConfiguration.functionality =
         AFE_HARDWARE_SWITCH_X_DEFAULT_FUNCTIONALITY;
     for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_SWITCHES;
-         i++) {
+         i++)
+    {
 #ifdef DEBUG
       printFileCreatingInformation(F(AFE_FILE_SWITCH_CONFIGURATION), i);
 #endif
@@ -2503,16 +2662,20 @@ void AFEDataAccess::createSwitchConfigurationFile() {
 #ifdef AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_ESP32
-void AFEDataAccess::getConfiguration(uint8_t id, ADCINPUT *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, ADCINPUT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_ADC_CONFIGURATION),
-               id, false)) {
+               id, false))
+  {
 
 #else // AFE_ESP32
-void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
+void AFEDataAccess::getConfiguration(ADCINPUT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_ADC_CONFIGURATION),
-               AFE_NONE, false)) {
+               AFE_NONE, false))
+  {
 
 #endif // AFE_ESP32
 
@@ -2525,7 +2688,8 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_ADC> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2572,7 +2736,8 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -2586,15 +2751,19 @@ void AFEDataAccess::getConfiguration(ADCINPUT *configuration) {
 }
 
 #ifdef AFE_ESP32
-void AFEDataAccess::saveConfiguration(uint8_t id, ADCINPUT *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, ADCINPUT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_ADC_CONFIGURATION),
-               id, true)) {
+               id, true))
+  {
 #else // AFE_ESP32
-void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
+void AFEDataAccess::saveConfiguration(ADCINPUT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_ADC_CONFIGURATION),
-               AFE_NONE, false)) {
+               AFE_NONE, false))
+  {
 
 #endif // AFE_ESP32
 
@@ -2656,7 +2825,8 @@ void AFEDataAccess::saveConfiguration(ADCINPUT *configuration) {
 #endif
 };
 
-void AFEDataAccess::createADCInputConfigurationFile() {
+void AFEDataAccess::createADCInputConfigurationFile()
+{
 
   ADCINPUT AnalogInputConfiguration;
   AnalogInputConfiguration.gpio = AFE_CONFIG_HARDWARE_ANALOG_INPUT_DEFAULT_GPIO;
@@ -2690,7 +2860,8 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif // AFE_CONFIG_FUNCTIONALITY_BATTERYMETER
 
 #ifdef AFE_ESP32
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_ADCS; i++)
+  {
     sprintf(AnalogInputConfiguration.name, "ADC%d", i);
 
 #ifdef DEBUG
@@ -2712,10 +2883,12 @@ void AFEDataAccess::createADCInputConfigurationFile() {
 #endif //  AFE_CONFIG_HARDWARE_ANALOG_INPUT
 
 #ifdef AFE_CONFIG_HARDWARE_DS18B20
-void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -2725,7 +2898,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DS18B20> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2744,7 +2918,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
       sprintf(configuration->mqtt.topic, root["mqttTopic"] | "");
 #endif
 
-      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH; i++) {
+      for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_DS18B20_ADDRESS_LENGTH; i++)
+      {
         configuration->address[i] = root["address"][i].as<int>();
       }
 
@@ -2753,7 +2928,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -2765,10 +2941,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, DS18B20 *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id)) {
+               F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2806,7 +2984,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DS18B20 *configuration) {
 #endif
 }
 
-void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
+void AFEDataAccess::createDS18B20SensorConfigurationFile(void)
+{
   DS18B20 configuration;
 
   configuration.gpio = AFE_CONFIG_HARDWARE_DS18B20_DEFAULT_GPIO;
@@ -2825,7 +3004,8 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DS18B20; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_DS18B20_SENSOR_CONFIGURATION), i);
 #endif
@@ -2837,10 +3017,12 @@ void AFEDataAccess::createDS18B20SensorConfigurationFile(void) {
 #endif // AFE_CONFIG_HARDWARE_DS18B20
 
 #ifdef AFE_CONFIG_HARDWARE_CONTACTRON
-void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_CONTACTRON_CONFIGURATION), id, false)) {
+               F(AFE_FILE_CONTACTRON_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -2850,7 +3032,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CONTACTRON> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -2872,7 +3055,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -2885,10 +3069,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, CONTACTRON *configuration) {
 #endif
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_CONTACTRON_CONFIGURATION), id)) {
+               F(AFE_FILE_CONTACTRON_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -2923,7 +3109,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CONTACTRON *configuration) {
 #endif
 }
 
-void AFEDataAccess::createContractonConfigurationFile() {
+void AFEDataAccess::createContractonConfigurationFile()
+{
   CONTACTRON ContactronConfiguration;
   uint8_t index = 0;
   ContactronConfiguration.bouncing =
@@ -2939,7 +3126,7 @@ void AFEDataAccess::createContractonConfigurationFile() {
   ContactronConfiguration.ledID = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-#if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) ||                                  \
+#if defined(AFE_DEVICE_iECS_GATE_DRIVERv2) || \
     defined(AFE_DEVICE_iECS_GATE_DRIVERv3)
   ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_1_DEFAULT_GPIO;
   sprintf(ContactronConfiguration.name, "C1");
@@ -2970,7 +3157,8 @@ void AFEDataAccess::createContractonConfigurationFile() {
 
   ContactronConfiguration.gpio = AFE_CONFIG_HARDWARE_CONTACTRON_X_DEFAULT_GPIO;
   for (uint8_t i = index; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
-       i++) {
+       i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_CONTACTRON_CONFIGURATION), i);
 #endif
@@ -2982,10 +3170,12 @@ void AFEDataAccess::createContractonConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_GATE
 
-void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_GATE_CONFIGURATION), id, false)) {
+               F(AFE_FILE_GATE_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -2995,7 +3185,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3006,7 +3197,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
       configuration->contactron.id[1] = root["contactrons"][1];
 
       for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
-           i++) {
+           i++)
+      {
         configuration->states.state[i] = root["states"][i];
       }
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -3022,7 +3214,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -3034,10 +3227,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, GATE *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_GATE_CONFIGURATION), id)) {
+               F(AFE_FILE_GATE_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3053,7 +3248,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
     if ((configuration->contactron.id[0] == AFE_HARDWARE_ITEM_NOT_EXIST &&
          configuration->contactron.id[1] != AFE_HARDWARE_ITEM_NOT_EXIST) ||
         (configuration->contactron.id[0] != AFE_HARDWARE_ITEM_NOT_EXIST &&
-         configuration->contactron.id[0] == configuration->contactron.id[1])) {
+         configuration->contactron.id[0] == configuration->contactron.id[1]))
+    {
       configuration->contactron.id[0] = configuration->contactron.id[1];
       configuration->contactron.id[1] = AFE_HARDWARE_ITEM_NOT_EXIST;
     }
@@ -3062,7 +3258,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
     jsonContactron.add(configuration->contactron.id[1]);
 
     for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CONTACTRONS;
-         i++) {
+         i++)
+    {
       jsonStates.add(configuration->states.state[i]);
     }
 
@@ -3087,7 +3284,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, GATE *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createGateConfigurationFile() {
+void AFEDataAccess::createGateConfigurationFile()
+{
 
   GATE GateConfiguration;
 
@@ -3120,7 +3318,8 @@ void AFEDataAccess::createGateConfigurationFile() {
   GateConfiguration.states.state[3] = AFE_GATE_UNKNOWN;
 
   for (uint8_t i = AFE_CONFIG_HARDWARE_DEFAULT_NUMBER_OF_GATES;
-       i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++) {
+       i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_GATES; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_GATE_CONFIGURATION), i);
 #endif
@@ -3130,11 +3329,13 @@ void AFEDataAccess::createGateConfigurationFile() {
   }
 }
 
-uint8_t AFEDataAccess::getGateState(uint8_t id) {
+uint8_t AFEDataAccess::getGateState(uint8_t id)
+{
   uint8_t state = AFE_GATE_CLOSED;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_GATE_STATE_CONFIGURATION), id, false)) {
+               F(AFE_FILE_GATE_STATE_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -3144,7 +3345,8 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_GATE_STATE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3155,7 +3357,8 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -3169,10 +3372,12 @@ uint8_t AFEDataAccess::getGateState(uint8_t id) {
 
   return state;
 }
-void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
+void AFEDataAccess::saveGateState(uint8_t id, uint8_t state)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_GATE_STATE_CONFIGURATION), id)) {
+               F(AFE_FILE_GATE_STATE_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3203,10 +3408,12 @@ void AFEDataAccess::saveGateState(uint8_t id, uint8_t state) {
 #endif // AFE_CONFIG_HARDWARE_GATE
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_REGULATOR
-void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_REGULATOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_REGULATOR_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -3216,7 +3423,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_REGULATOR> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3259,16 +3467,19 @@ void AFEDataAccess::getConfiguration(uint8_t id, REGULATOR *configuration) {
   }
 
 #ifdef DEBUG
-  else {
-   // printFileOpeningError(F(AFE_FILE_REGULATOR_CONFIGURATION), id); @TODO Tx 3.8.0 this is not consistant with previous ones
+  else
+  {
+    // printFileOpeningError(F(AFE_FILE_REGULATOR_CONFIGURATION), id); @TODO Tx 3.8.0 this is not consistant with previous ones
   }
 #endif
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_REGULATOR_CONFIGURATION), id)) {
+               F(AFE_FILE_REGULATOR_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3310,7 +3521,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, REGULATOR *configuration) {
 #endif
 }
 
-void AFEDataAccess::createRegulatorConfigurationFile(void) {
+void AFEDataAccess::createRegulatorConfigurationFile(void)
+{
 
   REGULATOR configuration;
   configuration.enabled = AFE_FUNCTIONALITY_REGULATOR_DEFAULT_ENABLED;
@@ -3333,7 +3545,8 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_REGULATORS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_REGULATORS; i++)
+  {
     sprintf(configuration.name, "regulator-%d", i + 1);
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_REGULATOR_CONFIGURATION), i);
@@ -3345,10 +3558,12 @@ void AFEDataAccess::createRegulatorConfigurationFile(void) {
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 void AFEDataAccess::getConfiguration(uint8_t id,
-                                     THERMAL_PROTECTOR *configuration) {
+                                     THERMAL_PROTECTOR *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -3358,7 +3573,8 @@ void AFEDataAccess::getConfiguration(uint8_t id,
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_THERMAL_PROTECTOR> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3384,7 +3600,8 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -3398,10 +3615,12 @@ void AFEDataAccess::getConfiguration(uint8_t id,
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      THERMAL_PROTECTOR *configuration) {
+                                      THERMAL_PROTECTOR *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id)) {
+               F(AFE_FILE_THERMAL_PROTECTOR_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3434,7 +3653,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createThermalProtectorConfigurationFile(void) {
+void AFEDataAccess::createThermalProtectorConfigurationFile(void)
+{
   THERMAL_PROTECTOR configuration;
   configuration.enabled = AFE_FUNCTIONALITY_THERMAL_PROTECTOR_DEFAULT_ENABLED;
   configuration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -3449,7 +3669,8 @@ void AFEDataAccess::createThermalProtectorConfigurationFile(void) {
 #endif
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_THERMAL_PROTECTOR;
-       i++) {
+       i++)
+  {
     sprintf(configuration.name, "protector-%d", i + 1);
 #ifdef DEBUG
 
@@ -3462,16 +3683,23 @@ void AFEDataAccess::createThermalProtectorConfigurationFile(void) {
 #endif // AFE_CONFIG_FUNCTIONALITY_THERMAL_PROTECTOR
 
 #ifdef AFE_CONFIG_FUNCTIONALITY_API_CONTROL
-void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
+void AFEDataAccess::saveAPI(uint8_t apiID, boolean state)
+{
   DEVICE configuration;
   getConfiguration(&configuration);
-  if (apiID == API_HTTP) {
+  if (apiID == API_HTTP)
+  {
     configuration.api.http = state;
-  } else if (apiID == API_MQTT) {
+  }
+  else if (apiID == API_MQTT)
+  {
     configuration.api.mqtt = state;
-  } else if (apiID == API_HTTP_DOMOTICZ(NOT SET)) {
+  }
+  else if (apiID == API_HTTP_DOMOTICZ(NOT SET))
+  {
     configuration.api.domoticz = state;
-    if (state) {
+    if (state)
+    {
       configuration.api.http = true;
     }
   }
@@ -3480,10 +3708,12 @@ void AFEDataAccess::saveAPI(uint8_t apiID, boolean state) {
 #endif // AFE_CONFIG_FUNCTIONALITY_API_CONTROL
 
 #ifdef AFE_CONFIG_HARDWARE_HPMA115S0
-void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_HPMA114S0_CONFIGURATION), id, false)) {
+               F(AFE_FILE_HPMA114S0_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -3493,7 +3723,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_HPMA115S0> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3531,15 +3762,18 @@ void AFEDataAccess::getConfiguration(uint8_t id, HPMA115S0 *configuration) {
   }
 
 #ifdef DEBUG
-  else {
-   // printFileOpeningError(F(AFE_FILE_HPMA114S0_CONFIGURATION), id); @TODO Tx 3.8.0 this is not consistant with previous ones
+  else
+  {
+    // printFileOpeningError(F(AFE_FILE_HPMA114S0_CONFIGURATION), id); @TODO Tx 3.8.0 this is not consistant with previous ones
   }
 #endif
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_HPMA114S0_CONFIGURATION), id)) {
+               F(AFE_FILE_HPMA114S0_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3579,7 +3813,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, HPMA115S0 *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
+void AFEDataAccess::createHPMA115S0SensorConfigurationFile()
+{
 
   HPMA115S0 configuration;
 
@@ -3598,7 +3833,8 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
 #else
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_HPMA115S0; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_HPMA114S0_CONFIGURATION), i)
 #endif
@@ -3609,10 +3845,12 @@ void AFEDataAccess::createHPMA115S0SensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_HPMA115S0
 
 #ifdef AFE_CONFIG_HARDWARE_UART
-void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
+void AFEDataAccess::getConfiguration(SERIALPORT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_UART_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_UART_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -3622,7 +3860,8 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_UART> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3635,7 +3874,8 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -3646,10 +3886,12 @@ void AFEDataAccess::getConfiguration(SERIALPORT *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
+void AFEDataAccess::saveConfiguration(SERIALPORT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_UART_CONFIGURATION))) {
+               F(AFE_FILE_UART_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3671,7 +3913,8 @@ void AFEDataAccess::saveConfiguration(SERIALPORT *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createSerialConfigurationFile() {
+void AFEDataAccess::createSerialConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F());
   << F(AFE_FILE_UART_CONFIGURATION);
@@ -3695,10 +3938,12 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration)
 
 #ifdef AFE_ESP32
   if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_I2C_CONFIGURATION),
-               id, false)) {
+               id, false))
+  {
 #else
   if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_I2C_CONFIGURATION),
-               AFE_NONE, false)) {
+               AFE_NONE, false))
+  {
 #endif
 
 #ifdef DEBUG
@@ -3710,7 +3955,8 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration)
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_I2C> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3727,7 +3973,8 @@ void AFEDataAccess::getConfiguration(I2CPORT *configuration)
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -3748,18 +3995,17 @@ void AFEDataAccess::saveConfiguration(I2CPORT *configuration)
   File configFile;
 #ifdef AFE_ESP32
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_I2C_CONFIGURATION),
-               id)) {
+               id))
+  {
 #else
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_I2C_CONFIGURATION),
-               AFE_NONE)) {
+               AFE_NONE))
+  {
 #endif
 
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
-
-
-
 
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_I2C> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
@@ -3783,7 +4029,8 @@ void AFEDataAccess::saveConfiguration(I2CPORT *configuration)
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createI2CConfigurationFile() {
+void AFEDataAccess::createI2CConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_I2C_CONFIGURATION));
 #endif
@@ -3805,10 +4052,12 @@ void AFEDataAccess::createI2CConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_I2C
 
 #ifdef AFE_CONFIG_HARDWARE_BMEX80
-void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_BMX680_CONFIGURATION), id, false)) {
+               F(AFE_FILE_BMX680_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -3818,7 +4067,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BMEX80> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -3880,7 +4130,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -3891,10 +4142,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, BMEX80 *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_BMX680_CONFIGURATION), id)) {
+               F(AFE_FILE_BMX680_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -3962,7 +4215,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, BMEX80 *configuration) {
 #endif
 };
 
-void AFEDataAccess::createBMEX80SensorConfigurationFile() {
+void AFEDataAccess::createBMEX80SensorConfigurationFile()
+{
 
   BMEX80 configuration;
   configuration.type = AFE_BMX_UNKNOWN_SENSOR;
@@ -4002,7 +4256,8 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BMEX80; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_BMX680_CONFIGURATION), i);
 #endif
@@ -4015,11 +4270,13 @@ void AFEDataAccess::createBMEX80SensorConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_BH1750
 boolean AFEDataAccess::getConfiguration(uint8_t id,
-                                        BH1750_CONFIG *configuration) {
+                                        BH1750_CONFIG *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_BH1750_CONFIGURATION), id, false)) {
+               F(AFE_FILE_BH1750_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -4030,7 +4287,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BH1750> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -4058,7 +4316,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_BH1750, jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
@@ -4066,7 +4326,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
     }
 
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -4075,10 +4337,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      BH1750_CONFIG *configuration) {
+                                      BH1750_CONFIG *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_BH1750_CONFIGURATION), id)) {
+               F(AFE_FILE_BH1750_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4114,7 +4378,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
   }
 }
 
-void AFEDataAccess::createBH1750SensorConfigurationFile() {
+void AFEDataAccess::createBH1750SensorConfigurationFile()
+{
   BH1750_CONFIG configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_INTERVAL;
   configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
@@ -4129,7 +4394,8 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
   configuration.mode = AFE_CONFIG_HARDWARE_BH1750_DEFAULT_MODE;
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BH1750; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_BH1750_CONFIGURATION), i);
 #endif
@@ -4141,10 +4407,12 @@ void AFEDataAccess::createBH1750SensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_BH1750
 
 #ifdef AFE_CONFIG_HARDWARE_AS3935
-void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_AS3935_CONFIGURATION), id, false)) {
+               F(AFE_FILE_AS3935_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -4155,7 +4423,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_AS3935> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -4183,7 +4452,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -4195,10 +4465,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, AS3935 *configuration) {
 #endif
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_AS3935_CONFIGURATION), id)) {
+               F(AFE_FILE_AS3935_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4237,7 +4509,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, AS3935 *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createAS3935SensorConfigurationFile() {
+void AFEDataAccess::createAS3935SensorConfigurationFile()
+{
   AS3935 configuration;
 
   configuration.irqGPIO = AFE_CONFIG_HARDWARE_AS3935_DEFAULT_GPIO;
@@ -4257,7 +4530,8 @@ void AFEDataAccess::createAS3935SensorConfigurationFile() {
 #endif
   configuration.unit = AFE_DISTANCE_KM;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_AS3935; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_AS3935_CONFIGURATION), i);
 #endif
@@ -4268,10 +4542,12 @@ void AFEDataAccess::createAS3935SensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_AS3935
 
 #ifdef AFE_CONFIG_HARDWARE_DHT
-void AFEDataAccess::getConfiguration(uint8_t id, DHT_CONFIG *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, DHT_CONFIG *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -4281,7 +4557,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT_CONFIG *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_DHT> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -4338,7 +4615,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT_CONFIG *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -4350,10 +4628,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, DHT_CONFIG *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, DHT_CONFIG *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, DHT_CONFIG *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id)) {
+               F(AFE_FILE_DHT_SENSOR_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4402,7 +4682,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, DHT_CONFIG *configuration) {
 #endif
 }
 
-void AFEDataAccess::createDHTSensorConfigurationFile(void) {
+void AFEDataAccess::createDHTSensorConfigurationFile(void)
+{
   DHT_CONFIG configuration;
 
   configuration.gpio = AFE_CONFIG_HARDWARE_DHT_DEFAULT_GPIO;
@@ -4430,7 +4711,8 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void) {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_DHT; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_DHT_SENSOR_CONFIGURATION), i);
 #endif
@@ -4441,9 +4723,11 @@ void AFEDataAccess::createDHTSensorConfigurationFile(void) {
 
 #endif // AFE_CONFIG_HARDWARE_DHT
 
-IPAddress AFEDataAccess::IPfromString(const char *address) {
+IPAddress AFEDataAccess::IPfromString(const char *address)
+{
   IPAddress ip;
-  if (!ip.fromString(address)) {
+  if (!ip.fromString(address))
+  {
 #ifdef DEBUG
     Debugger->printError(F("Conversion from String to IP Address: "),
                          F("TOOLS"));
@@ -4455,11 +4739,13 @@ IPAddress AFEDataAccess::IPfromString(const char *address) {
 }
 
 #ifdef AFE_CONFIG_HARDWARE_ANEMOMETER
-boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
+boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -4469,7 +4755,8 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_ANEMOMETER> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -4493,7 +4780,9 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_ANEMOMETER, jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
 #ifdef DEBUG
       printJSONNotPharsed();
 #endif
@@ -4502,7 +4791,8 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
     configFile.close();
   }
 
-  else {
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -4511,10 +4801,12 @@ boolean AFEDataAccess::getConfiguration(ANEMOMETER *configuration) {
   return _ret;
 }
 
-void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
+void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION))) {
+               F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION)))
+  {
 
 #ifdef DEBUG
     printFileWritingInformation();
@@ -4547,7 +4839,8 @@ void AFEDataAccess::saveConfiguration(ANEMOMETER *configuration) {
 #endif
 }
 
-void AFEDataAccess::createAnemometerSensorConfigurationFile() {
+void AFEDataAccess::createAnemometerSensorConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_ANEMOMETER_SENSOR_CONFIGURATION));
 #endif
@@ -4573,11 +4866,13 @@ void AFEDataAccess::createAnemometerSensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_ANEMOMETER
 
 #ifdef AFE_CONFIG_HARDWARE_RAINMETER
-boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
+boolean AFEDataAccess::getConfiguration(RAINMETER *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION), AFE_NONE, false)) {
+               F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -4587,7 +4882,8 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RAINMETER> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -4608,14 +4904,18 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_RAINMETER, jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
 #ifdef DEBUG
       printJSONNotPharsed();
 #endif
       _ret = false;
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -4624,10 +4924,12 @@ boolean AFEDataAccess::getConfiguration(RAINMETER *configuration) {
   return _ret;
 }
 
-void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
+void AFEDataAccess::saveConfiguration(RAINMETER *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION))) {
+               F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4658,7 +4960,8 @@ void AFEDataAccess::saveConfiguration(RAINMETER *configuration) {
 #endif
 }
 
-void AFEDataAccess::createRainmeterSensorConfigurationFile() {
+void AFEDataAccess::createRainmeterSensorConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_RAINMETER_SENSOR_CONFIGURATION));
 #endif
@@ -4679,10 +4982,12 @@ void AFEDataAccess::createRainmeterSensorConfigurationFile() {
   saveConfiguration(&configuration);
 }
 
-void AFEDataAccess::get(RAINMETER_DATA *data) {
+void AFEDataAccess::get(RAINMETER_DATA *data)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_RAINMETER_SENSOR_DATA), AFE_NONE, false)) {
+               F(AFE_FILE_RAINMETER_SENSOR_DATA), AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -4692,13 +4997,15 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_RAINMETER_DATA> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
 
       data->index1h = root["index1h"];
-      for (uint8_t i = 0; i < 60; i++) {
+      for (uint8_t i = 0; i < 60; i++)
+      {
         data->last1h[i] = root["last1h"][i].as<float>();
       }
 
@@ -4707,7 +5014,8 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 #else
       data->index12h = root["index12h"];
       data->index24h = root["index24h"];
-      for (uint8_t i = 0; i < 12; i++) {
+      for (uint8_t i = 0; i < 12; i++)
+      {
         data->last12h[i] = root["last12h"][i].as<float>();
       }
 
@@ -4721,7 +5029,8 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -4733,10 +5042,12 @@ void AFEDataAccess::get(RAINMETER_DATA *data) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::save(RAINMETER_DATA *data) {
+void AFEDataAccess::save(RAINMETER_DATA *data)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_RAINMETER_SENSOR_DATA))) {
+               F(AFE_FILE_RAINMETER_SENSOR_DATA)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4779,19 +5090,22 @@ void AFEDataAccess::save(RAINMETER_DATA *data) {
 #endif
 }
 
-void AFEDataAccess::createRainmeterSensorDataConfigurationFile() {
+void AFEDataAccess::createRainmeterSensorDataConfigurationFile()
+{
 #ifdef DEBUG
   printFileCreatingInformation(F(AFE_FILE_RAINMETER_SENSOR_DATA));
 #endif
   RAINMETER_DATA data;
   data.index1h = 0;
-  for (uint8_t i = 0; i < 60; i++) {
+  for (uint8_t i = 0; i < 60; i++)
+  {
     data.last1h[i] = 0;
   }
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
   data.counter = 0;
 #else
-  for (uint8_t i = 0; i < 12; i++) {
+  for (uint8_t i = 0; i < 12; i++)
+  {
     data.last12h[i] = 0;
   }
   data.last24h[0] = 0;
@@ -4806,10 +5120,12 @@ void AFEDataAccess::createRainmeterSensorDataConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_RAINMETER
 
 #ifdef AFE_CONFIG_HARDWARE_BINARY_SENSOR
-void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -4819,7 +5135,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_BINARY_SENSOR> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -4854,7 +5171,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -4867,10 +5185,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, BINARY_SENSOR *configuration) {
 #endif
 }
 void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      BINARY_SENSOR *configuration) {
+                                      BINARY_SENSOR *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id)) {
+               F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -4910,7 +5230,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createBinarySensorConfigurationFile() {
+void AFEDataAccess::createBinarySensorConfigurationFile()
+{
   BINARY_SENSOR configuration;
   configuration.bouncing = AFE_HARDWARE_BINARY_SENSOR_DEFAULT_BOUNCING;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
@@ -4938,7 +5259,8 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
 #endif // AFE_CONFIG_API_DOMOTICZ_ENABLED
 
   for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_BINARY_SENSORS;
-       i++) {
+       i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_BINARY_SENSOR_CONFIGURATION), i);
 #endif
@@ -4950,10 +5272,12 @@ void AFEDataAccess::createBinarySensorConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_PN532_SENSOR
-void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id, false)) {
+               F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -4963,7 +5287,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_PN532_SENSOR> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -4994,7 +5319,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -5006,10 +5332,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #endif
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id)) {
+               F(AFE_FILE_PN532_SENSOR_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5050,7 +5378,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, PN532_SENSOR *configuration) {
 #endif
 }
 
-void AFEDataAccess::createPN532ConfigurationFile() {
+void AFEDataAccess::createPN532ConfigurationFile()
+{
   PN532_SENSOR configuration;
   sprintf(configuration.name, (const char *)F("pn532"));
   configuration.interface = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -5073,7 +5402,8 @@ void AFEDataAccess::createPN532ConfigurationFile() {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_PN532; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_PN532_SENSOR_CONFIGURATION), i);
 #endif
@@ -5082,10 +5412,12 @@ void AFEDataAccess::createPN532ConfigurationFile() {
   }
 }
 
-void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
+void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id, false)) {
+               F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -5095,7 +5427,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MIFARE_CARD> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -5106,7 +5439,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
       sprintf(configuration->cardId, root["cardId"] | "");
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-      for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
+      for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++)
+      {
         configuration->domoticz[i].idx = root["idx"][i].as<int>();
       }
 #else
@@ -5119,7 +5453,8 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 #endif
     }
 #ifdef DEBUG
-    else {
+    else
+    {
       printJSONNotPharsed();
     }
 #endif
@@ -5131,10 +5466,12 @@ void AFEDataAccess::getConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 #endif
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id)) {
+               F(AFE_FILE_MIFARE_CARD_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5150,7 +5487,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
     root["sendAsSwitch"] = configuration->sendAsSwitch;
     root["howLongKeepState"] = configuration->howLongKeepState;
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
+    for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++)
+    {
       jsonIdx.add(configuration->domoticz[i].idx);
     }
 #else
@@ -5172,7 +5510,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MIFARE_CARD *configuration) {
 #endif
 }
 
-void AFEDataAccess::createMiFareCardConfigurationFile() {
+void AFEDataAccess::createMiFareCardConfigurationFile()
+{
   MIFARE_CARD configuration;
   configuration.relayId = AFE_HARDWARE_ITEM_NOT_EXIST;
   configuration.action = AFE_HARDWARE_ITEM_NOT_EXIST;
@@ -5182,14 +5521,16 @@ void AFEDataAccess::createMiFareCardConfigurationFile() {
       AFE_HARDWARE_MIFARE_CARD_DEFAULT_HOW_LONG_KEEP_STATE;
 
 #if AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
-  for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++) {
+  for (uint8_t i = 0; i < AFE_HARDWARE_PN532_TAG_SIZE; i++)
+  {
     configuration.domoticz[i].idx = AFE_DOMOTICZ_DEFAULT_IDX;
   }
 #else
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MIFARE_CARDS; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_MIFARE_CARD_CONFIGURATION), i);
 #endif
@@ -5201,11 +5542,13 @@ void AFEDataAccess::createMiFareCardConfigurationFile() {
 #endif
 
 #ifdef AFE_CONFIG_HARDWARE_CLED
-boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
+boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_LED_CONFIGURATION),
-               id, false)) {
+               id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -5215,7 +5558,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -5248,16 +5592,22 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
           exists.success() ? root["eIdx"] : AFE_DOMOTICZ_DEFAULT_IDX;
 #else
       exists = root["cMqttTopic"];
-      if (exists.success()) {
+      if (exists.success())
+      {
         sprintf(configuration->cled.topic, root["cMqttTopic"]);
-      } else {
+      }
+      else
+      {
         configuration->cled.topic[0] = AFE_EMPTY_STRING;
       }
 
       exists = root["eMqttTopic"];
-      if (exists.success()) {
+      if (exists.success())
+      {
         sprintf(configuration->effect.topic, root["eMqttTopic"]);
-      } else {
+      }
+      else
+      {
         configuration->effect.topic[0] = AFE_EMPTY_STRING;
       }
 
@@ -5274,7 +5624,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED, jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
@@ -5282,7 +5634,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -5290,10 +5644,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, CLED *configuration) {
 #endif
   return _ret;
 }
-void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING, F(AFE_FILE_LED_CONFIGURATION),
-               id, true)) {
+               id, true))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5337,7 +5693,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, CLED *configuration) {
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createCLEDConfigurationFile() {
+void AFEDataAccess::createCLEDConfigurationFile()
+{
   CLED configuration;
   /*
   configuration.chipset = 0;
@@ -5362,7 +5719,8 @@ void AFEDataAccess::createCLEDConfigurationFile() {
 #endif // AFE_FIRMWARE_API == AFE_FIRMWARE_API_STANDARD
 #endif // AFE_FIRMWARE_API == AFE_FIRMWARE_API_DOMOTICZ
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++)
+  {
     configuration.gpio = i == 0 ? AFE_CONFIG_HARDWARE_CLED_0_GPIO
                                 : AFE_CONFIG_HARDWARE_CLED_1_GPIO;
     AFE_FILE_LED_CONFIGURATION
@@ -5377,11 +5735,13 @@ void AFEDataAccess::createCLEDConfigurationFile() {
 
 /* RGB LED Blinking Effect */
 boolean AFEDataAccess::getConfiguration(uint8_t id,
-                                        CLED_EFFECT_BLINKING *configuration) {
+                                        CLED_EFFECT_BLINKING *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id, false)) {
+               F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -5391,7 +5751,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -5412,7 +5773,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_BLINKING,
                           jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
@@ -5420,7 +5783,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -5429,10 +5794,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      CLED_EFFECT_BLINKING *configuration) {
+                                      CLED_EFFECT_BLINKING *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id)) {
+               F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5471,7 +5838,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 }
 
-void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
+void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile()
+{
   CLED_EFFECT_BLINKING configuration;
   configuration.on.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
@@ -5488,7 +5856,8 @@ void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
   configuration.offTimeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_BINKING_DEFAULT_OFF_TIMER;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++)
+  {
     sprintf(configuration.name, "BLINK-%d", i + 1);
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_CLED_EFFECT_BLINKING_CONFIGURATION),
@@ -5500,11 +5869,13 @@ void AFEDataAccess::createCLEDEffectBlinkingConfigurationFile() {
 
 /* RGB LED Wave Effect */
 boolean AFEDataAccess::getConfiguration(uint8_t id,
-                                        CLED_EFFECT_WAVE *configuration) {
+                                        CLED_EFFECT_WAVE *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id, false)) {
+               F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -5514,7 +5885,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -5533,7 +5905,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_WAVE,
                           jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
@@ -5541,7 +5915,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -5550,10 +5926,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      CLED_EFFECT_WAVE *configuration) {
+                                      CLED_EFFECT_WAVE *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id)) {
+               F(AFE_FILE_CLED_EFFECT_WAVE_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5589,7 +5967,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
   }
 }
 
-void AFEDataAccess::createCLEDEffectWaveConfigurationFile() {
+void AFEDataAccess::createCLEDEffectWaveConfigurationFile()
+{
   CLED_EFFECT_WAVE configuration;
   configuration.on.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.on.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
@@ -5602,9 +5981,11 @@ void AFEDataAccess::createCLEDEffectWaveConfigurationFile() {
   configuration.timeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_WAVE_DEFAULT_WAVE_TIMEOUT;
 
-  Serial << endl << F("INFO: Creating CLED EFFECT Wave configuration file");
+  Serial << endl
+         << F("INFO: Creating CLED EFFECT Wave configuration file");
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++)
+  {
     sprintf(configuration.name, "WAVE-%d", i + 1);
     saveConfiguration(i, &configuration);
 #ifdef DEBUG
@@ -5615,11 +5996,13 @@ void AFEDataAccess::createCLEDEffectWaveConfigurationFile() {
 
 /* RGB LED Fade In/Out Effect */
 boolean AFEDataAccess::getConfiguration(uint8_t id,
-                                        CLED_EFFECT_FADE_INOUT *configuration) {
+                                        CLED_EFFECT_FADE_INOUT *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id, false)) {
+               F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -5629,7 +6012,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -5646,7 +6030,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_CLED_EFFECT_FADE_INOUT,
                           jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
@@ -5654,7 +6040,9 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -5663,10 +6051,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
   return _ret;
 }
 void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      CLED_EFFECT_FADE_INOUT *configuration) {
+                                      CLED_EFFECT_FADE_INOUT *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id)) {
+               F(AFE_FILE_CLED_EFFECT_FADE_INOUT_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5701,7 +6091,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
 #endif
 }
 
-void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile() {
+void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile()
+{
   CLED_EFFECT_FADE_INOUT configuration;
   configuration.in.color.red = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
   configuration.in.color.green = AFE_CONFIG_HARDWARE_CLED_DEFAULT_ON_COLOR;
@@ -5713,7 +6104,8 @@ void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile() {
   configuration.timeout =
       AFE_CONFIG_HARDWARE_CLED_EFFECT_FADE_IN_OUT_DEFAULT_FADE_TIMEOUT;
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_CLED_STRIPS; i++)
+  {
     sprintf(configuration.name, "FADE-%d", i + 1);
 #ifdef DEBUG
     printFileCreatingInformation(
@@ -5725,11 +6117,13 @@ void AFEDataAccess::createCLEDEffectFadeInOutConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_CLED
 
 #ifdef AFE_CONFIG_HARDWARE_TSL2561
-boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
+boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_TSL2561_CONFIGURATION), id, false)) {
+               F(AFE_FILE_TSL2561_CONFIGURATION), id, false))
+  {
 
 #ifdef DEBUG
     printFileContentInformation();
@@ -5741,7 +6135,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_TSL2561> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -5777,14 +6172,18 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_TSL2561, jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -5793,10 +6192,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, TSL2561 *configuration) {
   return _ret;
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_TSL2561_CONFIGURATION), id)) {
+               F(AFE_FILE_TSL2561_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5841,7 +6242,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, TSL2561 *configuration) {
 #endif
 }
 
-void AFEDataAccess::createTSL2561SensorConfigurationFile() {
+void AFEDataAccess::createTSL2561SensorConfigurationFile()
+{
   TSL2561 configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_TSL2561_DEFAULT_INTERVAL;
   configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
@@ -5861,7 +6263,8 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_TSL2561; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_TSL2561_CONFIGURATION), i);
 #endif
@@ -5873,11 +6276,13 @@ void AFEDataAccess::createTSL2561SensorConfigurationFile() {
 #endif // AFE_CONFIG_HARDWARE_TSL2561
 
 #ifdef AFE_CONFIG_HARDWARE_MCP23XXX
-boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
+boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_MCP23XXX_CONFIGURATION), id, false)) {
+               F(AFE_FILE_MCP23XXX_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -5888,7 +6293,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_MCP23XXX> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -5904,14 +6310,18 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_MCP23XXX, jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -5920,10 +6330,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id, MCP23XXX *configuration) {
   return _ret;
 }
 
-void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration) {
+void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_MCP23XXX_CONFIGURATION), id)) {
+               F(AFE_FILE_MCP23XXX_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -5953,7 +6365,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id, MCP23XXX *configuration) {
 #endif
 }
 
-void AFEDataAccess::createMCP23XXXConfigurationFile() {
+void AFEDataAccess::createMCP23XXXConfigurationFile()
+{
   MCP23XXX configuration;
   configuration.address = AFE_HARDWARE_ITEM_NOT_EXIST;
 
@@ -5961,7 +6374,8 @@ void AFEDataAccess::createMCP23XXXConfigurationFile() {
   configuration.wirePortId = AFE_HARDWARE_ITEM_NOT_EXIST;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MCP23017; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_MCP23017; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_MCP23XXX_CONFIGURATION), i);
 #endif
@@ -5973,11 +6387,13 @@ void AFEDataAccess::createMCP23XXXConfigurationFile() {
 
 #ifdef AFE_CONFIG_HARDWARE_FS3000
 boolean AFEDataAccess::getConfiguration(uint8_t id,
-                                        FS3000_CONFIG *configuration) {
+                                        FS3000_CONFIG *configuration)
+{
   boolean _ret = true;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING,
-               F(AFE_FILE_FS3000_CONFIGURATION), id, false)) {
+               F(AFE_FILE_FS3000_CONFIGURATION), id, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -5988,7 +6404,8 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
     StaticJsonBuffer<AFE_CONFIG_FILE_BUFFER_FS3000> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
 
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -6024,14 +6441,18 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 #ifdef DEBUG
       printBufforSizeInfo(AFE_CONFIG_FILE_BUFFER_FS3000, jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = false;
 #ifdef DEBUG
       printJSONNotPharsed();
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     _ret = false;
   }
 #ifdef DEBUG
@@ -6041,10 +6462,12 @@ boolean AFEDataAccess::getConfiguration(uint8_t id,
 }
 
 void AFEDataAccess::saveConfiguration(uint8_t id,
-                                      FS3000_CONFIG *configuration) {
+                                      FS3000_CONFIG *configuration)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_FS3000_CONFIGURATION), id)) {
+               F(AFE_FILE_FS3000_CONFIGURATION), id))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -6089,7 +6512,8 @@ void AFEDataAccess::saveConfiguration(uint8_t id,
   Debugger->printHeader(1, 1, 72, AFE_DEBUG_HEADER_TYPE_DASH);
 #endif
 }
-void AFEDataAccess::createFS3000SensorConfigurationFile() {
+void AFEDataAccess::createFS3000SensorConfigurationFile()
+{
   FS3000_CONFIG configuration;
   configuration.interval = AFE_CONFIG_HARDWARE_FS3000_DEFAULT_INTERVAL;
   configuration.i2cAddress = AFE_CONFIG_HARDWARE_I2C_DEFAULT_NON_EXIST_ADDRESS;
@@ -6109,7 +6533,8 @@ void AFEDataAccess::createFS3000SensorConfigurationFile() {
   configuration.mqtt.topic[0] = AFE_EMPTY_STRING;
 #endif
 
-  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_FS3000; i++) {
+  for (uint8_t i = 0; i < AFE_CONFIG_HARDWARE_MAX_NUMBER_OF_FS3000; i++)
+  {
 #ifdef DEBUG
     printFileCreatingInformation(F(AFE_FILE_FS3000_CONFIGURATION), i);
 #endif
@@ -6120,11 +6545,13 @@ void AFEDataAccess::createFS3000SensorConfigurationFile() {
 }
 #endif // AFE_CONFIG_HARDWARE_FS3000
 
-uint16_t AFEDataAccess::getRebootCounter(boolean increase) {
+uint16_t AFEDataAccess::getRebootCounter(boolean increase)
+{
   uint16_t _ret = 1;
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_READING, F(AFE_FILE_REBOOTS_COUNTER),
-               AFE_NONE, false)) {
+               AFE_NONE, false))
+  {
 #ifdef DEBUG
     printFileContentInformation();
 #endif
@@ -6134,7 +6561,8 @@ uint16_t AFEDataAccess::getRebootCounter(boolean increase) {
     configFile.readBytes(buf.get(), size);
     StaticJsonBuffer<AFE_FILE_BUFFER_REBOOTS_COUNTER> jsonBuffer;
     JsonObject &root = jsonBuffer.parseObject(buf.get());
-    if (root.success()) {
+    if (root.success())
+    {
 #ifdef DEBUG
       root.printTo(Serial);
 #endif
@@ -6144,27 +6572,34 @@ uint16_t AFEDataAccess::getRebootCounter(boolean increase) {
 #ifdef DEBUG
       printBufforSizeInfo(AFE_FILE_BUFFER_REBOOTS_COUNTER, jsonBuffer.size());
 #endif
-    } else {
+    }
+    else
+    {
       _ret = 0;
 #ifdef DEBUG
       printJSONNotPharsed();
 #endif
     }
     configFile.close();
-  } else {
+  }
+  else
+  {
     saveRebootCounter(0);
     _ret = 0;
   }
-  if (increase) {
+  if (increase)
+  {
     saveRebootCounter(_ret + 1);
   }
   return _ret;
 }
 
-void AFEDataAccess::saveRebootCounter(unsigned long counter) {
+void AFEDataAccess::saveRebootCounter(unsigned long counter)
+{
   File configFile;
   if (openFile(configFile, AFE_OPEN_FILE_WRITING,
-               F(AFE_FILE_REBOOTS_COUNTER))) {
+               F(AFE_FILE_REBOOTS_COUNTER)))
+  {
 #ifdef DEBUG
     printFileWritingInformation();
 #endif
@@ -6193,50 +6628,61 @@ void AFEDataAccess::saveRebootCounter(unsigned long counter) {
 
 #ifdef DEBUG
 
-void AFEDataAccess::addReference(AFEDebugger *_Debugger) {
+void AFEDataAccess::addReference(AFEDebugger *_Debugger)
+{
   Debugger = _Debugger;
 }
 
 void AFEDataAccess::printBufforSizeInfo(uint16_t bufferSize,
-                                        uint16_t jsonSize) {
+                                        uint16_t jsonSize)
+{
 
   Debugger->printBulletPoint(F("Buffer size: "));
   Serial << bufferSize;
   Debugger->printValue(F(", actual JSON size: "));
   Serial << jsonSize;
-  if (jsonSize > bufferSize - 10 && jsonSize < bufferSize) {
+  if (jsonSize > bufferSize - 10 && jsonSize < bufferSize)
+  {
     Debugger->printBulletPoint(F("Warn: "));
     Debugger->printValue(F("Buffor might be too small"));
-  } else if (jsonSize > bufferSize) {
+  }
+  else if (jsonSize > bufferSize)
+  {
     Debugger->printBulletPoint(F("Error: "));
     Debugger->printValue(F("Buffor is too small"));
   }
 }
 
-void AFEDataAccess::printFileWritingInformation() {
+void AFEDataAccess::printFileWritingInformation()
+{
   Debugger->printBulletPoint(F("Writing: "));
 }
 
-void AFEDataAccess::printFileContentInformation() {
+void AFEDataAccess::printFileContentInformation()
+{
   Debugger->printBulletPoint(F("Content: "));
 }
 
-void AFEDataAccess::printJSONNotPharsed() {
+void AFEDataAccess::printJSONNotPharsed()
+{
   Debugger->printBulletPoint(F("Error: JSON not pharsed"));
 }
 
 void AFEDataAccess::printFileCreatingInformation(
-    const __FlashStringHelper *fileName, uint8_t id) {
+    const __FlashStringHelper *fileName, uint8_t id)
+{
   Debugger->printInformation(F("Creating file: "), F("FS"), 2);
   Serial << fileName;
-  if (id != AFE_NONE) {
+  if (id != AFE_NONE)
+  {
     Serial << F(" (Id: ") << id << F(")");
   }
 }
 
 #endif // DEBUG
 
-boolean AFEDataAccess::initializeFileSystem() {
+boolean AFEDataAccess::initializeFileSystem()
+{
   boolean _ret;
 #ifdef DEBUG
   Debugger->printBulletPoint(F("Mounting file system: "));
@@ -6246,31 +6692,36 @@ boolean AFEDataAccess::initializeFileSystem() {
   _ret = LITTLEFS.begin();
 #else
   _ret = SPIFFS.begin();
-  if (_ret) {
+  if (_ret)
+  {
     yield();
     SPIFFS.gc();
   }
 #endif
 
 #ifdef DEBUG
-  if (_ret) {
+  if (_ret)
+  {
     Debugger->printValue(F("OK"));
-  } else {
+  }
+  else
+  {
     Debugger->printValue(F("FAILURE"));
   }
 #endif
 
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS
-  if (_ret) {
+  if (_ret)
+  {
     checkIfFolderExists(AFE_FILE_LOG_DIR);
   }
-#endif  
-
+#endif
 
   return _ret;
 }
 
-boolean AFEDataAccess::setDefaultConfiguration() {
+boolean AFEDataAccess::setDefaultConfiguration()
+{
   boolean _ret = false;
 /* Turning devicve LED on */
 #ifdef AFE_CONFIG_HARDWARE_LED
@@ -6282,7 +6733,8 @@ boolean AFEDataAccess::setDefaultConfiguration() {
   digitalWrite(AFE_CONFIG_HARDWARE_LED_0_DEFAULT_GPIO, LOW);
 #endif
 
-  if (formatFileSystem()) {
+  if (formatFileSystem())
+  {
 
     /* Initializatin of the FS */
     initializeFileSystem();
@@ -6409,13 +6861,14 @@ boolean AFEDataAccess::setDefaultConfiguration() {
 #endif // AFE_CONFIG_HARDWARE_MCP23XXX
 
 #ifdef AFE_CONFIG_HARDWARE_FS3000
-  createFS3000SensorConfigurationFile();
+    createFS3000SensorConfigurationFile();
 #endif
 
     _ret = true;
   }
 #ifdef DEBUG
-  else {
+  else
+  {
     Debugger->printError(F("Formating failed"), F("FS"));
   }
 #endif
