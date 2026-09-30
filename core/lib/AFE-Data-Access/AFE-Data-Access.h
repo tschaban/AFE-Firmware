@@ -14,7 +14,8 @@
 
 #ifdef AFE_ESP32
 
-#include <LITTLEFS.h>
+#include <LittleFS.h>
+#define LITTLEFS LittleFS
 #include <WiFi.h>
 
 #else /* ESP8266 */

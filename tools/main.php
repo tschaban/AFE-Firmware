@@ -4,12 +4,15 @@
 
 $gzipPathExe                = "\"C:/Program Files (x86)/GnuWin32/bin/gzip.exe\" -9f ";
 $subFolderForCommpressedLib = "/compressed.versions";
+$platformioBuildPath        = dirname(__DIR__) . "/.pio/build/";
+$rootPath                   = "D:/Adrian/Desktop/";
+$bootloadersPath            = __DIR__ . "/esp32.bootloaders";
 
 /* Set this before run */
 
 $type        = "0";
 $version     = "3.8.0";
-$language    = "pl";
+$language    = "en";
 $development = false;
 
 /**
@@ -41,7 +44,7 @@ function copyFolder($src, $dst)
 
                 // Recursively calling custom copy function
                 // for sub directory
-                copy_folder($src . '/' . $file, $dst . '/' . $file);
+                copyFolder($src . '/' . $file, $dst . '/' . $file);
 
             } else {
                 copy($src . '/' . $file, $dst . '/' . $file);
@@ -62,9 +65,16 @@ echo "\nCreating folders structure";
 if (! file_exists($targetFolder)) {
     mkdir($targetFolder);
     createdIndexFile($targetFolder);
+}
+
+if (! is_dir($bootloadersPath)) {
+    throw new RuntimeException("ESP32 bootloader source directory does not exist: " . $bootloadersPath);
+}
+
+$bootloaderTarget = $targetFolder . "/esp32.bootloaders";
+if (count(glob($bootloaderTarget . "/*.bin")) < count(glob($bootloadersPath . "/*.bin"))) {
     echo "\nCopying bootloaders";
-    mkdir($targetFolder . "/esp32.bootloaders");
-    copyFolder("esp32.bootloaders", $targetFolder . "/esp32.bootloaders");
+    copyFolder($bootloadersPath, $bootloaderTarget);
 }
 
 foreach ($targetLanguage as &$targetLanguageFolder) {

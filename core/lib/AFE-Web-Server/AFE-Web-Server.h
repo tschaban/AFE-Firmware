@@ -67,7 +67,7 @@ private:
    */
   unsigned long howLongInConfigMode = 0;
 
-  AFESitesGenerator *Site = new AFESitesGenerator(Firmware,Hardware);
+  AFESitesGenerator *Site;
 
 
   boolean upgradeSuccess = false;

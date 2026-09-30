@@ -145,7 +145,10 @@ void AFESitesGenerator::generateMenu(String &page, uint16_t redirect)
 
 /* Relay */
 #ifdef AFE_CONFIG_HARDWARE_RELAY
-  if (Firmware->Device->configuration.noOfRelays > 0)
+  // Relay instances are initialized only in normal mode.  Configuration and
+  // HotSpot modes still render the menu, so they must not dereference them.
+  if (Firmware->Device->getMode() == AFE_MODE_NORMAL &&
+      Firmware->Device->configuration.noOfRelays > 0)
   {
     addMenuHeaderItem(page, F(L_RELAYS_CONFIGURATION));
     for (uint8_t i = 0; i < Firmware->Device->configuration.noOfRelays; i++)

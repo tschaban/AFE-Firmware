@@ -352,6 +352,12 @@
 #define L_UPGRADE_NO_SPACE "Upgrade failed. Not enough space to begin upgrade"
 #define L_UPGRADE_NO_CONTENT "Upgrade failed. Problem with firmware server [Error: No response]"
 
+/* Site Logs */
+#define L_LOG_FILES "Log files"
+#define L_LOG_FILES_INFO "Select a file to download"
+#define L_LOG_DELETE "Delete all logs"
+#define L_LOG_LATEST "Today's logs"
+
 
 
 

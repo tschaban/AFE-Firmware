@@ -15,7 +15,10 @@ extern "C" {
 #include <Streaming.h>
 
 #ifdef AFE_ESP32
-#include <LITTLEFS.h>
+#include <LittleFS.h>
+#ifndef LITTLEFS
+#define LITTLEFS LittleFS
+#endif
 #else /* ESP8266 */
 #include <FS.h>
 #if AFE_FILE_SYSTEM == AFE_FS_LITTLEFS

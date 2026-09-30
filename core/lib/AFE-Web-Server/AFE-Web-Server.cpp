@@ -5,6 +5,7 @@
 AFEWebServer::AFEWebServer(AFEFirmware *_Firmware, AFEHardware *_Hardware) {
   Firmware = _Firmware;
   Hardware = _Hardware;
+  Site = new AFESitesGenerator(Firmware, Hardware);
 }
 
 void AFEWebServer::begin() {
@@ -1451,137 +1452,46 @@ void AFEWebServer::get(DEVICE &data) {
 }
 
 void AFEWebServer::get(NETWORK &data) {
-
-  if (server.arg(F("s")).length() > 0) {
-    server.arg(F("s")).toCharArray(data.primary.ssid,
-                                   sizeof(data.primary.ssid));
-  } else {
-    data.primary.ssid[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("sb")).length() > 0) {
-    server.arg(F("sb")).toCharArray(data.secondary.ssid,
-                                    sizeof(data.secondary.ssid));
-  } else {
-    data.secondary.ssid[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("p")).length() > 0) {
-    server.arg(F("p")).toCharArray(data.primary.password,
-                                   sizeof(data.primary.password));
-  } else {
-    data.primary.password[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("pb")).length() > 0) {
-    server.arg(F("pb")).toCharArray(data.secondary.password,
-                                    sizeof(data.secondary.password));
-  } else {
-    data.secondary.password[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i1")).length() > 0) {
-    server.arg(F("i1")).toCharArray(data.primary.ip, sizeof(data.primary.ip));
-  } else {
-    data.primary.ip[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i2")).length() > 0) {
-    server.arg(F("i2")).toCharArray(data.primary.gateway,
-                                    sizeof(data.primary.gateway));
-  } else {
-    data.primary.gateway[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i3")).length() > 0) {
-    server.arg(F("i3")).toCharArray(data.primary.subnet,
-                                    sizeof(data.primary.subnet));
-  } else {
-    data.primary.subnet[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i4")).length() > 0) {
-    server.arg(F("i4")).toCharArray(data.primary.dns1,
-                                    sizeof(data.primary.dns1));
-  } else {
-    data.primary.dns1[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i5")).length() > 0) {
-    server.arg(F("i5")).toCharArray(data.primary.dns2,
-                                    sizeof(data.primary.dns2));
-  } else {
-    data.primary.dns2[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i1b")).length() > 0) {
-    server.arg(F("i1b")).toCharArray(data.secondary.ip,
-                                     sizeof(data.secondary.ip));
-  } else {
-    data.secondary.ip[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i2b")).length() > 0) {
-    server.arg(F("i2b")).toCharArray(data.secondary.gateway,
-                                     sizeof(data.secondary.gateway));
-  } else {
-    data.secondary.gateway[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i3b")).length() > 0) {
-    server.arg(F("i3b")).toCharArray(data.secondary.subnet,
-                                     sizeof(data.secondary.subnet));
-  } else {
-    data.secondary.subnet[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i4b")).length() > 0) {
-    server.arg(F("i4b")).toCharArray(data.secondary.dns1,
-                                     sizeof(data.secondary.dns1));
-  } else {
-    data.secondary.dns1[0] = AFE_EMPTY_STRING;
-  }
-
-  if (server.arg(F("i5b")).length() > 0) {
-    server.arg(F("i5b")).toCharArray(data.secondary.dns2,
-                                     sizeof(data.secondary.dns2));
-  } else {
-    data.secondary.dns2[0] = AFE_EMPTY_STRING;
-  }
-
-  data.noConnectionAttempts =
-      server.arg(F("na")).length() > 0
-          ? server.arg(F("na")).toInt()
-          : AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
-
-  data.waitTimeConnections = server.arg(F("wc")).length() > 0
-                                 ? server.arg(F("wc")).toInt()
-                                 : AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME;
-
-  data.waitTimeSeries = server.arg(F("ws")).length() > 0
-                            ? server.arg(F("ws")).toInt()
-                            : AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES;
-
-  data.noFailuresToSwitchNetwork =
-      server.arg(F("fs")).length() > 0
-          ? server.arg(F("fs")).toInt()
-          : AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
-
-  data.primary.isDHCP = server.arg(F("d")).length() > 0 ? true : false;
-  data.secondary.isDHCP = server.arg(F("db")).length() > 0 ? true : false;
-
-  data.mDNSActive = server.arg(F("md")).length() > 0
-                        ? AFE_CONFIG_NETWORK_MDNS_ACTIVE
-                        : AFE_CONFIG_NETWORK_MDNS_INACTIVE;
-
+  data = {};
+  data.noConnectionAttempts = AFE_CONFIG_NETWORK_DEFAULT_CONNECTION_ATTEMPTS;
+  data.waitTimeConnections = AFE_CONFIG_NETWORK_DEFAULT_WAIT_TIME;
+  data.waitTimeSeries = AFE_CONFIG_NETWORK_DEFAULT_WAIT_SERIES;
+  data.noFailuresToSwitchNetwork = AFE_CONFIG_NETWORK_DEFAULT_SWITCH_NETWORK_AFTER;
 #if !defined(ESP32)
-  data.radioMode = server.arg(F("r")).length() > 0
-                       ? server.arg(F("r")).toInt()
-                       : AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
-  data.outputPower = server.arg(F("y")).length() > 0
-                         ? server.arg(F("y")).toFloat()
-                         : AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
+  data.radioMode = AFE_CONFIG_NETWORK_DEFAULT_RADIO_MODE;
+  data.outputPower = AFE_CONFIG_NETWORK_DEFAULT_OUTPUT_POWER;
 #endif
+
+  for (int argument = 0; argument < server.args(); ++argument) {
+    const String &name = server.argName(argument);
+    const String &value = server.arg(argument);
+
+    if (name == "s") value.toCharArray(data.primary.ssid, sizeof(data.primary.ssid));
+    else if (name == "sb") value.toCharArray(data.secondary.ssid, sizeof(data.secondary.ssid));
+    else if (name == "p") value.toCharArray(data.primary.password, sizeof(data.primary.password));
+    else if (name == "pb") value.toCharArray(data.secondary.password, sizeof(data.secondary.password));
+    else if (name == "i1") value.toCharArray(data.primary.ip, sizeof(data.primary.ip));
+    else if (name == "i2") value.toCharArray(data.primary.gateway, sizeof(data.primary.gateway));
+    else if (name == "i3") value.toCharArray(data.primary.subnet, sizeof(data.primary.subnet));
+    else if (name == "i4") value.toCharArray(data.primary.dns1, sizeof(data.primary.dns1));
+    else if (name == "i5") value.toCharArray(data.primary.dns2, sizeof(data.primary.dns2));
+    else if (name == "i1b") value.toCharArray(data.secondary.ip, sizeof(data.secondary.ip));
+    else if (name == "i2b") value.toCharArray(data.secondary.gateway, sizeof(data.secondary.gateway));
+    else if (name == "i3b") value.toCharArray(data.secondary.subnet, sizeof(data.secondary.subnet));
+    else if (name == "i4b") value.toCharArray(data.secondary.dns1, sizeof(data.secondary.dns1));
+    else if (name == "i5b") value.toCharArray(data.secondary.dns2, sizeof(data.secondary.dns2));
+    else if (name == "na") data.noConnectionAttempts = value.toInt();
+    else if (name == "wc") data.waitTimeConnections = value.toInt();
+    else if (name == "ws") data.waitTimeSeries = value.toInt();
+    else if (name == "fs") data.noFailuresToSwitchNetwork = value.toInt();
+    else if (name == "d") data.primary.isDHCP = true;
+    else if (name == "db") data.secondary.isDHCP = true;
+    else if (name == "md") data.mDNSActive = AFE_CONFIG_NETWORK_MDNS_ACTIVE;
+#if !defined(ESP32)
+    else if (name == "r") data.radioMode = value.toInt();
+    else if (name == "y") data.outputPower = value.toFloat();
+#endif
+  }
 }
 
 void AFEWebServer::get(MQTT &data) {
