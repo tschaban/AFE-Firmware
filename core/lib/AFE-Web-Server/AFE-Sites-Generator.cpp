@@ -1874,7 +1874,7 @@ void AFESitesGenerator::siteDHTSensor(String &page, uint8_t id)
   addListOfGPIOs(page, F("g"), configuration.gpio, "GPIO");
 
   /* Item: Name */
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", (const char *)F(L_NAME),
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "32");
 
   /* Item: type of the sensor */

@@ -10,9 +10,9 @@ $bootloadersPath            = __DIR__ . "/esp32.bootloaders";
 
 /* Set this before run */
 
-$type        = "1";
+$type        = "2";
 $version     = "3.8.0";
-$language    = "en";
+$language    = "pl";
 $development = false;
 
 /**
