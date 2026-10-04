@@ -175,7 +175,11 @@ void AFEDataAccess::getLogFileName(char *fileName)
 
 void AFEDataAccess::addLog(const char *log)
 {
-#ifndef DEBUG /* Logs are only saved for AFE Firmware when DEBUG is enabled */
+#if !defined(DEBUG) || !AFE_CONFIG_PERSISTENT_LOGS
+#ifdef DEBUG
+  Debugger->printBulletPoint(F("Log (flash persistence disabled): "));
+  Debugger->printValue(log);
+#endif
   return;
 #endif
   char fileName[strlen_P((PGM_P)F(AFE_FILE_LOGS)) + 1];

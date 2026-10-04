@@ -1790,7 +1790,7 @@ void AFESitesGenerator::siteDS18B20Sensor(String &page, uint8_t id)
   }
 
   /* Item: Name */
-  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", (const char *)F(L_NAME),
+  addInputFormItem(page, AFE_FORM_ITEM_TYPE_TEXT, "n", L_NAME,
                    configuration.name, "16");
 
   /* Item: Interval */

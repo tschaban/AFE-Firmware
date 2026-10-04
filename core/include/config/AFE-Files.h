@@ -21,6 +21,7 @@
 
 
 /* Max Log file content */
+#define AFE_CONFIG_PERSISTENT_LOGS 0 // 1: save runtime logs to flash, 0: Serial only
 #define AFE_LOG_FILE_MAX_SIZE_FOR_DISPLAY 9*1024 // @TODO Experimental not tested if the size isn't too much
 #define AFE_LOG_FILE_MAX_SIZE 64*1024 // Size after which log file is deleted
 
